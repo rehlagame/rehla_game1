@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حسابي - لعبة رحلة</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (if not already in style.css's HTML) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="logo">
+            <h1><a href="index.html">رحلة</a></h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="game.html">العب</a></li>
+                <li><a href="how-to-play.html">طريقة اللعب</a></li>
+                <li><a href="contact.html">تواصل معنا</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <!-- Placeholder - main.js سيملأ هذا -->
+        </div>
+    </div>
+</header>
+
+<main class="account-main-content new-account-layout">
+    <div class="container">
+        <div class="account-page-container">
+            <!-- الجزء الأيسر: الصورة والاسم والايميل وزر الخروج -->
+            <aside class="account-sidebar">
+                <div class="profile-summary">
+                    <div class="profile-picture-wrapper-logged">
+                        <img id="user-photo-logged" src="assets/images/default-avatar.png" alt="صورة الملف الشخصي" class="profile-picture-logged">
+                        <label for="photo-upload-logged" class="photo-upload-label-logged" title="تغيير الصورة">
+                            <i class="fas fa-camera"></i>
+                        </label>
+                        <input type="file" id="photo-upload-logged" accept="image/*" style="display: none;">
+                    </div>
+                    <h3 id="profile-summary-name">جار التحميل...</h3>
+                    <p id="profile-summary-email">جار التحميل...</p>
+                </div>
+                <button class="btn btn-logout-sidebar" id="logout-btn-sidebar">
+                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                </button>
+            </aside>
+
+            <!-- الجزء الأيمن: الألسنة والمحتوى -->
+            <section class="account-content">
+                <h2 class="account-title-main">حسابي</h2>
+                <div class="tabs-container">
+                    <div class="tab-nav">
+                        <button class="tab-link active" data-tab="profile-info-tab">حساب تعريفي</button>
+                        <button class="tab-link" data-tab="change-password-tab">تغيير كلمة المرور</button>
+                        <!-- يمكن إضافة ألسنة أخرى هنا -->
+                    </div>
+
+                    <div class="tab-content-wrapper">
+                        <!-- محتوى لسان: حساب تعريفي -->
+                        <div id="profile-info-tab" class="tab-content active">
+                            <form id="profile-info-form">
+                                <div class="form-row">
+                                    <div class="form-group-logged">
+                                        <label for="profile-first-name">الاسم الأول</label>
+                                        <input type="text" id="profile-first-name" name="firstName" placeholder="الاسم الأول" required>
+                                    </div>
+                                    <div class="form-group-logged">
+                                        <label for="profile-last-name">اسم العائلة</label>
+                                        <input type="text" id="profile-last-name" name="lastName" placeholder="اسم العائلة" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group-logged phone-group-logged">
+                                        <label for="profile-phone">رقم الهاتف</label>
+                                        <div class="phone-input-container-logged">
+                                            <select id="profile-country-code" name="countryCode" class="country-code-select-logged">
+                                                <option value="+965">Kuwait (+965)</option>
+                                                <option value="+966">KSA (+966)</option>
+                                                <option value="+971">UAE (+971)</option>
+                                                <option value="+973">Bahrain (+973)</option>
+                                                <option value="+974">Qatar (+974)</option>
+                                                <option value="+968">Oman (+968)</option>
+                                            </select>
+                                            <input type="tel" id="profile-phone" name="phone" placeholder="رقم الهاتف" required pattern="[0-9]{8,10}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group-logged">
+                                        <label for="profile-email">البريد الإلكتروني</label>
+                                        <input type="email" id="profile-email" name="email" placeholder="البريد الإلكتروني" readonly disabled>
+                                        <small>لتغيير البريد الإلكتروني، يرجى التواصل مع الدعم.</small>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-logged display-name-group-logged">
+                                    <label for="profile-display-name">اسم العرض (يظهر في اللعبة)</label>
+                                    <input type="text" id="profile-display-name" name="displayName" placeholder="اسم العرض">
+                                </div>
+
+
+                                <button type="submit" class="btn btn-save-changes-logged">حفظ التغييرات</button>
+                            </form>
+                            <div id="profile-update-success" class="form-message success" style="display:none;">تم تحديث البيانات بنجاح!</div>
+                            <div id="profile-update-error" class="form-message error" style="display:none;"></div>
+                        </div>
+
+                        <!-- محتوى لسان: تغيير كلمة المرور -->
+                        <div id="change-password-tab" class="tab-content">
+                            <h4>تغيير كلمة المرور</h4>
+                            <form id="change-password-form-logged">
+                                <div class="form-group-logged">
+                                    <label for="current-password">كلمة المرور الحالية</label>
+                                    <input type="password" id="current-password" name="currentPassword" placeholder="كلمة المرور الحالية" required>
+                                </div>
+                                <div class="form-group-logged">
+                                    <label for="new-password">كلمة المرور الجديدة</label>
+                                    <input type="password" id="new-password" name="newPassword" placeholder="6 أحرف على الأقل" required minlength="6">
+                                </div>
+                                <div class="form-group-logged">
+                                    <label for="confirm-new-password">تأكيد كلمة المرور الجديدة</label>
+                                    <input type="password" id="confirm-new-password" name="confirmNewPassword" placeholder="أعد إدخال كلمة المرور الجديدة" required>
+                                </div>
+                                <button type="submit" class="btn btn-save-changes-logged">تغيير كلمة المرور</button>
+                            </form>
+                            <div id="password-change-success" class="form-message success" style="display:none;">تم تغيير كلمة المرور بنجاح!</div>
+                            <div id="password-change-error" class="form-message error" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-danger btn-delete-account-logged">حذف الحساب نهائياً</button>
+            </section>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container footer-main-container">
+        <div class="footer-column footer-content-left">
+            <div class="app-store-icons">
+                <a href="#" class="app-icon-link" aria-label="Get it on Google Play"><i class="fab fa-android"></i></a>
+                <a href="#" class="app-icon-link" aria-label="Download on the App Store"><i class="fab fa-apple"></i></a>
+            </div>
+            <p class="developer-credit">
+                Developed by <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer">Google Gemini pro 2.5 </a>
+            </p>
+        </div>
+        <div class="footer-column footer-content-right">
+            <div class="social-media-icons">
+                <a href="#" class="social-icon-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon-link" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <p class="copyright-text">Copyright Rehla - All Rights Reserved 2025 <sup>®</sup></p>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/main.js" type="module"></script>
+</body>
+</html>

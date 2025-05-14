@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول / إنشاء حساب - لعبة رحلة</title>
+    <link rel="stylesheet" href="assets/css/style.css"> <!-- الربط بملف الأنماط العام -->
+    <link rel="stylesheet" href="assets/css/auth.css"> <!-- الربط بملف الأنماط الخاص بهذه الصفحة -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="logo">
+            <h1><a href="index.html">رحلة</a></h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="game.html">العب</a></li>
+                <li><a href="how-to-play.html">طريقة اللعب</a></li>
+                <li><a href="contact.html">تواصل معنا</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <a href="auth.html" class="btn btn-register">تسجيل / دخول</a>
+        </div>
+    </div>
+</header>
+
+<main class="auth-main-content">
+    <div class="container">
+        <div class="auth-container">
+            <div id="auth-error-message" class="auth-error" style="display: none;"></div>
+
+            <div class="form-wrapper">
+                <!-- قسم تسجيل الدخول (يظهر افتراضياً) -->
+                <div class="form-section" id="login-form">
+                    <h2>تسجيل الدخول</h2>
+                    <form id="login-email-form">
+                        <div class="input-group">
+                            <label for="login-email">البريد الإلكتروني</label>
+                            <input type="email" id="login-email" name="email" placeholder="ادخل بريدك الإلكتروني" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="login-password">كلمة المرور</label>
+                            <input type="password" id="login-password" name="password" placeholder="ادخل كلمة المرور" required>
+                        </div>
+                        <div class="form-options">
+                            <a href="#" class="forgot-password" id="show-forgot-password">نسيت كلمة المرور؟</a>
+                        </div>
+                        <button type="submit" class="btn btn-accent">تسجيل الدخول</button>
+                    </form>
+                    <p class="switch-form">
+                        ليس لديك حساب؟ <a href="#" id="show-register">أنشئ حسابًا جديدًا</a>
+                    </p>
+                </div>
+
+                <!-- قسم إنشاء حساب (مخفي افتراضياً) -->
+                <div class="form-section hidden" id="register-form">
+                    <h2>إنشاء حساب جديد</h2>
+                    <form id="register-email-form">
+                        <div class="input-row">
+                            <div class="input-group half-width">
+                                <label for="register-first-name">الاسم الأول</label>
+                                <input type="text" id="register-first-name" name="firstName" placeholder="مثال: محمد" required>
+                            </div>
+                            <div class="input-group half-width">
+                                <label for="register-last-name">اسم العائلة</label>
+                                <input type="text" id="register-last-name" name="lastName" placeholder="مثال: الأحمد" required>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="register-email">البريد الإلكتروني</label>
+                            <input type="email" id="register-email" name="email" placeholder="ادخل بريدك الإلكتروني" required>
+                        </div>
+
+                        <div class="input-group phone-group">
+                            <label for="register-phone">رقم الهاتف</label>
+                            <div class="phone-input-container">
+                                <select id="register-country-code" name="countryCode" class="country-code-select">
+                                    <option value="+965">Kuwait (+965)</option>
+                                    <option value="+966">KSA (+966)</option>
+                                    <option value="+971">UAE (+971)</option>
+                                    <option value="+973">Bahrain (+973)</option>
+                                    <option value="+974">Qatar (+974)</option>
+                                    <option value="+968">Oman (+968)</option>
+                                </select>
+                                <input type="tel" id="register-phone" name="phone" placeholder="مثال: 95550154" required pattern="[0-9]{8,10}">
+                            </div>
+                        </div>
+
+
+                        <div class="input-group">
+                            <label for="register-password">كلمة المرور</label>
+                            <input type="password" id="register-password" name="password" placeholder="6 أحرف على الأقل" required minlength="6">
+                        </div>
+                        <div class="input-group">
+                            <label for="register-confirm-password">تأكيد كلمة المرور</label>
+                            <input type="password" id="register-confirm-password" name="confirm_password" placeholder="أعد إدخال كلمة المرور" required>
+                        </div>
+                        <button type="submit" class="btn btn-accent">إنشاء الحساب</button>
+                    </form>
+                    <p class="switch-form">
+                        لديك حساب بالفعل؟ <a href="#" class="show-login-trigger">تسجيل الدخول</a>
+                    </p>
+                </div>
+
+                <!-- قسم نسيت كلمة المرور (مخفي افتراضياً) -->
+                <div class="form-section hidden" id="forgot-password-form">
+                    <h2>استعادة كلمة المرور</h2>
+                    <p class="reset-instructions">
+                        أدخل بريدك الإلكتروني المسجل، وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.
+                    </p>
+                    <form id="reset-password-form">
+                        <div class="input-group">
+                            <label for="reset-email">البريد الإلكتروني</label>
+                            <input type="email" id="reset-email" name="email" placeholder="ادخل بريدك الإلكتروني المسجل" required>
+                        </div>
+                        <button type="submit" class="btn btn-accent">إرسال رابط إعادة التعيين</button>
+                    </form>
+                    <p id="reset-success-message" class="auth-success" style="display: none;">تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني.</p>
+                    <p class="switch-form">
+                        تذكرت كلمة المرور؟ <a href="#" class="show-login-trigger">العودة إلى تسجيل الدخول</a>
+                    </p>
+                </div>
+
+                <div class="social-login-divider">
+                    <span>أو سجل الدخول بواسطة</span>
+                </div>
+
+                <div class="social-login-buttons">
+                    <button type="button" class="btn-social-img" id="google-signin-btn" aria-label="تسجيل الدخول بواسطة Google">
+                        <img src="assets/images/Google-logo.png" alt="شعار Google" class="social-logo-img">
+                    </button>
+                    <button type="button" class="btn btn-social btn-apple" id="apple-signin-btn">
+                        <img src="assets/images/apple-logo.png" alt="Apple" class="social-icon apple-icon">
+                        Apple
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container footer-main-container">
+        <div class="footer-column footer-content-left">
+            <div class="app-store-icons">
+                <a href="#" class="app-icon-link" aria-label="Get it on Google Play"><i class="fab fa-android"></i></a>
+                <a href="#" class="app-icon-link" aria-label="Download on the App Store"><i class="fab fa-apple"></i></a>
+            </div>
+            <p class="developer-credit">
+                Developed by <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer">Google Gemini pro 2.5 </a>
+            </p>
+        </div>
+        <div class="footer-column footer-content-right">
+            <div class="social-media-icons">
+                <a href="#" class="social-icon-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="social-icon-link" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <p class="copyright-text">Copyright Rehla - All Rights Reserved 2025 <sup>®</sup></p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
+        const showRegisterLink = document.getElementById('show-register');
+        const showForgotPasswordLink = document.getElementById('show-forgot-password');
+        const showLoginLinks = document.querySelectorAll('.show-login-trigger');
+        const registerPassword = document.getElementById('register-password');
+        const confirmPassword = document.getElementById('register-confirm-password');
+        const resetSuccessMessage = document.getElementById('reset-success-message');
+        const errorMessageDiv = document.getElementById('auth-error-message');
+
+        const hideMessages = () => {
+            if (errorMessageDiv) errorMessageDiv.style.display = 'none';
+            if (resetSuccessMessage) resetSuccessMessage.style.display = 'none';
+        };
+
+        if (showRegisterLink) {
+            showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); hideMessages(); loginForm.classList.add('hidden'); forgotPasswordForm.classList.add('hidden'); registerForm.classList.remove('hidden'); });
+        }
+        if (showForgotPasswordLink) {
+            showForgotPasswordLink.addEventListener('click', (e) => { e.preventDefault(); hideMessages(); loginForm.classList.add('hidden'); registerForm.classList.add('hidden'); forgotPasswordForm.classList.remove('hidden'); });
+        }
+        if (showLoginLinks.length > 0) {
+            showLoginLinks.forEach(link => { link.addEventListener('click', (e) => { e.preventDefault(); hideMessages(); registerForm.classList.add('hidden'); forgotPasswordForm.classList.add('hidden'); loginForm.classList.remove('hidden'); }); });
+        }
+        if (registerPassword && confirmPassword) {
+            const checkPasswordMatch = () => { confirmPassword.setCustomValidity(registerPassword.value !== confirmPassword.value && confirmPassword.value !== '' ? "كلمتا المرور غير متطابقتين!" : ""); confirmPassword.style.borderColor = registerPassword.value !== confirmPassword.value && confirmPassword.value !== '' ? 'red' : ''; };
+            registerPassword.addEventListener('input', checkPasswordMatch); confirmPassword.addEventListener('input', checkPasswordMatch);
+        }
+        const hash = window.location.hash;
+        if (hash === '#register-form') { if(registerForm) registerForm.classList.remove('hidden'); if(loginForm) loginForm.classList.add('hidden'); if(forgotPasswordForm) forgotPasswordForm.classList.add('hidden'); }
+        else if (hash === '#forgot-password-form') { if(forgotPasswordForm) forgotPasswordForm.classList.remove('hidden'); if(loginForm) loginForm.classList.add('hidden'); if(registerForm) registerForm.classList.add('hidden'); }
+    });
+</script>
+<script src="assets/js/main.js" type="module"></script>
+</body>
+</html>

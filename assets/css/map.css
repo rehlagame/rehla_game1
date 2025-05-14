@@ -1,0 +1,83 @@
+/* style.css - نسخة معدلة لتناسب ألوان موقع "رحلة" */
+
+/* تنسيق أساسي للصفحة */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* استخدام خط مشابه أو خط الموقع الرئيسي إن أمكن */
+    background-color: #ffffff; /* خلفية بيضاء لتتماشى مع المحتوى الرئيسي لموقعك */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* توسيط المحتوى أفقياً */
+    color: #333; /* لون نص افتراضي داكن للتباين */
+}
+
+h1 {
+    color: #17a2b8; /* اللون التيل الرئيسي من موقعك (تقديري - عدله إذا لزم الأمر) */
+    margin-top: 30px;  /* زيادة المسافة العلوية قليلاً */
+    margin-bottom: 20px;
+    font-weight: bold; /* جعل الخط أعرض قليلاً مثل كلمة "رحلة" */
+}
+
+/* --- تنسيق حاوية الخريطة --- */
+#map {
+    height: 550px; /* يمكنك تعديل الارتفاع */
+    width: 90%;
+    max-width: 1000px;
+    /* استخدام لون التيل للإطار */
+    border: 3px solid #17a2b8; /* إطار أكثر سمكًا وبلون التيل */
+    border-radius: 10px; /* زيادة استدارة الحواف قليلاً */
+    box-shadow: 0 5px 15px rgba(72, 201, 176, 0.2); /* ظل خفيف بلون التيل الشفاف */
+    margin-bottom: 30px;
+    background-color: #eaf7f6; /* خلفية فاتحة جداً داخل إطار الخريطة قبل تحميلها */
+}
+
+/* --- تنسيق عناصر التحكم في Leaflet (اختياري، للتكامل الأفضل) --- */
+.leaflet-control-zoom a {
+    background-color: #ffffff; /* خلفية بيضاء لأزرار التكبير */
+    color: #48c9b0; /* لون الأيقونات (زائد وناقص) بالتيل */
+    border-bottom: 1px solid #d8f3ef; /* فاصل بلون تيل فاتح جداً */
+    border-radius: 4px; /* حواف دائرية بسيطة */
+}
+.leaflet-control-zoom a:hover {
+    background-color: #f8f9fa; /* تغيير طفيف عند التمرير */
+    color: #3aa99a; /* درجة أغمق من التيل عند التمرير */
+}
+
+.leaflet-control-attribution {
+    background: rgba(255, 255, 255, 0.85) !important; /* خلفية بيضاء شبه شفافة للمصدر */
+    color: #555; /* لون نص المصدر أغمق قليلاً */
+    border-radius: 5px 0 0 0; /* استدارة للزاوية العلوية اليمنى (لأنها في RTL) */
+}
+.leaflet-control-attribution a {
+     color: #3aa99a; /* لون الروابط في المصدر */
+}
+
+
+/* --- تنسيق النوافذ المنبثقة في Leaflet --- */
+.leaflet-popup-content-wrapper {
+    background-color: #ffffff; /* خلفية بيضاء تماماً للنافذة المنبثقة */
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* ظل أوضح للنافذة */
+    border: 1px solid #eee; /* حدود رمادية فاتحة جداً */
+}
+
+.leaflet-popup-content {
+    font-size: 14px;
+    color: #333; /* لون نص داكن للوضوح */
+    padding: 10px 12px; /* تعديل الحشو الداخلي */
+    line-height: 1.5; /* تباعد أسطر أفضل */
+}
+.leaflet-popup-content b {
+    color: #48c9b0; /* تمييز النص العريض بلون التيل */
+}
+
+.leaflet-popup-tip {
+     background-color: #ffffff; /* جعل "السهم" أبيض */
+     box-shadow: none; /* إزالة الظل من السهم إذا كان موجودًا */
+}
+
+/* إخفاء أيقونة Leaflet الزرقاء الافتراضية إذا أردت (أقل أهمية) */
+/* .leaflet-marker-icon { */
+    /* يمكنك هنا تحديد أيقونة مخصصة إذا أردت */
+/* } */

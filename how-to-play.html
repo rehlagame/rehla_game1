@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>طريقة اللعب - لعبة رحلة</title>
+    <!-- ربط ملف CSS الرئيسي للمتغيرات والأنماط الأساسية -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- (اختياري) ربط ملف CSS خاص بهذه الصفحة إذا احتجت لتنسيقات معقدة -->
+    <!-- <link rel="stylesheet" href="Frontend/how-to-play.css"> -->
+    <!-- خط Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- أيقونات Font Awesome (اختياري، لإضافة أيقونات للخطوات) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* يمكن إضافة تنسيقات بسيطة هنا مباشرة أو في ملف منفصل */
+        .how-to-play-content {
+            padding: 60px 0; /* نفس حشو الأقسام الأخرى */
+            text-align: center;
+            line-height: 1.8; /* زيادة تباعد الأسطر لتحسين القراءة */
+        }
+        .how-to-play-content h1 {
+            font-size: 2.8em;
+            margin-bottom: 40px;
+            color: var(--primary-color);
+        }
+        .steps-container {
+            max-width: 850px; /* تحديد عرض المحتوى */
+            margin: 0 auto;
+            text-align: right; /* محاذاة النص لليمين */
+        }
+        .step {
+            background-color: var(--white-color);
+            border-radius: 10px;
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+            display: flex; /* استخدام flex لمحاذاة الأيقونة مع النص */
+            align-items: flex-start; /* محاذاة بداية الأيقونة مع بداية النص */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .step:hover {
+             transform: translateY(-5px);
+             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .step-icon {
+            font-size: 2.5em; /* حجم الأيقونة */
+            color: var(--accent-color); /* لون الأيقونة بلون Accent */
+            margin-left: 25px; /* مسافة بين الأيقونة والنص */
+            min-width: 40px; /* ضمان حد أدنى لعرض الأيقونة */
+            text-align: center;
+        }
+        .step-text h3 {
+            color: var(--secondary-color); /* لون عنوان الخطوة */
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.4em;
+        }
+        .step-text p {
+            color: var(--text-color);
+            font-size: 1.05em;
+            margin-bottom: 0;
+        }
+        .call-to-action {
+             margin-top: 40px;
+        }
+
+        /* تجاوبية بسيطة */
+         @media (max-width: 768px) {
+             .how-to-play-content h1 {
+                 font-size: 2.2em;
+             }
+             .step {
+                 padding: 20px;
+                 flex-direction: column; /* وضع الأيقونة فوق النص في الشاشات الصغيرة */
+                 align-items: center; /* توسيط المحتوى */
+                 text-align: center; /* توسيط النص */
+             }
+             .step-icon {
+                 margin-left: 0;
+                 margin-bottom: 15px; /* مسافة تحت الأيقونة */
+                 font-size: 2em;
+             }
+             .steps-container {
+                 text-align: center; /* توسيط النص في الحاوية */
+             }
+         }
+    </style>
+</head>
+<body>
+
+    <!-- نسخ الهيدر من index.html مع تعديل الرابط النشط -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1><a href="index.html">رحلة</a></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#play">العب</a></li>
+                    <!-- إضافة كلاس active لرابط هذه الصفحة -->
+                    <li><a href="how-to-play.html" class="active">طريقة اللعب</a></li>
+                    <li><a href="index.html#contact">تواصل معنا</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="auth.html" class="btn btn-register">تسجيل / دخول</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- محتوى الصفحة -->
+    <main class="how-to-play-content">
+        <div class="container">
+            <h1>طريقة لعب رحلة: اكتشف كنوز الكويت!</h1>
+
+            <div class="steps-container">
+
+                <!-- الخطوة الأولى -->
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-map-marked-alt"></i> <!-- أيقونة خريطة -->
+                    </div>
+                    <div class="step-text">
+                        <h3>1. ابدأ مغامرتك</h3>
+                        <p>تبدأ مغامرتك على خريطة الكويت الافتراضية، حيث ترى المعالم والمناطق الشهيرة تنتظر استكشافك. اختر نقطة البداية أو دع اللعبة تقودك!</p>
+                    </div>
+                </div>
+
+                <!-- الخطوة الثانية -->
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-question-circle"></i> <!-- أيقونة سؤال -->
+                    </div>
+                    <div class="step-text">
+                        <h3>2. واجه التحدي</h3>
+                        <p>عند كل معلم شهير أو منطقة مميزة (مثل أبراج الكويت، سوق المباركية، بيت السدو، وغيرها)، ستواجه تحديًا ممتعًا! قد يكون سؤالاً عن تاريخ المكان، لغزًا بصريًا، معلومة تحتاج للبحث عنها، أو تحدي ملاحظة يعتمد على الصور.</p>
+                    </div>
+                </div>
+
+                <!-- الخطوة الثالثة -->
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-check-circle"></i> <!-- أيقونة صح -->
+                    </div>
+                    <div class="step-text">
+                        <h3>3. أجب وانطلق</h3>
+                        <p>أجب بشكل صحيح أو حل اللغز لتكسب النقاط وتفتح الطريق أمامك للانتقال إلى المحطة التالية في رحلتك. كلما تقدمت، قد تزداد التحديات إثارة وصعوبة!</p>
+                    </div>
+                </div>
+
+                <!-- الخطوة الرابعة -->
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-users"></i> <!-- أيقونة مستخدمين -->
+                    </div>
+                    <div class="step-text">
+                        <h3>4. تنافس وتعاون</h3>
+                        <p>اجمع النقاط وتصدر قائمة المتصدرين! يمكنك لعب "رحلة" بمفردك أو دعوة أصدقائك وعائلتك للعب معك في نفس الجلسة. تنافسوا لمعرفة من هو المستكشف الأسرع والأكثر معرفة، أو تعاونوا معًا لحل الألغاز الصعبة.</p>
+                    </div>
+                </div>
+
+                 <!-- (اختياري) الخطوة الخامسة - وسائل المساعدة -->
+                 <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-lightbulb"></i> <!-- أيقونة لمبة (فكرة) -->
+                    </div>
+                    <div class="step-text">
+                        <h3>5. استخدم المساعدة (عند الحاجة)</h3>
+                        <p>هل واجهت سؤالاً صعباً؟ لا تقلق! قد تجد وسائل مساعدة متاحة داخل اللعبة، مثل التلميحات أو حذف بعض الإجابات الخاطئة، لتساعدك على مواصلة رحلتك الممتعة.</p>
+                    </div>
+                </div>
+
+            </div> <!-- نهاية steps-container -->
+
+            <div class="call-to-action">
+                 <p style="font-size: 1.2em; color: var(--text-color); margin-bottom: 20px;">استعد لرحلة مليئة بالمعرفة والمرح، واكتشف الكويت بطريقة لم تعرفها من قبل!</p>
+                 <a href="index.html#play" class="btn btn-accent">ابدأ اللعب الآن!</a>
+            </div>
+
+        </div> <!-- نهاية container -->
+    </main>
+
+    <!-- نسخ الفوتر من index.html -->
+    <footer>
+        <div class="container footer-main-container">
+            <div class="footer-column footer-content-left">
+                <div class="app-store-icons">
+                    <a href="#" class="app-icon-link" aria-label="Get it on Google Play"><i class="fab fa-android"></i></a>
+                    <a href="#" class="app-icon-link" aria-label="Download on the App Store"><i class="fab fa-apple"></i></a>
+                </div>
+                <p class="developer-credit">
+                    Developed by <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer">Google Gemini pro 2.5 </a>
+                </p>
+            </div>
+            <div class="footer-column footer-content-right">
+                <div class="social-media-icons">
+                    <a href="#" class="social-icon-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon-link" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                </div>
+                <p class="copyright-text">Copyright Rehla - All Rights Reserved 2025 <sup>®</sup></p>
+            </div>
+        </div>
+    </footer>
+    <script src="assets/js/main.js" type="module"></script>
+</body>
+</html>
