@@ -185,7 +185,12 @@
         <div class="container">
             <h1>تواصل معنا</h1>
             <p class="intro-text">
+                للدعم الفني
+                Email: rehlagame@gmail.com
+
+
                 نسعد دائمًا بسماع آرائكم واقتراحاتكم! سواء كان لديكم استفسار عن اللعبة، فكرة تودون مشاركتها، أو واجهتكم مشكلة تقنية، لا تترددوا في التواصل معنا عبر القنوات التالية أو باستخدام نموذج الاتصال.
+
             </p>
 
             <!-- روابط التواصل الاجتماعي -->
@@ -209,7 +214,271 @@
 
             <!-- نموذج الاتصال -->
             <div class="contact-form-container">
-                <h3>أو أرسل لنا رسالة مباشرة:</h3>
+                <h3>     أو أرسل لنا رسالة مباشرة:</h3>
+                <form action="/submit_contact_form" method="POST"> <!-- استبدل Action بالمسار الصحيح للمعالجة في الخادم -->
+                    <div class="input-group">
+                        <label for="contact-name">الاسم</label>
+                        <input type="text" id="contact-name" name="name" placeholder="اسمك الكامل" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="contact-email">البريد الإلكتروني</label>
+                        <input type="email" id="contact-email" name="email" placeholder="بريدك الإلكتروني للرد عليك" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="contact-subject">الموضوع</label>
+                        <input type="text" id="contact-subject" name="subject" placeholder="موضوع الرسالة (مثال: استفسار، اقتراح، مشكلة تقنية)">
+                    </div>
+                    <div class="input-group">
+                        <label for="contact-message">الرسالة</label>
+                        <textarea id="contact-message" name="message" placeholder="اكتب رسالتك هنا..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-accent">إرسال الرسالة</button>
+                </form>
+            </div>
+
+        </div> <!-- نهاية container -->
+    </main>
+
+    <!-- نسخ الفوتر من الصفحات الأخرى -->
+    <footer>
+        <div class="container footer-main-container">
+            <div class="footer-column footer-content-left">
+                <div class="app-store-icons">
+                    <a href="#" class="app-icon-link" aria-label="Get it on Google Play"><i class="fab fa-android"></i></a>
+                    <a href="#" class="app-icon-link" aria-label="Download on the App Store"><i class="fab fa-apple"></i></a>
+                </div>
+                <p class="developer-credit">
+                    Developed by <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer">Google Gemini pro 2.5 </a>
+                </p>
+            </div>
+            <div class="footer-column footer-content-right">
+                <div class="social-media-icons">
+                    <a href="#" class="social-icon-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon-link" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                </div>
+                <p class="copyright-text">Copyright Rehla - All Rights Reserved 2025 <sup>®</sup></p>
+            </div>
+        </div>
+    </footer>
+    <script src="assets/js/main.js" type="module"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تواصل معنا - لعبة رحلة</title>
+    <!-- ربط ملف CSS الرئيسي للمتغيرات والأنماط الأساسية -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- (اختياري) ربط ملف CSS خاص بهذه الصفحة إذا احتجت لتنسيقات معقدة -->
+    <!-- <link rel="stylesheet" href="Frontend/contact.css"> -->
+    <!-- خط Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- أيقونات Font Awesome (ضروري لأيقونات التواصل الاجتماعي) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* يمكن إضافة تنسيقات بسيطة هنا مباشرة أو في ملف منفصل */
+        .contact-page-content {
+            padding: 60px 0;
+            text-align: center;
+        }
+        .contact-page-content h1 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        .contact-page-content .intro-text {
+            font-size: 1.1em;
+            color: var(--grey-color-dark);
+            max-width: 700px;
+            margin: 0 auto 40px auto;
+            line-height: 1.7;
+        }
+
+        /* قسم روابط التواصل الاجتماعي */
+        .social-media-links {
+            margin-bottom: 50px;
+        }
+        .social-media-links h3 {
+            font-size: 1.5em;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 25px; /* مسافة بين الأيقونات */
+        }
+        .social-icons a {
+            color: var(--white-color);
+            background-color: var(--primary-color); /* خلفية الأيقونة */
+            width: 55px;
+            height: 55px;
+            border-radius: 50%; /* جعلها دائرية */
+            display: inline-flex; /* استخدام inline-flex للتوسيط */
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8em; /* حجم الأيقونة */
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .social-icons a:hover {
+            background-color: var(--secondary-color); /* تغيير اللون عند المرور */
+            transform: translateY(-3px); /* تأثير رفع بسيط */
+        }
+        /* ألوان خاصة لتيك توك وانستغرام (اختياري) */
+        .social-icons a.instagram:hover { background-color: #E1306C; }
+        .social-icons a.tiktok:hover { background-color: #000000; }
+
+
+        /* قسم نموذج الاتصال */
+        .contact-form-container {
+            background-color: var(--white-color);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            max-width: 700px;
+            margin: 0 auto; /* توسيط النموذج */
+            text-align: right; /* محاذاة محتويات النموذج لليمين */
+        }
+        .contact-form-container h3 {
+             font-size: 1.5em;
+             color: var(--secondary-color);
+             margin-bottom: 25px;
+             text-align: center; /* عنوان النموذج في المنتصف */
+        }
+
+        /* إعادة استخدام تنسيقات حقول الإدخال من auth.css مع بعض التعديلات إذا لزم الأمر */
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--grey-color-dark);
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .input-group input[type="text"],
+        .input-group input[type="email"],
+        .input-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-family: 'Cairo', sans-serif;
+            background-color: #f8f9fa;
+        }
+         .input-group textarea {
+             min-height: 120px; /* ارتفاع أدنى لحقل الرسالة */
+             resize: vertical; /* السماح بتغيير الحجم رأسيًا فقط */
+         }
+
+        .input-group input[type="text"]:focus,
+        .input-group input[type="email"]:focus,
+        .input-group textarea:focus {
+            border-color: var(--primary-color);
+            background-color: var(--white-color);
+            box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
+            outline: none;
+        }
+
+        .btn.btn-accent {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+            padding: 12px 30px; /* زيادة الحشو الأفقي قليلاً */
+            font-size: 1.1em;
+            border-radius: 8px;
+            width: 100%; /* زر بعرض كامل */
+            margin-top: 10px;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn.btn-accent:hover {
+            background-color: #ffca2c;
+            transform: translateY(-2px);
+        }
+
+         /* تجاوبية بسيطة */
+         @media (max-width: 768px) {
+             .contact-page-content h1 {
+                 font-size: 2.2em;
+             }
+             .contact-form-container {
+                 padding: 30px 20px;
+             }
+             .social-icons a {
+                  width: 50px;
+                  height: 50px;
+                  font-size: 1.6em;
+             }
+         }
+    </style>
+</head>
+<body>
+
+    <!-- نسخ الهيدر من الصفحات الأخرى مع تعديل الرابط النشط -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1><a href="index.html">رحلة</a></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#play">العب</a></li>
+                    <li><a href="how-to-play.html">طريقة اللعب</a></li>
+                    <!-- إضافة كلاس active لرابط هذه الصفحة -->
+                    <li><a href="contact.html" class="active">تواصل معنا</a></li>
+                </ul>
+            </nav>
+            <div class="user-actions">
+                <a href="auth.html" class="btn btn-register">تسجيل / دخول</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- محتوى الصفحة -->
+    <main class="contact-page-content">
+        <div class="container">
+            <h1>تواصل معنا</h1>
+            <p class="intro-text">
+                للدعم الفني
+                Email: rehlagame@gmail.com
+
+
+                نسعد دائمًا بسماع آرائكم واقتراحاتكم! سواء كان لديكم استفسار عن اللعبة، فكرة تودون مشاركتها، أو واجهتكم مشكلة تقنية، لا تترددوا في التواصل معنا عبر القنوات التالية أو باستخدام نموذج الاتصال.
+
+            </p>
+
+            <!-- روابط التواصل الاجتماعي -->
+            <div class="social-media-links">
+                <h3>تابعنا على:</h3>
+                <div class="social-icons">
+                    <!-- استبدل # بالروابط الفعلية لحساباتك -->
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="instagram" aria-label="تابعنا على انستغرام">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="tiktok" aria-label="تابعنا على تيك توك">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                    <!-- يمكنك إضافة المزيد من الروابط هنا بنفس الطريقة (فيسبوك، تويتر، الخ) -->
+                    <!--
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="facebook" aria-label="تابعنا على فيسبوك"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" target="_blank" rel="noopener noreferrer" class="twitter" aria-label="تابعنا على تويتر"><i class="fab fa-twitter"></i></a>
+                    -->
+                </div>
+            </div>
+
+            <!-- نموذج الاتصال -->
+            <div class="contact-form-container">
+                <h3>     أو أرسل لنا رسالة مباشرة:</h3>
                 <form action="/submit_contact_form" method="POST"> <!-- استبدل Action بالمسار الصحيح للمعالجة في الخادم -->
                     <div class="input-group">
                         <label for="contact-name">الاسم</label>
