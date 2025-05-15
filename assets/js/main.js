@@ -43,9 +43,9 @@ const storage = getStorage(app);
 
 // --- Constants ---
 const USER_GAMES_KEY_PREFIX = 'rehlaUserGames_';
-// MODIFIED: Point to your Render API
-const RENDER_API_BASE_URL = 'https://your-rehla-api.onrender.com'; // <--- استبدل هذا بالـ URL الصحيح!
-const PROMO_API_URL = `${RENDER_API_BASE_URL}/api/promos`; // Example endpoint
+// تأكد 100% من أن هذا هو الـ URL الصحيح والنهائي لخادمك على Render
+const RENDER_API_BASE_URL = 'https://your-rehla-api.onrender.com'; // <--- استبدل هذا بالـ URL الصحيح للـ API الخاص بك!
+const PROMO_API_URL = `${RENDER_API_BASE_URL}/api/promos`;
 
 // --- DOM Element Selectors (Cached for performance) ---
 const userActionsContainer = document.querySelector('header .user-actions');
@@ -127,11 +127,11 @@ const getFriendlyErrorMessage = (errorCode) => {
             return 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
         case 'auth/requires-recent-login':
             return 'هذه العملية تتطلب إعادة تسجيل الدخول مؤخرًا. يرجى تسجيل الخروج ثم الدخول مرة أخرى.';
-        default: return `حدث خطأ غير متوقع. (${errorCode})`;
+        default: return `حدث خطأ غير متوقع. (${errorCode || 'UNKNOWN_ERROR'})`;
     }
 };
 
-// --- Game Balance Management (LocalStorage, with potential sync) ---
+// --- Game Balance Management ---
 function getUserGamesKey(userId) {
     return `${USER_GAMES_KEY_PREFIX}${userId}`;
 }
@@ -151,27 +151,31 @@ function updateRemainingGamesDisplay(userId) {
 }
 
 async function syncGamesBalanceWithBackend(userId) {
-    if (!userId) return;
+    if (!userId || !auth.currentUser) return;
     try {
         const token = await getIdToken(auth.currentUser);
         const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${userId}/profile`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!response.ok) throw new Error('Failed to fetch user profile from backend');
+        if (!response.ok) {
+            console.warn(`Failed to fetch user profile from backend for sync: ${response.status}, ${await response.text()}`);
+            return;
+        }
         const profileData = await response.json();
-        if (typeof profileData.gamesBalance === 'number') {
+        if (profileData && typeof profileData.gamesBalance === 'number') {
             localStorage.setItem(getUserGamesKey(userId), profileData.gamesBalance.toString());
             updateRemainingGamesDisplay(userId);
             console.log(`Synced games balance for ${userId} from backend: ${profileData.gamesBalance}`);
+        } else {
+            console.warn("Backend profile data for sync did not contain a valid gamesBalance.");
         }
     } catch (error) {
         console.error("Error syncing games balance with backend:", error);
-        // Fallback to localStorage if sync fails, or handle as appropriate
     }
 }
 
 
-function addGamesToBalance(userId, gamesToAdd, source = "localStorage") {
+function addGamesToBalance(userId, gamesToAdd, source = "localStorage_update") {
     if (!userId || typeof gamesToAdd !== 'number' || gamesToAdd <= 0) {
         console.warn("addGamesToBalance: Invalid userId or gamesToAdd.", { userId, gamesToAdd });
         return;
@@ -180,8 +184,7 @@ function addGamesToBalance(userId, gamesToAdd, source = "localStorage") {
     const newTotalGames = currentGames + gamesToAdd;
     localStorage.setItem(getUserGamesKey(userId), newTotalGames.toString());
     updateRemainingGamesDisplay(userId);
-    console.log(`Added ${gamesToAdd} games from ${source}. New balance for ${userId}: ${newTotalGames}`);
-    // Optionally, you could also make an API call here to update the backend if the source wasn't already the backend.
+    console.log(`Added ${gamesToAdd} games (source: ${source}). New balance for ${userId}: ${newTotalGames}`);
 }
 
 function deductGameFromBalance(userId) {
@@ -195,8 +198,6 @@ function deductGameFromBalance(userId) {
         localStorage.setItem(getUserGamesKey(userId), newTotalGames.toString());
         updateRemainingGamesDisplay(userId);
         console.log(`Deducted 1 game. New balance for ${userId}: ${newTotalGames}`);
-        // Optionally, you could also make an API call here to inform the backend.
-        // e.g., fetch(`${RENDER_API_BASE_URL}/api/user/${userId}/decrement-game`, { method: 'POST', headers: { 'Authorization': `Bearer <TOKEN>` }});
         return true;
     }
     console.log(`Cannot deduct game for ${userId}, balance is 0.`);
@@ -219,7 +220,6 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
                 lastName: registrationData.lastName,
                 phone: registrationData.countryCode && registrationData.phone ? `${registrationData.countryCode}${registrationData.phone}` : null,
                 photoURL: user.photoURL || null,
-                // gamesBalance will be initialized by backend or set to 0 if not present
             };
 
             const response = await fetch(`${RENDER_API_BASE_URL}/api/user/register-profile`, {
@@ -232,26 +232,29 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                console.error("Failed to save new user profile to backend:", errorData);
-                // Decide how to handle this: maybe log out user, or proceed with a warning
+                const errorData = await response.json().catch(() => ({}));
+                console.error("Failed to save new user profile to backend:", errorData.message || response.status);
+                localStorage.setItem(getUserGamesKey(user.uid), '0');
             } else {
                 console.log("New user profile saved to backend.");
                 const backendProfile = await response.json();
                 if (backendProfile && typeof backendProfile.gamesBalance === 'number') {
                     localStorage.setItem(getUserGamesKey(user.uid), backendProfile.gamesBalance.toString());
                 } else {
-                    localStorage.setItem(getUserGamesKey(user.uid), '0'); // Default if not returned
+                    localStorage.setItem(getUserGamesKey(user.uid), '0');
                 }
             }
         } catch (error) {
             console.error("Error saving new user profile to backend:", error);
+            localStorage.setItem(getUserGamesKey(user.uid), '0');
         }
+    } else if (!isNewUser) {
+        await syncGamesBalanceWithBackend(user.uid);
+    } else {
+        localStorage.setItem(getUserGamesKey(user.uid), '0');
     }
 
-    // For both new and existing users, try to sync balance
-    await syncGamesBalanceWithBackend(user.uid); // This will also update display
-
+    updateRemainingGamesDisplay(user.uid);
     window.location.href = 'index.html';
 };
 
@@ -273,10 +276,10 @@ if (registerEmailFormEl) {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const displayName = `${firstName} ${lastName}`.trim() || email.split('@')[0];
-            await updateProfile(userCredential.user, { displayName: displayName }); // Update Firebase Auth profile
+            await updateProfile(userCredential.user, { displayName: displayName });
 
             const registrationData = { firstName, lastName, countryCode, phone, displayName };
-            await handleAuthSuccess(userCredential.user, true, registrationData); // Pass isNewUser=true and registrationData
+            await handleAuthSuccess(userCredential.user, true, registrationData);
         } catch (error) {
             console.error("Registration Error:", error);
             showAuthError(getFriendlyErrorMessage(error.code));
@@ -291,7 +294,7 @@ if (loginEmailFormEl) {
         const email = loginEmailFormEl['login-email'].value;
         const password = loginEmailFormEl['login-password'].value;
         signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => handleAuthSuccess(userCredential.user, false)) // isNewUser = false
+            .then((userCredential) => handleAuthSuccess(userCredential.user, false))
             .catch((error) => {
                 console.error("Login Error:", error);
                 showAuthError(getFriendlyErrorMessage(error.code));
@@ -300,7 +303,20 @@ if (loginEmailFormEl) {
 }
 
 if (resetPasswordFormEl) {
-    resetPasswordFormEl.addEventListener('submit', (e) => { /* ... (unchanged) ... */ });
+    resetPasswordFormEl.addEventListener('submit', (e) => {
+        e.preventDefault();
+        hideAuthMessages(authErrorMessageDiv, resetSuccessMessageDiv);
+        const email = resetPasswordFormEl['reset-email'].value;
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                showSuccessMessage("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.", resetSuccessMessageDiv);
+                resetPasswordFormEl.reset();
+            })
+            .catch((error) => {
+                console.error("Password Reset Error:", error);
+                showAuthError(getFriendlyErrorMessage(error.code), authErrorMessageDiv);
+            });
+    });
 }
 
 const handleSocialSignIn = async (provider) => {
@@ -308,16 +324,11 @@ const handleSocialSignIn = async (provider) => {
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        // For social sign-in, Firebase usually populates displayName and photoURL.
-        // We might need to check if this user profile exists in our backend.
-        // Let handleAuthSuccess handle the initial sync or profile creation logic.
-        // The isNewUser flag can be determined by checking if a profile already exists in your backend for this firebaseUid.
-        // For simplicity here, we'll assume handleAuthSuccess will attempt to create/sync if needed.
-        // A more robust way: check if user exists in your DB. If not, pass isNewUser=true.
-        // For now, let's treat it like a login (isNewUser=false), and let backend handle potential profile creation if needed.
-        await handleAuthSuccess(user, false);
+        await handleAuthSuccess(user, result.additionalUserInfo?.isNewUser || false, {
+            displayName: user.displayName,
+            email: user.email,
+        });
     } catch (error) {
-        // ... (error handling unchanged)
         console.error("Social Sign-In Error:", error);
         if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
             showAuthError(getFriendlyErrorMessage(error.code));
@@ -325,40 +336,41 @@ const handleSocialSignIn = async (provider) => {
     }
 };
 
+if (googleSignInButtonEl) {
+    const googleProvider = new GoogleAuthProvider();
+    googleSignInButtonEl.addEventListener('click', () => handleSocialSignIn(googleProvider));
+}
 
-if (googleSignInButtonEl) { /* ... (unchanged) ... */ }
-if (appleSignInButtonEl) { /* ... (unchanged) ... */ }
-
+if (appleSignInButtonEl) {
+    const appleProvider = new OAuthProvider('apple.com');
+    appleProvider.addScope('email'); appleProvider.addScope('name');
+    appleSignInButtonEl.addEventListener('click', () => handleSocialSignIn(appleProvider));
+}
 
 // --- Profile Page (Logged.html) Logic ---
 async function setupProfilePage(user) {
     const els = profilePageElements;
     if (!els.infoForm || !user) return;
 
-    // Load initial data from Firebase Auth (local cache)
     if (els.userPhoto) els.userPhoto.src = user.photoURL || 'assets/images/default-avatar.png';
     if (els.summaryName) els.summaryName.textContent = user.displayName || 'مستخدم رحلة';
     if (els.summaryEmail) els.summaryEmail.textContent = user.email;
-    if (els.emailInput) els.emailInput.value = user.email; // Email is readonly
+    if (els.emailInput) els.emailInput.value = user.email;
     if (els.displayNameInput) els.displayNameInput.value = user.displayName || '';
 
-
-    // Fetch full profile data from your backend (Render API)
     try {
         const token = await getIdToken(user);
         const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${user.uid}/profile`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!response.ok) throw new Error('Failed to fetch profile from backend');
+        if (!response.ok) throw new Error('Failed to fetch profile from backend for setupProfilePage');
         const profileData = await response.json();
 
         if (els.firstNameInput) els.firstNameInput.value = profileData.firstName || '';
         if (els.lastNameInput) els.lastNameInput.value = profileData.lastName || '';
         if (profileData.phone) {
-            // Attempt to parse country code and phone number
-            // This is a simple heuristic, might need refinement based on how you store phone numbers
             let fullPhone = profileData.phone;
-            let countryCode = "+965"; // Default
+            let countryCode = "+965";
             let phoneNum = fullPhone;
             const knownCodes = ["+965", "+966", "+971", "+973", "+974", "+968"];
             for (const code of knownCodes) {
@@ -372,117 +384,91 @@ async function setupProfilePage(user) {
             if (els.phoneInput) els.phoneInput.value = phoneNum;
         }
         if (els.displayNameInput && profileData.displayName) els.displayNameInput.value = profileData.displayName;
-        if (els.userPhoto && profileData.photoURL) els.userPhoto.src = profileData.photoURL; // Update with backend URL if different/more up-to-date
+        if (els.userPhoto && profileData.photoURL) els.userPhoto.src = profileData.photoURL;
         if (els.summaryName && profileData.displayName) els.summaryName.textContent = profileData.displayName;
-
-
     } catch (error) {
-        console.error("Error fetching profile data from backend:", error);
-        // Fallback to Firebase Auth data if backend fetch fails for non-critical fields
+        console.error("Error fetching profile data from backend for setupProfilePage:", error);
         const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
         if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
         if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
     }
 
-
     if (els.photoUploadInput && els.userPhoto) {
-        els.photoUploadInput.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (!file || !user) return;
+        if (!els.photoUploadInput.dataset.listenerAttached) {
+            els.photoUploadInput.addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (!file || !auth.currentUser) return;
 
-            const imageRef = storageRef(storage, `profile_pictures/${user.uid}/${file.name}`);
-            try {
-                profilePageElements.userPhoto.src = 'assets/images/loading-spinner.gif'; // Show loading
-                await uploadBytes(imageRef, file);
-                const downloadURL = await getDownloadURL(imageRef);
-
-                // 1. Update Firebase Auth profile (for immediate local reflection and Firebase sync)
-                await updateProfile(user, { photoURL: downloadURL });
-
-                // 2. Update your backend database with the new photoURL
-                const token = await getIdToken(user);
-                const updateResponse = await fetch(`${RENDER_API_BASE_URL}/api/user/${user.uid}/profile`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ photoURL: downloadURL }) // Send only the photoURL or other fields as needed
-                });
-
-                if (!updateResponse.ok) {
-                    throw new Error('Failed to update profile photo URL in backend.');
+                const imageRef = storageRef(storage, `profile_pictures/${auth.currentUser.uid}/${file.name}`);
+                try {
+                    if (profilePageElements.userPhoto) profilePageElements.userPhoto.src = 'assets/images/loading-spinner.gif';
+                    await uploadBytes(imageRef, file);
+                    const downloadURL = await getDownloadURL(imageRef);
+                    await updateProfile(auth.currentUser, { photoURL: downloadURL });
+                    const token = await getIdToken(auth.currentUser);
+                    const updateResponse = await fetch(`${RENDER_API_BASE_URL}/api/user/${auth.currentUser.uid}/profile`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ photoURL: downloadURL })
+                    });
+                    if (!updateResponse.ok) throw new Error('Failed to update profile photo URL in backend.');
+                    if (els.userPhoto) els.userPhoto.src = downloadURL;
+                    showSuccessMessage("تم تحديث صورة الملف الشخصي بنجاح!", els.updateSuccessDiv);
+                    setTimeout(() => { if (els.updateSuccessDiv) els.updateSuccessDiv.style.display = 'none'; }, 3000);
+                } catch (error) {
+                    console.error("Error uploading profile picture or updating backend:", error);
+                    showAuthError(getFriendlyErrorMessage(error.code || 'PROFILE_PIC_UPLOAD_ERROR'), els.updateErrorDiv);
+                    if (els.userPhoto && auth.currentUser) els.userPhoto.src = auth.currentUser.photoURL || 'assets/images/default-avatar.png';
                 }
-
-                if (els.userPhoto) els.userPhoto.src = downloadURL;
-                showSuccessMessage("تم تحديث صورة الملف الشخصي بنجاح!", els.updateSuccessDiv);
-                setTimeout(() => { if (els.updateSuccessDiv) els.updateSuccessDiv.style.display = 'none'; }, 3000);
-
-            } catch (error) {
-                console.error("Error uploading profile picture or updating backend:", error);
-                showAuthError(getFriendlyErrorMessage(error.code || 'PROFILE_PIC_UPLOAD_ERROR'), els.updateErrorDiv);
-                if (els.userPhoto) els.userPhoto.src = user.photoURL || 'assets/images/default-avatar.png'; // Revert to old or default
-            }
-        });
+            });
+            els.photoUploadInput.dataset.listenerAttached = 'true';
+        }
     }
 
-    els.infoForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        hideAuthMessages(els.updateErrorDiv, els.updateSuccessDiv);
-        if (!user) return;
-
-        const newFirstName = els.firstNameInput.value;
-        const newLastName = els.lastNameInput.value;
-        const newCountryCode = els.countryCodeSelect.value;
-        const newPhone = els.phoneInput.value;
-        let newDisplayName = els.displayNameInput.value.trim();
-
-        if (!newDisplayName) {
-            newDisplayName = `${newFirstName} ${newLastName}`.trim() || user.email.split('@')[0];
-        }
-
-        const updatedProfileData = {
-            firstName: newFirstName,
-            lastName: newLastName,
-            displayName: newDisplayName,
-            phone: newCountryCode && newPhone ? `${newCountryCode}${newPhone}` : user.phoneNumber, // Keep existing if new one is empty
-            // email is not updated here, photoURL is updated separately
-        };
-
-        try {
-            // 1. Update Firebase Auth profile (primarily for displayName)
-            await updateProfile(user, { displayName: newDisplayName });
-
-            // 2. Update your backend database
-            const token = await getIdToken(user);
-            const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${user.uid}/profile`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(updatedProfileData)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to update profile in backend.');
+    if (els.infoForm && !els.infoForm.dataset.listenerAttached) {
+        els.infoForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAuthMessages(els.updateErrorDiv, els.updateSuccessDiv);
+            if (!auth.currentUser) return;
+            const newFirstName = els.firstNameInput.value;
+            const newLastName = els.lastNameInput.value;
+            const newCountryCode = els.countryCodeSelect.value;
+            const newPhone = els.phoneInput.value;
+            let newDisplayName = els.displayNameInput.value.trim();
+            if (!newDisplayName) newDisplayName = `${newFirstName} ${newLastName}`.trim() || auth.currentUser.email.split('@')[0];
+            const updatedProfileData = {
+                firstName: newFirstName, lastName: newLastName, displayName: newDisplayName,
+                phone: newCountryCode && newPhone ? `${newCountryCode}${newPhone}` : auth.currentUser.phoneNumber,
+            };
+            try {
+                await updateProfile(auth.currentUser, { displayName: newDisplayName });
+                const token = await getIdToken(auth.currentUser);
+                const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${auth.currentUser.uid}/profile`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(updatedProfileData)
+                });
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || 'Failed to update profile in backend.');
+                }
+                if (els.summaryName) els.summaryName.textContent = newDisplayName;
+                showSuccessMessage("تم تحديث بيانات الملف الشخصي بنجاح!", els.updateSuccessDiv);
+                setTimeout(() => { if (els.updateSuccessDiv) els.updateSuccessDiv.style.display = 'none'; }, 3000);
+            } catch (error) {
+                console.error("Profile Update Error:", error);
+                showAuthError(error.message || getFriendlyErrorMessage(error.code), els.updateErrorDiv);
             }
+        });
+        els.infoForm.dataset.listenerAttached = 'true';
+    }
 
-            if (els.summaryName) els.summaryName.textContent = newDisplayName; // Update sidebar display name
-            showSuccessMessage("تم تحديث بيانات الملف الشخصي بنجاح!", els.updateSuccessDiv);
-            setTimeout(() => { if (els.updateSuccessDiv) els.updateSuccessDiv.style.display = 'none'; }, 3000);
-
-        } catch (error) {
-            console.error("Profile Update Error:", error);
-            showAuthError(error.message || getFriendlyErrorMessage(error.code), els.updateErrorDiv);
-        }
-    });
-
-    if (els.changePasswordForm) {
+    if (els.changePasswordForm && !els.changePasswordForm.dataset.listenerAttached) {
         els.changePasswordForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAuthMessages(els.passwordChangeErrorDiv, els.passwordChangeSuccessDiv);
+            if (!auth.currentUser) return;
+
             const currentPassword = els.changePasswordForm['current-password'].value;
             const newPassword = els.changePasswordForm['new-password'].value;
             const confirmNewPassword = els.changePasswordForm['confirm-new-password'].value;
@@ -497,29 +483,83 @@ async function setupProfilePage(user) {
             }
 
             try {
-                const credential = EmailAuthProvider.credential(user.email, currentPassword);
-                await reauthenticateWithCredential(user, credential);
-                await updatePassword(user, newPassword);
+                const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
+                await reauthenticateWithCredential(auth.currentUser, credential);
+                await updatePassword(auth.currentUser, newPassword);
                 showSuccessMessage("تم تغيير كلمة المرور بنجاح!", els.passwordChangeSuccessDiv);
                 els.changePasswordForm.reset();
-                setTimeout(() => { if (els.passwordChangeSuccessDiv) els.passwordChangeSuccessDiv.style.display = 'none'; }, 3000);
             } catch (error) {
                 console.error("Password Change Error:", error);
                 showAuthError(getFriendlyErrorMessage(error.code), els.passwordChangeErrorDiv);
             }
         });
+        els.changePasswordForm.dataset.listenerAttached = 'true';
     }
-    els.tabLinks.forEach(link => { /* ... (unchanged, UI only) ... */ });
-    if (els.logoutBtnSidebar) { /* ... (unchanged) ... */ }
-    if (els.deleteAccountBtn) { /* ... (unchanged, but would need a backend API call too) ... */ }
+
+
+    if (els.tabLinks.length > 0 && !els.tabLinks[0].dataset.tabListenerAttached) {
+        els.tabLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                const tabId = link.dataset.tab;
+                els.tabLinks.forEach(l => l.classList.remove('active'));
+                els.tabContents.forEach(c => c.classList.remove('active'));
+                link.classList.add('active');
+                const activeContent = document.getElementById(tabId);
+                if (activeContent) activeContent.classList.add('active');
+            });
+            link.dataset.tabListenerAttached = 'true';
+        });
+    }
+
+    if (els.logoutBtnSidebar && !els.logoutBtnSidebar.dataset.listenerAttached) {
+        els.logoutBtnSidebar.addEventListener('click', () => { signOut(auth).catch(err => console.error("Sidebar Logout Error:", err)); });
+        els.logoutBtnSidebar.dataset.listenerAttached = 'true';
+    }
+    if (els.deleteAccountBtn && !els.deleteAccountBtn.dataset.listenerAttached) {
+        els.deleteAccountBtn.addEventListener('click', async () => {
+            if (!auth.currentUser) return;
+            if (confirm("هل أنت متأكد أنك تريد حذف حسابك نهائياً؟ هذا الإجراء لا يمكن التراجع عنه.")) {
+                const currentPassword = prompt("لحذف حسابك، يرجى إدخال كلمة المرور الحالية:");
+                if (currentPassword === null) return; // User cancelled
+
+                try {
+                    const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
+                    await reauthenticateWithCredential(auth.currentUser, credential);
+
+                    const token = await getIdToken(auth.currentUser);
+                    const backendDeleteResponse = await fetch(`${RENDER_API_BASE_URL}/api/user/${auth.currentUser.uid}/delete-account`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    if (!backendDeleteResponse.ok) {
+                        const errorData = await backendDeleteResponse.json().catch(() => ({}));
+                        throw new Error(errorData.message || 'فشل حذف بيانات الحساب من الخادم.');
+                    }
+                    console.log("User data deleted from backend.");
+
+                    await auth.currentUser.delete();
+
+                    alert("تم حذف حسابك بنجاح.");
+                    window.location.href = 'index.html';
+                } catch (error) {
+                    console.error("Account Deletion Error:", error);
+                    alert("خطأ في حذف الحساب: " + getFriendlyErrorMessage(error.code || error.message));
+                }
+            }
+        });
+        els.deleteAccountBtn.dataset.listenerAttached = 'true';
+    }
 }
 
 
-// --- Purchase Dropdown Logic (REVISED to use Render API for MyFatoorah) ---
+// --- Purchase Dropdown Logic ---
 function setupPurchaseDropdown(user) {
-    const gamesTrigger = document.getElementById('games-trigger');
     const purchaseDropdown = document.getElementById('purchase-dropdown');
-    if (!gamesTrigger || !purchaseDropdown) { console.warn("Purchase trigger or dropdown not found."); return; }
+    if (!purchaseDropdown) {
+        console.error("Purchase dropdown menu not found when setting up internal listeners.");
+        return { resetDropdownStateForNewOpen: () => {} }; // إرجاع دالة فارغة لتجنب أخطاء لاحقة
+    }
 
     const purchaseOptions = Array.from(purchaseDropdown.querySelectorAll('.purchase-option'));
     const promoInput = document.getElementById('promo-code-input');
@@ -527,240 +567,216 @@ function setupPurchaseDropdown(user) {
     const totalPriceDisplay = document.getElementById('total-price-display');
     const payNowBtn = document.getElementById('pay-now-btn');
     let promoStatusDiv = purchaseDropdown.querySelector('.promo-status-feedback');
-    // ... (promoStatusDiv creation if not exists - unchanged) ...
+
     if (!promoStatusDiv) {
         promoStatusDiv = document.createElement('div');
         promoStatusDiv.className = 'promo-status-feedback';
-        // Ensure this style is appropriate or defined in CSS
-        promoStatusDiv.style.cssText = "font-size: 0.85em; margin-top: -10px; margin-bottom: 15px; text-align: center; min-height: 1.2em; font-weight: bold;";
+        promoStatusDiv.style.cssText = "font-size: 0.85em; margin-top: -10px; margin-bottom: 15px; text-align: center; min-height: 1.2em; font-weight: bold; color: var(--primary-color);";
         const totalSection = purchaseDropdown.querySelector('.total-section');
         if (totalSection) purchaseDropdown.insertBefore(promoStatusDiv, totalSection);
-        else purchaseDropdown.insertBefore(promoStatusDiv, payNowBtn);
+        else if (payNowBtn) purchaseDropdown.insertBefore(promoStatusDiv, payNowBtn);
+        else purchaseDropdown.appendChild(promoStatusDiv);
     }
-
-
-    updateRemainingGamesDisplay(user.uid);
 
     let selectedPrice = 0;
     let selectedGames = 0;
-    let selectedPackageName = ""; // To send to backend
+    let selectedPackageName = "";
     let finalPrice = 0;
     let currentPromo = null;
     let gamesToGrantFromPromo = 0;
 
-    function resetPromoState(clearInput = true) { /* ... (unchanged) ... */ }
-    function showPromoStatus(message, type = "info") { /* ... (unchanged) ... */ }
+    const resetDropdownStateForNewOpen = () => {
+        selectedPrice = 0;
+        selectedGames = 0;
+        selectedPackageName = "";
+        gamesToGrantFromPromo = 0;
+        purchaseOptions.forEach(opt => opt.classList.remove('selected'));
+        resetPromoState(true);
+    };
+
+    function resetPromoState(clearInput = true) {
+        currentPromo = null;
+        if (clearInput && promoInput) promoInput.value = '';
+        if (promoInput) promoInput.disabled = false;
+        if (applyPromoBtn) { applyPromoBtn.disabled = false; applyPromoBtn.textContent = 'تطبيق';}
+        if (promoStatusDiv) promoStatusDiv.textContent = '';
+        purchaseOptions.forEach(opt => {
+            opt.style.pointerEvents = 'auto';
+            opt.style.opacity = '1';
+        });
+        updateFinalPrice();
+    }
+    function showPromoStatus(message, type = "info") {
+        if (!promoStatusDiv) return;
+        promoStatusDiv.textContent = message;
+        promoStatusDiv.className = 'promo-status-feedback';
+        if (type === "success") promoStatusDiv.style.color = 'var(--success-color)';
+        else if (type === "error") promoStatusDiv.style.color = 'var(--danger-color)';
+        else promoStatusDiv.style.color = 'var(--primary-color)';
+    }
 
     function updateFinalPrice() {
         if (!totalPriceDisplay || !payNowBtn) return;
         payNowBtn.disabled = true;
-
         if (currentPromo && currentPromo.type === 'free_games') {
             finalPrice = 0;
-            selectedGames = 0; // No package games if free games promo is active
-            selectedPackageName = `Free Games (${currentPromo.code})`; // Or similar identifier
             if (gamesToGrantFromPromo > 0) {
                 payNowBtn.disabled = false;
-                payNowBtn.textContent = `الحصول على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : 'ألعاب'} مجاناً`;
-            } else {
-                payNowBtn.textContent = 'ادفع الآن';
-            }
+                payNowBtn.textContent = `الحصول على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجاناً`;
+            } else payNowBtn.textContent = 'ادفع الآن';
         } else if (selectedGames > 0) {
             let discountMultiplier = 0;
-            if (currentPromo && currentPromo.type === 'percentage') {
-                discountMultiplier = currentPromo.value / 100;
-            }
+            if (currentPromo && currentPromo.type === 'percentage') discountMultiplier = currentPromo.value / 100;
             finalPrice = selectedPrice * (1 - discountMultiplier);
-            payNowBtn.disabled = false;
-            payNowBtn.textContent = 'ادفع الآن';
-            gamesToGrantFromPromo = 0;
+            payNowBtn.disabled = false; payNowBtn.textContent = 'ادفع الآن';
         } else {
-            finalPrice = 0;
-            selectedGames = 0;
-            selectedPackageName = "";
-            gamesToGrantFromPromo = 0;
-            payNowBtn.textContent = 'ادفع الآن';
+            finalPrice = 0; payNowBtn.textContent = 'ادفع الآن';
         }
         totalPriceDisplay.textContent = `${finalPrice.toFixed(2)} KWD`;
     }
 
-    // Event listeners for dropdown toggle, option selection (unchanged)
-    if (!gamesTrigger.dataset.dropdownListenerAttached) { /* ... (unchanged) ... */ }
-    if (!document.body.dataset.globalDropdownListenerAttached) { /* ... (unchanged) ... */ }
-
     purchaseOptions.forEach(option => {
-        if (!option.dataset.optionListenerAttached) {
-            option.addEventListener('click', () => {
-                if (currentPromo && currentPromo.type === 'free_games') return;
-
-                purchaseOptions.forEach(opt => opt.classList.remove('selected'));
-                option.classList.add('selected');
-                selectedPrice = parseFloat(option.dataset.price) || 0;
-                selectedGames = parseInt(option.dataset.games) || 0;
-                selectedPackageName = option.querySelector('span:first-child').textContent; // Get package name
-                resetPromoState(false); // Keep promo input if user wants to re-apply
-                updateFinalPrice();
-            });
-            option.dataset.optionListenerAttached = 'true';
-        }
+        option.addEventListener('click', () => {
+            if (currentPromo && currentPromo.type === 'free_games') return;
+            purchaseOptions.forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+            selectedPrice = parseFloat(option.dataset.price) || 0;
+            selectedGames = parseInt(option.dataset.games) || 0;
+            selectedPackageName = option.querySelector('span:first-child').textContent;
+            gamesToGrantFromPromo = 0;
+            resetPromoState(false);
+            updateFinalPrice();
+        });
     });
 
-
-    if (applyPromoBtn && !applyPromoBtn.dataset.promoListenerAttached) {
+    if (applyPromoBtn) {
         applyPromoBtn.addEventListener('click', async () => {
-            const code = promoInput.value.trim().toUpperCase();
-            if (!code) { showPromoStatus("الرجاء إدخال كود الخصم.", "error"); return; }
-
-            applyPromoBtn.disabled = true; applyPromoBtn.textContent = 'تحقق...';
-            showPromoStatus('');
-
+            if (!promoInput || !auth.currentUser) return;
+            const promoCodeValue = promoInput.value.trim().toUpperCase();
+            if (!promoCodeValue) {
+                showPromoStatus("الرجاء إدخال كود الخصم.", "error");
+                return;
+            }
+            applyPromoBtn.disabled = true;
+            applyPromoBtn.textContent = 'جار التحقق...';
+            showPromoStatus("جار التحقق من الكود...", "info");
             try {
-                const token = await getIdToken(user); // Get Firebase token
-                const response = await fetch(`${PROMO_API_URL}/validate/${code}`, {
-                    headers: { 'Authorization': `Bearer ${token}` } // Send token
+                const token = await getIdToken(auth.currentUser);
+                const response = await fetch(`${PROMO_API_URL}/validate/${promoCodeValue}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.message || "الكود غير صالح أو غير فعال.");
-
-                currentPromo = { code: result.code, type: result.type, value: result.value };
-                showPromoStatus(`تم تطبيق الكود ${result.code}!`, "success");
-                promoInput.disabled = true; applyPromoBtn.textContent = 'مُطبّق';
-
-                if (currentPromo.type === 'free_games') {
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ message: "كود الخصم غير صالح أو منتهي الصلاحية." }));
+                    throw new Error(errorData.message || "كود الخصم غير صالح.");
+                }
+                const promoData = await response.json();
+                currentPromo = promoData;
+                if (promoData.type === 'free_games' && promoData.value > 0) {
+                    gamesToGrantFromPromo = promoData.value;
+                    selectedGames = 0; selectedPrice = 0;
+                    selectedPackageName = `${promoData.value} ${promoData.value === 1 ? 'لعبة' : (promoData.value === 2 ? 'لعبتين' : `${promoData.value} ألعاب`)} مجانية (عرض)`;
+                    showPromoStatus(`تم تطبيق العرض! ستحصل على ${gamesToGrantFromPromo} ألعاب مجانية.`, "success");
                     purchaseOptions.forEach(opt => {
-                        opt.style.pointerEvents = 'none';
-                        opt.style.opacity = '0.5';
-                        opt.classList.remove('selected');
+                        opt.classList.remove('selected'); opt.style.pointerEvents = 'none'; opt.style.opacity = '0.5';
                     });
-                    selectedGames = 0; selectedPrice = 0; selectedPackageName = `Free Games (${currentPromo.code})`;
-                    gamesToGrantFromPromo = currentPromo.value;
-                } else { // Percentage promo
+                    promoInput.disabled = true;
+                } else if (promoData.type === 'percentage' && promoData.value > 0) {
                     gamesToGrantFromPromo = 0;
-                    purchaseOptions.forEach(opt => {
-                        opt.style.pointerEvents = 'auto';
-                        opt.style.opacity = '1';
-                    });
-                    // If a package was already selected, the price will update.
-                    // If not, user needs to select one.
+                    showPromoStatus(`تم تطبيق خصم ${promoData.value}% بنجاح!`, "success");
+                    if (selectedGames === 0) showPromoStatus(`تم تطبيق خصم ${promoData.value}%. اختر باقة للاستفادة من الخصم.`, "info");
+                } else {
+                    throw new Error("نوع كود الخصم غير مدعوم أو قيمة الخصم غير صالحة.");
                 }
             } catch (error) {
                 console.error("Promo validation error:", error);
-                showPromoStatus(error.message || "خطأ في التحقق من الكود.", "error");
-                resetPromoState(false); // Keep promo input content for re-try
+                showPromoStatus(error.message || "خطأ في تطبيق كود الخصم.", "error");
+                currentPromo = null; gamesToGrantFromPromo = 0;
             } finally {
-                if (!currentPromo && applyPromoBtn) {
-                    applyPromoBtn.disabled = false;
-                    applyPromoBtn.textContent = 'تطبيق';
-                }
+                if(applyPromoBtn) { applyPromoBtn.disabled = false; applyPromoBtn.textContent = 'تطبيق';}
                 updateFinalPrice();
             }
         });
-        applyPromoBtn.dataset.promoListenerAttached = 'true';
     }
 
-    if (payNowBtn && !payNowBtn.dataset.payListenerAttached) {
+    if (payNowBtn) {
         payNowBtn.addEventListener('click', async () => {
-            let isFreeClaim = currentPromo && currentPromo.type === 'free_games' && gamesToGrantFromPromo > 0;
-            let itemsToProcess = isFreeClaim ? gamesToGrantFromPromo : selectedGames;
+            if (!auth.currentUser) { alert("الرجاء تسجيل الدخول أولاً لإتمام عملية الشراء."); return; }
+            payNowBtn.disabled = true; payNowBtn.textContent = 'جاري المعالجة...';
+            const userId = auth.currentUser.uid;
+            const token = await getIdToken(auth.currentUser);
+            const currentPurchaseDropdown = document.getElementById('purchase-dropdown');
 
-            if (itemsToProcess <= 0) {
-                alert("الرجاء اختيار باقة ألعاب أو تطبيق كود ألعاب صالح.");
-                return;
-            }
-
-            payNowBtn.disabled = true;
-            payNowBtn.textContent = 'جار المعالجة...';
-
-            try {
-                const token = await getIdToken(user);
-                const payload = {
-                    userId: user.uid,
-                    email: user.email, // MyFatoorah might need customer email
-                    amount: finalPrice, // Send final calculated price
-                    packageName: selectedPackageName,
-                    gamesInPackage: selectedGames, // Original games in package before discount
-                    promoCode: currentPromo ? currentPromo.code : null,
-                    isFreeClaim: isFreeClaim,
-                    gamesToGrantFromPromo: gamesToGrantFromPromo, // For backend to verify free claim
-                };
-
-                // If it's a free claim from a promo code, directly update balance (or let backend do it)
-                if (isFreeClaim) {
-                    console.log(`Claiming ${gamesToGrantFromPromo} free games for user ${user.uid} via promo ${currentPromo.code}.`);
-                    // Backend should verify promo and add games.
-                    // For frontend-only simulation (if backend doesn't handle free claim logic directly):
-                    // addGamesToBalance(user.uid, gamesToGrantFromPromo, "promo_claim");
-                    // alert(`تمت إضافة ${gamesToGrantFromPromo} لعبة مجانية إلى رصيدك!`);
-
-                    // Assuming backend handles the free claim and games addition:
-                    const freeClaimResponse = await fetch(`${RENDER_API_BASE_URL}/api/payments/claim-free-games`, {
+            if (currentPromo && currentPromo.type === 'free_games' && gamesToGrantFromPromo > 0) {
+                try {
+                    const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${userId}/grant-free-games`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify(payload)
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ promoCode: currentPromo.code, gamesToGrant: gamesToGrantFromPromo, source: `Promo: ${currentPromo.code}` })
                     });
-
-                    if (!freeClaimResponse.ok) {
-                        const errorData = await freeClaimResponse.json();
-                        throw new Error(errorData.message || "فشل في الحصول على الألعاب المجانية.");
-                    }
-                    const claimResult = await freeClaimResponse.json();
-                    addGamesToBalance(user.uid, claimResult.gamesAdded || gamesToGrantFromPromo, "promo_backend_claim");
-                    alert(claimResult.message || `تمت إضافة ${claimResult.gamesAdded || gamesToGrantFromPromo} لعبة مجانية!`);
-
-                } else { // Regular payment processing
-                    const response = await fetch(`${RENDER_API_BASE_URL}/api/payments/initiate`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
                     if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || "فشل بدء عملية الدفع.");
+                        const errData = await response.json().catch(() => ({ message: 'فشل في الحصول على الألعاب المجانية من الخادم.' }));
+                        throw new Error(errData.message);
                     }
-
-                    const paymentData = await response.json();
-                    if (paymentData.paymentUrl) {
-                        // Redirect to MyFatoorah payment page
-                        window.location.href = paymentData.paymentUrl;
-                        // Backend will handle callback from MyFatoorah and update game balance.
-                        // The user will be redirected back to a success/failure page you configure in MyFatoorah.
-                        // On return to your app, onAuthStateChanged and syncGamesBalanceWithBackend should update the UI.
-                        return; // Stop further execution here as user is redirected
-                    } else {
-                        throw new Error("لم يتم استقبال رابط الدفع.");
+                    addGamesToBalance(userId, gamesToGrantFromPromo, `Promo: ${currentPromo.code}`);
+                    alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية.`);
+                    if(currentPurchaseDropdown) currentPurchaseDropdown.classList.remove('show');
+                    if (window.currentPurchaseDropdownSetup && typeof window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen === 'function') {
+                        window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen();
                     }
+                    await syncGamesBalanceWithBackend(userId);
+                } catch (error) {
+                    console.error("Error granting free games:", error);
+                    alert(`حدث خطأ أثناء الحصول على الألعاب المجانية: ${error.message}`);
+                } finally {
+                    if(payNowBtn) {payNowBtn.disabled = false; updateFinalPrice();}
                 }
-
-                // Reset dropdown if not redirected (e.g., for free claims processed here)
-                if (purchaseDropdown) purchaseDropdown.classList.remove('show');
-                selectedPrice = 0; selectedGames = 0; gamesToGrantFromPromo = 0; selectedPackageName = "";
-                purchaseOptions.forEach(opt => opt.classList.remove('selected'));
-                resetPromoState(true);
-
-            } catch (error) {
-                console.error("Payment/Claim Error:", error);
-                alert(error.message || "حدث خطأ أثناء محاولة الشراء/الحصول على الألعاب.");
-                payNowBtn.disabled = false;
-                updateFinalPrice(); // Reset button text and state
+            } else if (selectedGames > 0 && finalPrice >= 0) {
+                try {
+                    const paymentPayload = {
+                        amount: finalPrice, currency: "KWD", packageName: selectedPackageName, gamesInPackage: selectedGames,
+                        customerName: auth.currentUser.displayName || auth.currentUser.email, customerEmail: auth.currentUser.email,
+                        appliedPromoCode: (currentPromo && currentPromo.type === 'percentage') ? currentPromo.code : null
+                    };
+                    console.log("Initiating payment with payload:", paymentPayload);
+                    const paymentResponse = await fetch(`${RENDER_API_BASE_URL}/api/payment/initiate-myfatoorah`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify(paymentPayload)
+                    });
+                    if (!paymentResponse.ok) {
+                        const errorData = await paymentResponse.json().catch(() => ({ message: "فشل في بدء عملية الدفع." }));
+                        throw new Error(errorData.message);
+                    }
+                    const paymentData = await paymentResponse.json();
+                    if (paymentData.paymentURL) {
+                        window.location.href = paymentData.paymentURL;
+                    } else {
+                        throw new Error("لم يتم استلام رابط الدفع من الخادم.");
+                    }
+                } catch (error) {
+                    console.error("Payment initiation error:", error);
+                    alert(`خطأ في بدء عملية الدفع: ${error.message}`);
+                    if(payNowBtn) {payNowBtn.disabled = false; payNowBtn.textContent = 'ادفع الآن';}
+                }
+            } else {
+                alert("الرجاء اختيار باقة أولاً.");
+                if(payNowBtn) {payNowBtn.disabled = false; payNowBtn.textContent = 'ادفع الآن';}
             }
         });
-        payNowBtn.dataset.payListenerAttached = 'true';
     }
+
+    updateRemainingGamesDisplay(user.uid);
+    updateFinalPrice();
+    return { resetDropdownStateForNewOpen };
 }
+
 
 // --- Header UI Update ---
 function updateHeaderUI(user) {
     if (!userActionsContainer) return;
 
     if (user) {
-        const latestUser = auth.currentUser; // Get the most up-to-date user object
+        const latestUser = auth.currentUser;
         const displayName = latestUser?.displayName || (latestUser?.email ? latestUser.email.split('@')[0] : 'مستخدم رحلة');
         userActionsContainer.innerHTML = `
             <span class="user-greeting">مرحباً، ${displayName}</span>
@@ -781,7 +797,7 @@ function updateHeaderUI(user) {
                         <input type="text" id="promo-code-input" placeholder="أدخل كود الخصم" style="text-transform: uppercase;">
                         <button id="apply-promo-btn" class="btn btn-secondary btn-sm">تطبيق</button>
                     </div>
-                    {/* Promo status div will be inserted here by JS if not present */}
+                    {/* سيتم إدخال promoStatusDiv هنا بواسطة JS إذا لم يكن موجودًا */}
                     <div class="total-section">
                         <span>المجموع:</span> <strong id="total-price-display">0.00 KWD</strong>
                     </div>
@@ -793,33 +809,74 @@ function updateHeaderUI(user) {
         `;
 
         const logoutButtonHeader = document.getElementById('logout-btn-header');
-        if (logoutButtonHeader && !logoutButtonHeader.dataset.logoutListenerAttached) {
+        if (logoutButtonHeader && !logoutButtonHeader.dataset.listenerAttachedLogout) {
             logoutButtonHeader.addEventListener('click', () => {
                 signOut(auth).catch((error) => { console.error("Sign Out Error:", error); alert("خطأ تسجيل الخروج."); });
             });
-            logoutButtonHeader.dataset.logoutListenerAttached = 'true';
+            logoutButtonHeader.dataset.listenerAttachedLogout = 'true';
         }
 
         if (latestUser) {
-            setupPurchaseDropdown(latestUser); // Ensure it's called with the fresh user object
+            updateRemainingGamesDisplay(latestUser.uid);
+            const purchaseDropdownElement = document.getElementById('purchase-dropdown');
+            if (purchaseDropdownElement) {
+                window.currentPurchaseDropdownSetup = setupPurchaseDropdown(latestUser);
+            }
         }
     } else {
         userActionsContainer.innerHTML = `<a href="auth.html" class="btn btn-register">تسجيل / دخول</a>`;
+        window.currentPurchaseDropdownSetup = null;
     }
 }
+
+
+// --- تفويض الأحداث لزر فتح/إغلاق القائمة المنسدلة (يُضاف مرة واحدة) ---
+if (userActionsContainer && !userActionsContainer.dataset.delegatedListenerAttached) {
+    userActionsContainer.addEventListener('click', function(event) {
+        const gamesTriggerButton = event.target.closest('#games-trigger');
+        const purchaseDropdownElement = document.getElementById('purchase-dropdown');
+
+        if (gamesTriggerButton && purchaseDropdownElement) {
+            event.stopPropagation();
+            const isOpening = !purchaseDropdownElement.classList.contains('show');
+
+            if (isOpening && window.currentPurchaseDropdownSetup && typeof window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen === 'function') {
+                window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen();
+            }
+            purchaseDropdownElement.classList.toggle('show');
+        }
+    });
+    userActionsContainer.dataset.delegatedListenerAttached = 'true';
+}
+
+// لإغلاق القائمة عند النقر خارجها (يُضاف مرة واحدة)
+if (!document.body.dataset.globalDropdownCloseListener) {
+    document.addEventListener('click', function(event) {
+        const purchaseDropdownElement = document.getElementById('purchase-dropdown');
+        const gamesCounterContainer = document.querySelector('.games-counter-container');
+
+        if (purchaseDropdownElement && purchaseDropdownElement.classList.contains('show')) {
+            if (gamesCounterContainer && !gamesCounterContainer.contains(event.target)) {
+                purchaseDropdownElement.classList.remove('show');
+            }
+        }
+    });
+    document.body.dataset.globalDropdownCloseListener = 'true';
+}
+
 
 // --- Auth State Listener ---
 onAuthStateChanged(auth, async (user) => {
     const currentPage = window.location.pathname.toLowerCase().split('/').pop() || 'index.html';
     console.log(`Auth state change on: ${currentPage}. User: ${user ? user.uid : 'Logged out'}`);
 
-    updateHeaderUI(user); // Update header first, this might re-create dropdown elements
+    updateHeaderUI(user);
 
     if (user) {
-        await syncGamesBalanceWithBackend(user.uid); // Sync balance after login/auth state change
+        await syncGamesBalanceWithBackend(user.uid);
 
         if (currentPage === 'logged.html') {
-            await setupProfilePage(user); // Pass the user object
+            await setupProfilePage(user);
         }
         if (currentPage === 'auth.html') {
             window.location.href = 'index.html';
@@ -834,12 +891,46 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // --- Play Button Logic (index.html - Balance Check Only) ---
-function handlePlayAttemptCheckBalanceOnly() { /* ... (unchanged) ... */ }
-if (mainPlayButtonEl && (window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html'))) { /* ... (unchanged) ... */ }
+function handlePlayAttemptCheckBalanceOnly() {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+        alert("يجب تسجيل الدخول أولاً لتتمكن من اللعب.");
+        window.location.href = 'auth.html';
+        return false;
+    }
+    const gamesLeft = getRemainingGames(currentUser.uid);
+    if (gamesLeft > 0) {
+        console.log(`Balance check OK for ${currentUser.uid}: ${gamesLeft} games. Navigating to game setup.`);
+        return true;
+    } else {
+        alert("رصيدك من الألعاب هو 0. الرجاء شراء المزيد من الألعاب لتتمكن من اللعب.");
+        const gamesTrigger = document.getElementById('games-trigger');
+        const purchaseDropdown = document.getElementById('purchase-dropdown');
+        if (gamesTrigger && purchaseDropdown && !purchaseDropdown.classList.contains('show')) {
+            setTimeout(() => {
+                if(document.getElementById('games-trigger')) {
+                    document.getElementById('games-trigger').click();
+                }
+            }, 100);
+        }
+        return false;
+    }
+}
+
+if (mainPlayButtonEl && (window.location.pathname.endsWith('/') || window.location.pathname.endsWith('index.html'))) {
+    mainPlayButtonEl.addEventListener('click', function(event) {
+        event.preventDefault();
+        if (handlePlayAttemptCheckBalanceOnly()) {
+            window.location.href = this.href;
+        }
+    });
+}
+
 
 // --- Expose functions needed by game.js or other modules ---
 window.firebaseAuth = auth;
 window.getRemainingGamesForUser = getRemainingGames;
 window.deductGameFromUserBalance = deductGameFromBalance;
+window.RENDER_API_BASE_URL = RENDER_API_BASE_URL;
 
-console.log("main.js loaded and initialized. Using Render API for backend interactions.");
+console.log("main.js loaded with event delegation for purchase dropdown trigger. Full code restored.");
