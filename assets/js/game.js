@@ -28,10 +28,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyA5vUQpt15Y2INFgUoBMQgaNkashAhxWTM", // تأكد أن هذا هو مفتاحك الصحيح
+    apiKey: "AIzaSyA5vUQpt15Y2INFgUoBMQgaNkashAhxWTM",
     authDomain: "rehlaapp-9a985.firebaseapp.com",
     projectId: "rehlaapp-9a985",
-    storageBucket: "rehlaapp-9a985.appspot.com", // أو "rehlaapp-9a985.firebasestorage.app" - تأكد من القيمة الصحيحة من Firebase Console
+    storageBucket: "rehlaapp-9a985.firebasestorage.app",
     messagingSenderId: "827594007582",
     appId: "1:827594007582:web:cb07445443b72ce7cb7a0f"
 };
