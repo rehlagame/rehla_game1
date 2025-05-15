@@ -797,7 +797,7 @@ function updateHeaderUI(user) {
                         <input type="text" id="promo-code-input" placeholder="أدخل كود الخصم" style="text-transform: uppercase;">
                         <button id="apply-promo-btn" class="btn btn-secondary btn-sm">تطبيق</button>
                     </div>
-                    {/* سيتم إدخال promoStatusDiv هنا بواسطة JS إذا لم يكن موجودًا */}
+                   
                     <div class="total-section">
                         <span>المجموع:</span> <strong id="total-price-display">0.00 KWD</strong>
                     </div>
