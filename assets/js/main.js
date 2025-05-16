@@ -44,7 +44,7 @@ const storage = getStorage(app);
 // --- Constants ---
 const USER_GAMES_KEY_PREFIX = 'rehlaUserGames_';
 // تأكد 100% من أن هذا هو الـ URL الصحيح والنهائي لخادمك على Render
-const RENDER_API_BASE_URL = 'https://your-rehla-api.onrender.com'; // <--- استبدل هذا بالـ URL الصحيح للـ API الخاص بك!
+const RENDER_API_BASE_URL = 'https://rehla-game-backend.onrender.com'; // <--- استبدل هذا بالـ URL الصحيح للـ API الخاص بك!
 const PROMO_API_URL = `${RENDER_API_BASE_URL}/api/promos`;
 
 // --- DOM Element Selectors (Cached for performance) ---
