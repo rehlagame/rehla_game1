@@ -18,28 +18,29 @@ const PORT = parseInt(process.env.PORT, 10) || 3001;
 
 // تكوين CORS بشكل أكثر تحديدًا
 const corsOptions = {
-    origin: function (origin, callback) {
-        // قائمة المصادر المسموح بها
-        const allowedOrigins = [
-            'https://rehla-game1.vercel.app', // <--- تأكد أن هذا هو نطاق Vercel الفعلي والصحيح الخاص بك!
-            // إذا كنت لا تزال تختبر admin.html من file:///، أضف 'null'
-            'null',
-            // إذا كنت تشغل admin.html عبر خادم تطوير محلي (مثل Live Server في VS Code) أضف منفذه:
-            // 'http://localhost:5500', // مثال إذا كان Live Server يعمل على 5500
-            // 'http://127.0.0.1:5500'  // مثال آخر لـ Live Server
-        ];
+  origin: function (origin, callback) {
+    // قائمة المصادر المسموح بها
+    const allowedOrigins = [
+      'https://rehla-game1.vercel.app', // نطاق Vercel الخاص بك (تأكد من صحته)
+      'http://localhost:63342',         // للسماح بالوصول من WebStorm IDE (أو أي خادم تطوير محلي على هذا المنفذ)
+      // 'null' // عادةً، إذا كان origin هو 'null' (من file:///)، فإن !origin سيكون true
+                // ولكن يمكننا إضافته صراحة إذا لزم الأمر لبعض المتصفحات أو الحالات
+    ];
 
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            console.warn(`CORS: Origin ${origin} not allowed by CORS policy.`);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // تأكد من تضمين OPTIONS
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // أضف أي headers أخرى تستخدمها (Authorization مهم لـ Firebase token)
-    credentials: true, // مهم إذا كنت ترسل cookies أو Authorization header
-    optionsSuccessStatus: 200 // بعض المتصفحات القديمة (IE11) تتعثر على 204
+    // اسمح بالطلبات التي ليس لها origin (مثل ملفات html محلية من file:///)
+    // أو إذا كان Origin ضمن المصادر المسموح بها
+    // أو إذا كان origin هو السلسلة الحرفية 'null' (لبعض المتصفحات عند فتح ملف محلي)
+    if (!origin || origin === 'null' || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS: Origin ${origin} not allowed by CORS policy.`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // تأكد من تضمين OPTIONS
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], // أضف أي headers أخرى تستخدمها (Authorization مهم لـ Firebase token)
+  credentials: true, // مهم إذا كنت ترسل cookies أو Authorization header
+  optionsSuccessStatus: 200 // بعض المتصفحات القديمة (IE11) تتعثر على 204
 };
 
 app.use(cors(corsOptions));
