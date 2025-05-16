@@ -1012,7 +1012,7 @@ if (mainPlayButtonEl && (window.location.pathname.endsWith('/') || window.locati
 // --- Expose functions needed by game.js or other modules ---
 window.firebaseAuth = auth;
 window.getRemainingGamesForUser = getRemainingGames;
-window.deductGameFromUserBalance = deductGameFromBalance;
+window.updateRemainingGamesDisplay = updateRemainingGamesDisplay; // اجعل هذه متاحة
 window.RENDER_API_BASE_URL = RENDER_API_BASE_URL;
 
 console.log("main.js loaded and updated. RENDER_API_BASE_URL is set to:", RENDER_API_BASE_URL);
