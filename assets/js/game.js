@@ -394,73 +394,104 @@ function displayResults() {
     }
 }
 
-/// MODIFIED: initializeGame now first fetches data from API
+// في assets/js/game.js
+
+// ... (الكود الذي يسبق دالة initializeGame) ...
+
 async function initializeGame() {
     console.log("Attempting to initialize game...");
-    const startButton = gameSetupForm ? gameSetupForm.querySelector('.btn-start-game') : null; // احصل على الزر مبكرًا
+    const startButton = gameSetupForm ? gameSetupForm.querySelector('.btn-start-game') : null;
 
     const currentUser = window.firebaseAuth ? window.firebaseAuth.currentUser : null;
     if (!currentUser) {
         alert("خطأ: المستخدم غير مسجل الدخول. لا يمكن بدء اللعبة.");
-        // لا تقم بإخفاء/إظهار الأقسام هنا، فقط أعد تفعيل الزر
         if (startButton) startButton.disabled = false;
         return;
     }
 
-    // يجب استدعاء window.deductGameFromUserBalance الذي تم تعريفه في main.js
-    const canPlayNow = window.deductGameFromUserBalance ? window.deductGameFromUserBalance(currentUser.uid) : false;
+    // --- بداية التعديل الرئيسي هنا: خصم اللعبة من الخادم ---
+    let serverDeductSuccessful = false;
+    let newBalanceFromServer;
 
-    if (!canPlayNow) {
-        alert("رصيدك من الألعاب هو 0. الرجاء شراء المزيد من الألعاب لتتمكن من اللعب.");
-        console.log("InitializeGame aborted: No game balance for user " + currentUser.uid + " after attempting deduction.");
-        const noBalanceMessageId = 'no-balance-message';
-        let noBalanceDiv = document.getElementById(noBalanceMessageId);
-        if (!noBalanceDiv) {
-            noBalanceDiv = document.createElement('div');
-            noBalanceDiv.id = noBalanceMessageId;
-            noBalanceDiv.innerHTML = `
-                <h2 style="color: var(--danger-color); margin-bottom: 20px;">نفد رصيد الألعاب!</h2>
-                <p style="font-size: 1.1em; margin-bottom: 25px;">يجب عليك شراء المزيد من الألعاب لمواصلة اللعب.</p>
-                <p><i>يمكنك شراء الألعاب من الزر البرتقالي (+) في الهيدر.</i></p>`;
-            noBalanceDiv.style.cssText = "text-align: center; padding: 30px; background-color: var(--white-color); border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin: 20px auto; max-width: 500px;";
-            const mainContainer = document.querySelector('main.game-content > .container');
-            if (mainContainer) {
-                if (gameSetupSection) gameSetupSection.classList.add('hidden');
-                if (gamePlayArea) gamePlayArea.classList.add('hidden'); // تأكد أن منطقة اللعب مخفية
-                const existingMsg = mainContainer.querySelector(`#${noBalanceMessageId}`);
-                if(existingMsg) existingMsg.remove();
-                mainContainer.appendChild(noBalanceDiv);
-            }
-        } else {
-            noBalanceDiv.classList.remove('hidden');
-            if (gameSetupSection) gameSetupSection.classList.add('hidden'); // إخفاء نموذج الإعداد
+    try {
+        console.log(`[GameJS] Attempting to deduct game via backend for user ${currentUser.uid}`);
+        // تأكد أن main.js قد قام بتعريف window.RENDER_API_BASE_URL بشكل صحيح
+        if (!window.RENDER_API_BASE_URL) {
+            throw new Error("RENDER_API_BASE_URL is not defined on window object.");
         }
-        // إذا كان playAgainBtn موجودًا، فربما يجب تعطيله هنا أيضًا
-        if (playAgainBtn) { playAgainBtn.disabled = true; playAgainBtn.style.opacity = "0.5"; playAgainBtn.style.cursor = "not-allowed"; }
+        if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
+            throw new Error("Firebase auth or current user is not available for token generation.");
+        }
 
-        if (startButton) startButton.disabled = false; // أعد تفعيل الزر
-        return;
+        const token = await window.firebaseAuth.currentUser.getIdToken(true); // احصل على التوكن (مع تحديث إذا لزم الأمر)
+        const deductResponse = await fetch(`${window.RENDER_API_BASE_URL}/api/user/${currentUser.uid}/deduct-game`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+            // لا حاجة لـ body هنا إذا كان الخصم دائمًا لعبة واحدة ولا يرسل بيانات إضافية
+        });
+
+        const deductData = await deductResponse.json(); // اقرأ الرد دائمًا
+
+        if (!deductResponse.ok) {
+            // إذا فشل الخصم في الخادم (بسبب عدم وجود رصيد أو خطأ آخر)
+            alert(deductData.message || "فشل التحقق من رصيد الألعاب في الخادم.");
+            console.error("Backend deduction failed:", deductResponse.status, deductData.message);
+            if (startButton) startButton.disabled = false; // أعد تفعيل زر البدء
+            return; // لا تبدأ اللعبة
+        }
+
+        // إذا نجح الخصم في الخادم
+        serverDeductSuccessful = true;
+        newBalanceFromServer = deductData.newBalance; // الرصيد الجديد من الخادم
+        console.log(`[GameJS] Game deduction successful on backend. New balance: ${newBalanceFromServer}`);
+
+        // قم بتحديث localStorage والرصيد المعروض فورًا بالبيانات من الخادم
+        // تأكد أن getUserGamesKey و updateRemainingGamesDisplay متاحتان (معرفتان في main.js ومتاحتان كـ window. أو مستوردتان)
+        if (window.getUserGamesKey && window.updateRemainingGamesDisplay) {
+            localStorage.setItem(window.getUserGamesKey(currentUser.uid), newBalanceFromServer.toString());
+            window.updateRemainingGamesDisplay(currentUser.uid);
+        } else {
+            console.warn("getUserGamesKey or updateRemainingGamesDisplay is not available on window. UI might not update immediately.");
+            // كحل احتياطي إذا لم تكن الدوال العامة متاحة
+            localStorage.setItem(`rehlaUserGames_${currentUser.uid}`, newBalanceFromServer.toString());
+            const remainingGamesCountSpan = document.getElementById('remaining-games-count');
+            if (remainingGamesCountSpan) remainingGamesCountSpan.textContent = newBalanceFromServer;
+        }
+
+    } catch (error) {
+        console.error("Error calling /api/user/.../deduct-game endpoint or processing its response:", error);
+        alert(`حدث خطأ أثناء الاتصال بالخادم لخصم اللعبة: ${error.message || 'يرجى المحاولة مرة أخرى.'}`);
+        if (startButton) startButton.disabled = false; // أعد تفعيل زر البدء
+        return; // لا تبدأ اللعبة
     }
 
-    try { // --- بداية try...catch رئيسي لمعظم منطق التهيئة ---
+    // هذا الشرط للتأكيد، يجب أن يكون قد تم الخروج قبله إذا فشل الخصم
+    if (!serverDeductSuccessful) {
+        console.error("InitializeGame aborted: Server deduction was not successful (should have returned earlier).");
+        if (startButton) startButton.disabled = false;
+        return;
+    }
+    // --- نهاية التعديل الرئيسي هنا ---
 
-        // NEW: Fetch game data from API if not already loaded
+
+    // بقية دالة initializeGame تستمر إذا نجح الخصم من الخادم
+    try {
         if (!isGameDataLoaded) {
             if (startButton) {
                 startButton.textContent = 'جاري تحميل بيانات اللعبة...';
-                // startButton.disabled = true; // الزر معطل بالفعل من معالج submit
             }
-            const gameDataFetched = await fetchGameDataFromAPI(); // fetchGameDataFromAPI تعالج أخطاءها وتعرض رسالة للمستخدم
-
+            const gameDataFetched = await fetchGameDataFromAPI();
             if (!gameDataFetched) {
                 if (startButton) {
                     startButton.textContent = 'بدء الرحلة!';
-                    startButton.disabled = false; // أعد تفعيله إذا فشل تحميل البيانات
+                    startButton.disabled = false;
                 }
                 if (playAgainBtn) { playAgainBtn.disabled = false; }
-                return; // توقف إذا فشل تحميل البيانات
+                return;
             }
-            // إذا نجح التحميل، أعد نص الزر (سيتم إعادة تفعيله لاحقًا إذا لزم الأمر)
             if (startButton) {
                 startButton.textContent = 'بدء الرحلة!';
             }
@@ -472,7 +503,7 @@ async function initializeGame() {
             return;
         }
 
-        resetGameState(true); // إعادة تعيين حالة اللعبة بالكامل
+        resetGameState(true);
 
         gameState.team1.name = team1NameInput.value.trim() || "الفريق الأول";
         gameState.team2.name = team2NameInput.value.trim() || "الفريق الثاني";
@@ -490,7 +521,6 @@ async function initializeGame() {
         let t1Station = null;
         let t2Station = null;
 
-        // Assign Team 1 start
         if (t1Start && available.includes(t1Start)) {
             t1Station = t1Start;
             available = available.filter(n => n !== t1Station);
@@ -503,7 +533,6 @@ async function initializeGame() {
             return;
         }
 
-        // Assign Team 2 start
         if (t2Start && available.includes(t2Start) && t2Start !== t1Station) {
             t2Station = t2Start;
             available = available.filter(n => n !== t2Station);
@@ -527,6 +556,7 @@ async function initializeGame() {
 
         gameState.team1.path = [{ name: t1Station }];
         gameState.team2.path = [{ name: t2Station }];
+        // ... (بقية منطق تهيئة المسارات وحالة اللعبة) ...
         gameState.team1.currentStationIndex = 0;
         gameState.team2.currentStationIndex = 0;
         gameState.team1.currentQuestionIndexInStation = 0;
@@ -571,7 +601,7 @@ async function initializeGame() {
             gameState.team2.path.push(...getPathStations(remainingStationsNeededPerTeam, team2CurrentPathNames));
         }
 
-        // إخفاء نموذج الإعداد وإظهار منطقة اللعب فقط عند النجاح الكامل
+
         if(gameSetupSection) gameSetupSection.classList.add('hidden');
         if(gamePlayArea) gamePlayArea.classList.remove('hidden');
         if(questionInteractionArea) questionInteractionArea.classList.remove('hidden');
@@ -581,23 +611,23 @@ async function initializeGame() {
 
         updateDashboard();
         startTurn();
-        console.log("Game Initialized and started successfully. 1 game deducted.");
-        // لا تقم بإعادة تفعيل زر البدء هنا لأن النموذج تم إخفاؤه
+        console.log("Game Initialized and started successfully AFTER server deduction.");
 
     } catch (error) {
-        console.error("Critical error during initializeGame:", error);
+        console.error("Critical error during game content initialization (after deduction attempt):", error);
         alert("حدث خطأ غير متوقع أثناء بدء اللعبة. يرجى المحاولة مرة أخرى.");
         if (startButton) {
             startButton.textContent = 'بدء الرحلة!';
-            startButton.disabled = false; // أعد تفعيل الزر عند حدوث خطأ فادح
+            startButton.disabled = false;
         }
-        // أعد إظهار نموذج الإعداد إذا كان مخفيًا بسبب رسالة رصيد الألعاب
         const noBalanceMessage = document.getElementById('no-balance-message');
         if (noBalanceMessage) noBalanceMessage.classList.add('hidden');
         if (gameSetupSection) gameSetupSection.classList.remove('hidden');
         if (gamePlayArea) gamePlayArea.classList.add('hidden');
     }
 }
+
+// ... (بقية الكود في game.js: startTurn, displayQuestion, إلخ)
 
 function startTurn() {
     console.log(`Starting turn for ${gameState.currentTurn}`);
