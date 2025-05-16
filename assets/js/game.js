@@ -67,7 +67,7 @@ const POINT_ASSIGNMENT_DELAY = 2500; // milliseconds
 // For robustness, it's better if main.js exports RENDER_API_BASE_URL and game.js imports it,
 // or ensure main.js script tag in HTML comes before game.js.
 // As a fallback or if main.js is not guaranteed to load first defining it:
-const RENDER_API_BASE_URL_GAME = typeof window !== 'undefined' && window.RENDER_API_BASE_URL ? window.RENDER_API_BASE_URL : 'https://your-rehla-api.onrender.com'; // Fallback
+const RENDER_API_BASE_URL_GAME = typeof window !== 'undefined' && window.RENDER_API_BASE_URL ? window.RENDER_API_BASE_URL : 'https://rehla-game-backend.onrender.com'; // <--- استخدم عنوان Render الصحيح هنا
 const RENDER_API_QUESTIONS_ENDPOINT = `${RENDER_API_BASE_URL_GAME}/api/game/questions-data`; // <--- استبدل بالـ Endpoint الصحيح إذا لزم الأمر
 
 // --- حالة اللعبة (Game State) ---
