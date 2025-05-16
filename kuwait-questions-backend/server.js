@@ -1,11 +1,11 @@
 // server.js
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors'); // تأكد من وجود هذا السطر
 const path = require('path');
 const fs = require('fs');
 const db = require('./database/database');
-const setupMulter = require('./middleware/multerConfig');
+// const setupMulter = require('./middleware/multerConfig'); // setupMulter غير مستخدم مباشرة هنا
 const questionRoutes = require('./routes/questionRoutes');
 const promoRoutes = require('./routes/promoRoutes');
 const multer = require('multer');
@@ -15,8 +15,8 @@ const PORT = parseInt(process.env.PORT, 10) || 3001;
 
 // --- Middleware ---
 
-// Enable CORS for all origins (narrow this in production)
-app.use(cors({ origin: '*' }));
+// Enable CORS for all origins
+app.use(cors()); // <--- تم التعديل هنا (إزالة الخيارات مؤقتًا)
 
 // Parse JSON and URL-encoded bodies
 app.use(express.json());
