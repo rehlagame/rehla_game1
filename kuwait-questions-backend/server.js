@@ -13,6 +13,7 @@ const multer = require('multer'); // multer يُستخدم في questionRoutes
 
 const app = express();
 const PORT = parseInt(process.env.PORT, 10) || 3001;
+const gameDataRoutes = require('./routes/gameDataRoutes'); // <--- أضف هذا
 
 // --- Middleware ---
 
@@ -60,6 +61,7 @@ console.log(
 app.use('/api/questions', questionRoutes);
 app.use('/api/promos', promoRoutes);
 app.use('/api/user', userRoutes); // تم تسجيل مسارات المستخدمين هنا
+app.use('/api/game', gameDataRoutes); // <--- أضف هذا لتسجيل المسارات الجديدة
 
 // Simple root endpoint (جيد للاختبار السريع لمعرفة ما إذا كان الخادم يعمل)
 app.get('/', (req, res) => {
