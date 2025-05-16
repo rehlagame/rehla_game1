@@ -12,7 +12,8 @@ const multer = require('multer');
 
 const app = express();
 const PORT = parseInt(process.env.PORT, 10) || 3001;
-
+const userRoutes = require('./routes/userRoutes'); // افترض أنك أنشأت هذا الملف
+app.use('/api/user', userRoutes); // <--- تسجيل المسارات الجديدة
 // --- Middleware ---
 
 // Enable CORS for all origins
