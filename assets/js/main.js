@@ -28,7 +28,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyA5vUQpt15Y2INFgUoBMQgaNkashAhxWTM",
+    apiKey: "AIzaSyA5vUQpt15Y2INFgUoBMQgaNkashAhxWTM", // انتبه: هذا المفتاح ظاهر للعامة
     authDomain: "rehlaapp-9a985.firebaseapp.com",
     projectId: "rehlaapp-9a985",
     storageBucket: "rehlaapp-9a985.firebasestorage.app",
@@ -43,8 +43,8 @@ const storage = getStorage(app);
 
 // --- Constants ---
 const USER_GAMES_KEY_PREFIX = 'rehlaUserGames_';
-// تأكد 100% من أن هذا هو الـ URL الصحيح والنهائي لخادمك على Render
-const RENDER_API_BASE_URL = 'https://rehla-game-backend.onrender.com'; // <--- استبدل هذا بالـ URL الصحيح للـ API الخاص بك!
+// !!!!! استبدل هذا بعنوان URL الفعلي لخدمة الواجهة الخلفية على Render !!!!!
+const RENDER_API_BASE_URL = 'https://rehla-game-backend.onrender.com'; // <--- مثال: 'https://your-rehla-backend.onrender.com'
 const PROMO_API_URL = `${RENDER_API_BASE_URL}/api/promos`;
 
 // --- DOM Element Selectors (Cached for performance) ---
@@ -151,40 +151,65 @@ function updateRemainingGamesDisplay(userId) {
 }
 
 async function syncGamesBalanceWithBackend(userId) {
-    if (!userId || !auth.currentUser) return;
+    if (!userId || !auth.currentUser) {
+        console.warn("syncGamesBalanceWithBackend: User not available for sync.");
+        return;
+    }
     try {
         const token = await getIdToken(auth.currentUser);
         const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${userId}/profile`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!response.ok) {
-            console.warn(`Failed to fetch user profile from backend for sync: ${response.status}, ${await response.text()}`);
+
+        if (response.status === 404) {
+            const errorData = await response.json().catch(() => ({ message: "User profile not found on server."}));
+            console.warn(`User profile not found on backend for UID: ${userId}. Message: ${errorData.message}. Games balance in localStorage might be stale or user needs to be registered in backend.`);
+            // إذا لم يتم العثور على المستخدم في الخلفية، لا تقم بتغيير رصيده المحلي إذا كان موجودًا
+            // فقد يكون هذا نتيجة لعملية تسجيل لم تكتمل في الخلفية بعد.
+            // لكن إذا لم يكن هناك رصيد محلي، يمكنك تعيين 0.
+            if (!localStorage.getItem(getUserGamesKey(userId))) {
+                localStorage.setItem(getUserGamesKey(userId), '0');
+                updateRemainingGamesDisplay(userId);
+            }
             return;
         }
+
+        if (!response.ok) {
+            const errorText = await response.text().catch(() => "No error text from server.");
+            console.warn(`Failed to fetch user profile from backend for sync: ${response.status}, ${errorText}`);
+            return;
+        }
+
         const profileData = await response.json();
-        if (profileData && typeof profileData.gamesBalance === 'number') {
-            localStorage.setItem(getUserGamesKey(userId), profileData.gamesBalance.toString());
+        if (profileData && typeof profileData.games_balance === 'number') { // تأكد من اسم الحقل الصحيح من الخادم
+            localStorage.setItem(getUserGamesKey(userId), profileData.games_balance.toString());
             updateRemainingGamesDisplay(userId);
-            console.log(`Synced games balance for ${userId} from backend: ${profileData.gamesBalance}`);
+            console.log(`Synced games balance for ${userId} from backend: ${profileData.games_balance}`);
         } else {
-            console.warn("Backend profile data for sync did not contain a valid gamesBalance.");
+            console.warn("Backend profile data for sync did not contain a valid games_balance. Profile Data:", profileData);
+            // إذا لم يرجع الخادم رصيدًا، لا تقم بتغيير الرصيد المحلي إلا إذا كان غير موجود
+             if (!localStorage.getItem(getUserGamesKey(userId))) {
+                localStorage.setItem(getUserGamesKey(userId), '0');
+                updateRemainingGamesDisplay(userId);
+            }
         }
     } catch (error) {
-        console.error("Error syncing games balance with backend:", error);
+        console.error("Error syncing games balance with backend (fetch failed or JSON parse error):", error);
     }
 }
 
-
-function addGamesToBalance(userId, gamesToAdd, source = "localStorage_update") {
+// هذه الدالة تستخدم فقط إذا كان الخادم لا يرجع الرصيد المحدث بعد عملية شراء ناجحة أو منح ألعاب
+// الأفضل دائمًا الاعتماد على الرصيد المرجع من الخادم.
+function addGamesToBalanceClientSide(userId, gamesToAdd, source = "client_side_update") {
     if (!userId || typeof gamesToAdd !== 'number' || gamesToAdd <= 0) {
-        console.warn("addGamesToBalance: Invalid userId or gamesToAdd.", { userId, gamesToAdd });
+        console.warn("addGamesToBalanceClientSide: Invalid userId or gamesToAdd.", { userId, gamesToAdd });
         return;
     }
     const currentGames = getRemainingGames(userId);
     const newTotalGames = currentGames + gamesToAdd;
     localStorage.setItem(getUserGamesKey(userId), newTotalGames.toString());
     updateRemainingGamesDisplay(userId);
-    console.log(`Added ${gamesToAdd} games (source: ${source}). New balance for ${userId}: ${newTotalGames}`);
+    console.log(`Client-side added ${gamesToAdd} games (source: ${source}). New balance for ${userId}: ${newTotalGames}`);
 }
 
 function deductGameFromBalance(userId) {
@@ -206,7 +231,7 @@ function deductGameFromBalance(userId) {
 
 // --- Authentication Logic ---
 const handleAuthSuccess = async (user, isNewUser = false, registrationData = null) => {
-    console.log("Authentication successful for:", user.uid, user.displayName);
+    console.log("Authentication successful for user:", user.uid, "Is new user:", isNewUser);
     hideAuthMessages();
 
     if (isNewUser && registrationData) {
@@ -222,6 +247,7 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
                 photoURL: user.photoURL || null,
             };
 
+            console.log("Attempting to register new user profile with backend:", profilePayload);
             const response = await fetch(`${RENDER_API_BASE_URL}/api/user/register-profile`, {
                 method: 'POST',
                 headers: {
@@ -231,31 +257,42 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
                 body: JSON.stringify(profilePayload)
             });
 
+            const responseText = await response.text(); // اقرأ الرد كنص أولاً لتشخيص المشكلة
+            console.log("Response from /register-profile:", response.status, responseText);
+
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error("Failed to save new user profile to backend:", errorData.message || response.status);
-                localStorage.setItem(getUserGamesKey(user.uid), '0');
+                let errorData = { message: "Unknown error during profile registration." };
+                try { errorData = JSON.parse(responseText); } catch (e) { console.error("Could not parse error response as JSON:", e); }
+                console.error("Failed to save new user profile to backend:", response.status, errorData.message);
+                localStorage.setItem(getUserGamesKey(user.uid), '5'); // رصيد ابتدائي افتراضي
             } else {
-                console.log("New user profile saved to backend.");
-                const backendProfile = await response.json();
-                if (backendProfile && typeof backendProfile.gamesBalance === 'number') {
-                    localStorage.setItem(getUserGamesKey(user.uid), backendProfile.gamesBalance.toString());
+                console.log("New user profile successfully saved/retrieved from backend.");
+                const backendProfile = JSON.parse(responseText); // الآن يمكننا تحليل JSON بأمان
+                if (backendProfile && typeof backendProfile.games_balance === 'number') {
+                    localStorage.setItem(getUserGamesKey(user.uid), backendProfile.games_balance.toString());
                 } else {
-                    localStorage.setItem(getUserGamesKey(user.uid), '0');
+                    console.warn("Backend profile registration response did not contain a valid games_balance. Using default. Profile:", backendProfile);
+                    localStorage.setItem(getUserGamesKey(user.uid), '5');
                 }
             }
         } catch (error) {
-            console.error("Error saving new user profile to backend:", error);
-            localStorage.setItem(getUserGamesKey(user.uid), '0');
+            console.error("Error in try-catch during new user profile registration with backend:", error);
+            localStorage.setItem(getUserGamesKey(user.uid), '5');
         }
     } else if (!isNewUser) {
         await syncGamesBalanceWithBackend(user.uid);
     } else {
-        localStorage.setItem(getUserGamesKey(user.uid), '0');
+        // هذه الحالة لا يجب أن تحدث (مستخدم غير جديد ولكن registrationData هو null)
+        // كإجراء احتياطي، حاول المزامنة
+        console.warn("handleAuthSuccess: Unexpected state - not new user but no prior sync. Attempting sync.");
+        await syncGamesBalanceWithBackend(user.uid);
     }
 
     updateRemainingGamesDisplay(user.uid);
-    window.location.href = 'index.html';
+    // تأخير بسيط قبل إعادة التوجيه للسماح ببعض العمليات غير المتزامنة بالانتهاء إذا لزم الأمر
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 100);
 };
 
 if (registerEmailFormEl) {
@@ -324,10 +361,19 @@ const handleSocialSignIn = async (provider) => {
     try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        await handleAuthSuccess(user, result.additionalUserInfo?.isNewUser || false, {
-            displayName: user.displayName,
-            email: user.email,
-        });
+        const isNewUser = result.additionalUserInfo?.isNewUser || false;
+        let registrationData = null;
+        if (isNewUser) {
+            const nameParts = user.displayName ? user.displayName.split(' ') : [''];
+            registrationData = {
+                displayName: user.displayName,
+                email: user.email,
+                firstName: nameParts[0] || '',
+                lastName: nameParts.slice(1).join(' ') || '',
+                // لا يوجد رقم هاتف أو كود دولة من تسجيل الدخول الاجتماعي عادةً
+            };
+        }
+        await handleAuthSuccess(user, isNewUser, registrationData);
     } catch (error) {
         console.error("Social Sign-In Error:", error);
         if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
@@ -350,7 +396,10 @@ if (appleSignInButtonEl) {
 // --- Profile Page (Logged.html) Logic ---
 async function setupProfilePage(user) {
     const els = profilePageElements;
-    if (!els.infoForm || !user) return;
+    if (!els.infoForm || !user) {
+        console.warn("setupProfilePage: Missing elements or user object.");
+        return;
+    }
 
     if (els.userPhoto) els.userPhoto.src = user.photoURL || 'assets/images/default-avatar.png';
     if (els.summaryName) els.summaryName.textContent = user.displayName || 'مستخدم رحلة';
@@ -363,31 +412,47 @@ async function setupProfilePage(user) {
         const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${user.uid}/profile`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
-        if (!response.ok) throw new Error('Failed to fetch profile from backend for setupProfilePage');
-        const profileData = await response.json();
 
-        if (els.firstNameInput) els.firstNameInput.value = profileData.firstName || '';
-        if (els.lastNameInput) els.lastNameInput.value = profileData.lastName || '';
-        if (profileData.phone) {
-            let fullPhone = profileData.phone;
-            let countryCode = "+965";
-            let phoneNum = fullPhone;
-            const knownCodes = ["+965", "+966", "+971", "+973", "+974", "+968"];
-            for (const code of knownCodes) {
-                if (fullPhone.startsWith(code)) {
-                    countryCode = code;
-                    phoneNum = fullPhone.substring(code.length);
-                    break;
+        if (response.status === 404) {
+            console.warn(`Profile for user ${user.uid} not found in backend during setupProfilePage. Using Firebase data as fallback.`);
+            const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
+            if (els.firstNameInput) els.firstNameInput.value = nameParts[0] || '';
+            if (els.lastNameInput) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
+            if (els.countryCodeSelect) els.countryCodeSelect.value = '+965';
+            if (els.phoneInput) els.phoneInput.value = '';
+        } else if (!response.ok) {
+            const errorText = await response.text().catch(() => "Failed to fetch profile details.");
+            console.error(`Failed to fetch profile from backend (setupProfilePage): ${response.status} - ${errorText}`);
+            // استخدام بيانات Firebase كقيم افتراضية عند الخطأ أيضًا
+            const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
+            if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || ''; // فقط إذا لم يتم ملؤها بعد
+            if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
+        } else {
+            const profileData = await response.json();
+            console.log("Backend profile data for setupProfilePage:", profileData);
+            if (els.firstNameInput) els.firstNameInput.value = profileData.first_name || '';
+            if (els.lastNameInput) els.lastNameInput.value = profileData.last_name || '';
+            if (profileData.phone) {
+                let fullPhone = profileData.phone;
+                let countryCode = "+965";
+                let phoneNum = fullPhone;
+                const knownCodes = ["+965", "+966", "+971", "+973", "+974", "+968"];
+                for (const code of knownCodes) {
+                    if (fullPhone.startsWith(code)) {
+                        countryCode = code;
+                        phoneNum = fullPhone.substring(code.length);
+                        break;
+                    }
                 }
+                if (els.countryCodeSelect) els.countryCodeSelect.value = countryCode;
+                if (els.phoneInput) els.phoneInput.value = phoneNum;
             }
-            if (els.countryCodeSelect) els.countryCodeSelect.value = countryCode;
-            if (els.phoneInput) els.phoneInput.value = phoneNum;
+            if (els.displayNameInput && profileData.display_name) els.displayNameInput.value = profileData.display_name;
+            if (els.userPhoto && profileData.photo_url) els.userPhoto.src = profileData.photo_url;
+            if (els.summaryName && profileData.display_name) els.summaryName.textContent = profileData.display_name;
         }
-        if (els.displayNameInput && profileData.displayName) els.displayNameInput.value = profileData.displayName;
-        if (els.userPhoto && profileData.photoURL) els.userPhoto.src = profileData.photoURL;
-        if (els.summaryName && profileData.displayName) els.summaryName.textContent = profileData.displayName;
     } catch (error) {
-        console.error("Error fetching profile data from backend for setupProfilePage:", error);
+        console.error("Error in try-catch fetching/processing profile data (setupProfilePage):", error);
         const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
         if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
         if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
@@ -401,23 +466,28 @@ async function setupProfilePage(user) {
 
                 const imageRef = storageRef(storage, `profile_pictures/${auth.currentUser.uid}/${file.name}`);
                 try {
-                    if (profilePageElements.userPhoto) profilePageElements.userPhoto.src = 'assets/images/loading-spinner.gif';
+                    if (profilePageElements.userPhoto) profilePageElements.userPhoto.src = 'assets/images/loading-spinner.gif'; // مؤشر تحميل
                     await uploadBytes(imageRef, file);
                     const downloadURL = await getDownloadURL(imageRef);
+                    
                     await updateProfile(auth.currentUser, { photoURL: downloadURL });
+                    
                     const token = await getIdToken(auth.currentUser);
                     const updateResponse = await fetch(`${RENDER_API_BASE_URL}/api/user/${auth.currentUser.uid}/profile`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ photoURL: downloadURL })
+                        body: JSON.stringify({ photo_url: downloadURL }) // تأكد أن الخادم يتوقع photo_url
                     });
-                    if (!updateResponse.ok) throw new Error('Failed to update profile photo URL in backend.');
+                    if (!updateResponse.ok) {
+                        const errorData = await updateResponse.json().catch(() => ({message: "Failed to update photo in backend."}));
+                        throw new Error(errorData.message);
+                    }
                     if (els.userPhoto) els.userPhoto.src = downloadURL;
                     showSuccessMessage("تم تحديث صورة الملف الشخصي بنجاح!", els.updateSuccessDiv);
                     setTimeout(() => { if (els.updateSuccessDiv) els.updateSuccessDiv.style.display = 'none'; }, 3000);
                 } catch (error) {
                     console.error("Error uploading profile picture or updating backend:", error);
-                    showAuthError(getFriendlyErrorMessage(error.code || 'PROFILE_PIC_UPLOAD_ERROR'), els.updateErrorDiv);
+                    showAuthError(error.message || getFriendlyErrorMessage(error.code || 'PROFILE_PIC_UPLOAD_ERROR'), els.updateErrorDiv);
                     if (els.userPhoto && auth.currentUser) els.userPhoto.src = auth.currentUser.photoURL || 'assets/images/default-avatar.png';
                 }
             });
@@ -436,21 +506,26 @@ async function setupProfilePage(user) {
             const newPhone = els.phoneInput.value;
             let newDisplayName = els.displayNameInput.value.trim();
             if (!newDisplayName) newDisplayName = `${newFirstName} ${newLastName}`.trim() || auth.currentUser.email.split('@')[0];
-            const updatedProfileData = {
-                firstName: newFirstName, lastName: newLastName, displayName: newDisplayName,
-                phone: newCountryCode && newPhone ? `${newCountryCode}${newPhone}` : auth.currentUser.phoneNumber,
+            
+            const updatedProfileDataForBackend = {
+                firstName: newFirstName, 
+                lastName: newLastName, 
+                displayName: newDisplayName,
+                phone: newCountryCode && newPhone ? `${newCountryCode}${newPhone}` : null,
             };
+            
             try {
                 await updateProfile(auth.currentUser, { displayName: newDisplayName });
+                
                 const token = await getIdToken(auth.currentUser);
                 const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${auth.currentUser.uid}/profile`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify(updatedProfileData)
+                    body: JSON.stringify(updatedProfileDataForBackend)
                 });
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.message || 'Failed to update profile in backend.');
+                    const errorData = await response.json().catch(() => ({message: "Failed to update profile in backend."}));
+                    throw new Error(errorData.message);
                 }
                 if (els.summaryName) els.summaryName.textContent = newDisplayName;
                 showSuccessMessage("تم تحديث بيانات الملف الشخصي بنجاح!", els.updateSuccessDiv);
@@ -496,7 +571,6 @@ async function setupProfilePage(user) {
         els.changePasswordForm.dataset.listenerAttached = 'true';
     }
 
-
     if (els.tabLinks.length > 0 && !els.tabLinks[0].dataset.tabListenerAttached) {
         els.tabLinks.forEach(link => {
             link.addEventListener('click', () => {
@@ -520,7 +594,7 @@ async function setupProfilePage(user) {
             if (!auth.currentUser) return;
             if (confirm("هل أنت متأكد أنك تريد حذف حسابك نهائياً؟ هذا الإجراء لا يمكن التراجع عنه.")) {
                 const currentPassword = prompt("لحذف حسابك، يرجى إدخال كلمة المرور الحالية:");
-                if (currentPassword === null) return; // User cancelled
+                if (currentPassword === null) return; 
 
                 try {
                     const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
@@ -533,11 +607,11 @@ async function setupProfilePage(user) {
                     });
 
                     if (!backendDeleteResponse.ok) {
-                        const errorData = await backendDeleteResponse.json().catch(() => ({}));
-                        throw new Error(errorData.message || 'فشل حذف بيانات الحساب من الخادم.');
+                        const errorData = await backendDeleteResponse.json().catch(() => ({message: "Failed to delete user data from server."}));
+                        throw new Error(errorData.message);
                     }
                     console.log("User data deleted from backend.");
-
+                    
                     await auth.currentUser.delete();
 
                     alert("تم حذف حسابك بنجاح.");
@@ -552,13 +626,11 @@ async function setupProfilePage(user) {
     }
 }
 
-
 // --- Purchase Dropdown Logic ---
 function setupPurchaseDropdown(user) {
     const purchaseDropdown = document.getElementById('purchase-dropdown');
     if (!purchaseDropdown) {
-        console.error("Purchase dropdown menu not found when setting up internal listeners.");
-        return { resetDropdownStateForNewOpen: () => {} }; // إرجاع دالة فارغة لتجنب أخطاء لاحقة
+        return { resetDropdownStateForNewOpen: () => {} };
     }
 
     const purchaseOptions = Array.from(purchaseDropdown.querySelectorAll('.purchase-option'));
@@ -617,20 +689,22 @@ function setupPurchaseDropdown(user) {
 
     function updateFinalPrice() {
         if (!totalPriceDisplay || !payNowBtn) return;
-        payNowBtn.disabled = true;
+        payNowBtn.disabled = true; // ابدأ بتعطيل الزر
         if (currentPromo && currentPromo.type === 'free_games') {
             finalPrice = 0;
             if (gamesToGrantFromPromo > 0) {
                 payNowBtn.disabled = false;
                 payNowBtn.textContent = `الحصول على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجاناً`;
-            } else payNowBtn.textContent = 'ادفع الآن';
+            } else payNowBtn.textContent = 'اختر عرضًا صالحًا';
         } else if (selectedGames > 0) {
             let discountMultiplier = 0;
-            if (currentPromo && currentPromo.type === 'percentage') discountMultiplier = currentPromo.value / 100;
+            if (currentPromo && currentPromo.type === 'percentage' && currentPromo.value > 0) {
+                discountMultiplier = currentPromo.value / 100;
+            }
             finalPrice = selectedPrice * (1 - discountMultiplier);
             payNowBtn.disabled = false; payNowBtn.textContent = 'ادفع الآن';
         } else {
-            finalPrice = 0; payNowBtn.textContent = 'ادفع الآن';
+            finalPrice = 0; payNowBtn.textContent = 'اختر باقة أولاً';
         }
         totalPriceDisplay.textContent = `${finalPrice.toFixed(2)} KWD`;
     }
@@ -643,47 +717,48 @@ function setupPurchaseDropdown(user) {
             selectedPrice = parseFloat(option.dataset.price) || 0;
             selectedGames = parseInt(option.dataset.games) || 0;
             selectedPackageName = option.querySelector('span:first-child').textContent;
-            gamesToGrantFromPromo = 0;
-            resetPromoState(false);
             updateFinalPrice();
         });
     });
 
     if (applyPromoBtn) {
         applyPromoBtn.addEventListener('click', async () => {
-            if (!promoInput || !auth.currentUser) return;
+            if (!promoInput || !auth.currentUser) {
+                if (!auth.currentUser) alert("الرجاء تسجيل الدخول أولاً لتطبيق كود الخصم.");
+                return;
+            }
             const promoCodeValue = promoInput.value.trim().toUpperCase();
             if (!promoCodeValue) {
                 showPromoStatus("الرجاء إدخال كود الخصم.", "error");
                 return;
             }
-            applyPromoBtn.disabled = true;
-            applyPromoBtn.textContent = 'جار التحقق...';
+            applyPromoBtn.disabled = true; applyPromoBtn.textContent = 'جار التحقق...';
             showPromoStatus("جار التحقق من الكود...", "info");
             try {
                 const token = await getIdToken(auth.currentUser);
                 const response = await fetch(`${PROMO_API_URL}/validate/${promoCodeValue}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
+                const responseData = await response.json(); // اقرأ الرد دائمًا
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({ message: "كود الخصم غير صالح أو منتهي الصلاحية." }));
-                    throw new Error(errorData.message || "كود الخصم غير صالح.");
+                    throw new Error(responseData.message || "كود الخصم غير صالح أو منتهي الصلاحية.");
                 }
-                const promoData = await response.json();
-                currentPromo = promoData;
-                if (promoData.type === 'free_games' && promoData.value > 0) {
-                    gamesToGrantFromPromo = promoData.value;
+                currentPromo = responseData;
+                if (responseData.type === 'free_games' && responseData.value > 0) {
+                    gamesToGrantFromPromo = responseData.value;
                     selectedGames = 0; selectedPrice = 0;
-                    selectedPackageName = `${promoData.value} ${promoData.value === 1 ? 'لعبة' : (promoData.value === 2 ? 'لعبتين' : `${promoData.value} ألعاب`)} مجانية (عرض)`;
+                    selectedPackageName = `${responseData.value} لعبة/ألعاب مجانية (عرض)`;
                     showPromoStatus(`تم تطبيق العرض! ستحصل على ${gamesToGrantFromPromo} ألعاب مجانية.`, "success");
                     purchaseOptions.forEach(opt => {
                         opt.classList.remove('selected'); opt.style.pointerEvents = 'none'; opt.style.opacity = '0.5';
                     });
-                    promoInput.disabled = true;
-                } else if (promoData.type === 'percentage' && promoData.value > 0) {
+                    if (promoInput) promoInput.disabled = true;
+                } else if (responseData.type === 'percentage' && responseData.value > 0) {
                     gamesToGrantFromPromo = 0;
-                    showPromoStatus(`تم تطبيق خصم ${promoData.value}% بنجاح!`, "success");
-                    if (selectedGames === 0) showPromoStatus(`تم تطبيق خصم ${promoData.value}%. اختر باقة للاستفادة من الخصم.`, "info");
+                    showPromoStatus(`تم تطبيق خصم ${responseData.value}% بنجاح!`, "success");
+                    if (selectedGames === 0) {
+                        showPromoStatus(`تم تطبيق خصم ${responseData.value}%. اختر باقة للاستفادة من الخصم.`, "info");
+                    }
                 } else {
                     throw new Error("نوع كود الخصم غير مدعوم أو قيمة الخصم غير صالحة.");
                 }
@@ -691,8 +766,9 @@ function setupPurchaseDropdown(user) {
                 console.error("Promo validation error:", error);
                 showPromoStatus(error.message || "خطأ في تطبيق كود الخصم.", "error");
                 currentPromo = null; gamesToGrantFromPromo = 0;
+                resetPromoState(false); // أعد تمكين حقول الباقات عند فشل تطبيق الكود
             } finally {
-                if(applyPromoBtn) { applyPromoBtn.disabled = false; applyPromoBtn.textContent = 'تطبيق';}
+                if(applyPromoBtn) { applyPromoBtn.disabled = (currentPromo && currentPromo.type === 'free_games'); applyPromoBtn.textContent = 'تطبيق';}
                 updateFinalPrice();
             }
         });
@@ -700,11 +776,11 @@ function setupPurchaseDropdown(user) {
 
     if (payNowBtn) {
         payNowBtn.addEventListener('click', async () => {
-            if (!auth.currentUser) { alert("الرجاء تسجيل الدخول أولاً لإتمام عملية الشراء."); return; }
+            if (!auth.currentUser) { alert("الرجاء تسجيل الدخول أولاً لإتمام العملية."); return; }
             payNowBtn.disabled = true; payNowBtn.textContent = 'جاري المعالجة...';
             const userId = auth.currentUser.uid;
             const token = await getIdToken(auth.currentUser);
-            const currentPurchaseDropdown = document.getElementById('purchase-dropdown');
+            const currentPurchaseDropdownElement = document.getElementById('purchase-dropdown');
 
             if (currentPromo && currentPromo.type === 'free_games' && gamesToGrantFromPromo > 0) {
                 try {
@@ -713,20 +789,29 @@ function setupPurchaseDropdown(user) {
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                         body: JSON.stringify({ promoCode: currentPromo.code, gamesToGrant: gamesToGrantFromPromo, source: `Promo: ${currentPromo.code}` })
                     });
+                    
+                    const responseData = await response.json();
                     if (!response.ok) {
-                        const errData = await response.json().catch(() => ({ message: 'فشل في الحصول على الألعاب المجانية من الخادم.' }));
-                        throw new Error(errData.message);
+                        throw new Error(responseData.message || 'فشل في الحصول على الألعاب المجانية من الخادم.');
                     }
-                    addGamesToBalance(userId, gamesToGrantFromPromo, `Promo: ${currentPromo.code}`);
-                    alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية.`);
-                    if(currentPurchaseDropdown) currentPurchaseDropdown.classList.remove('show');
+                    
+                    if (responseData && typeof responseData.newBalance === 'number') {
+                        localStorage.setItem(getUserGamesKey(userId), responseData.newBalance.toString());
+                        updateRemainingGamesDisplay(userId);
+                        alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية. رصيدك الآن ${responseData.newBalance}.`);
+                    } else {
+                        console.warn("Grant free games response did not contain newBalance, syncing from profile.");
+                        await syncGamesBalanceWithBackend(userId); // محاولة مزامنة إذا لم يرجع الخادم الرصيد
+                        alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية. يتم تحديث رصيدك.`);
+                    }
+
+                    if(currentPurchaseDropdownElement) currentPurchaseDropdownElement.classList.remove('show');
                     if (window.currentPurchaseDropdownSetup && typeof window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen === 'function') {
                         window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen();
                     }
-                    await syncGamesBalanceWithBackend(userId);
                 } catch (error) {
                     console.error("Error granting free games:", error);
-                    alert(`حدث خطأ أثناء الحصول على الألعاب المجانية: ${error.message}`);
+                    alert(error.message || `حدث خطأ أثناء الحصول على الألعاب المجانية. حاول مرة أخرى أو تواصل مع الدعم.`);
                 } finally {
                     if(payNowBtn) {payNowBtn.disabled = false; updateFinalPrice();}
                 }
@@ -760,7 +845,7 @@ function setupPurchaseDropdown(user) {
                 }
             } else {
                 alert("الرجاء اختيار باقة أولاً.");
-                if(payNowBtn) {payNowBtn.disabled = false; payNowBtn.textContent = 'ادفع الآن';}
+                if(payNowBtn) {payNowBtn.disabled = false; updateFinalPrice();}
             }
         });
     }
@@ -769,7 +854,6 @@ function setupPurchaseDropdown(user) {
     updateFinalPrice();
     return { resetDropdownStateForNewOpen };
 }
-
 
 // --- Header UI Update ---
 function updateHeaderUI(user) {
@@ -797,11 +881,11 @@ function updateHeaderUI(user) {
                         <input type="text" id="promo-code-input" placeholder="أدخل كود الخصم" style="text-transform: uppercase;">
                         <button id="apply-promo-btn" class="btn btn-secondary btn-sm">تطبيق</button>
                     </div>
-                   
+                    
                     <div class="total-section">
                         <span>المجموع:</span> <strong id="total-price-display">0.00 KWD</strong>
                     </div>
-                    <button id="pay-now-btn" class="btn btn-primary btn-block" disabled>ادفع الآن</button>
+                    <button id="pay-now-btn" class="btn btn-primary btn-block" disabled>اختر باقة أولاً</button>
                 </div>
             </div>
             <a href="Logged.html" class="btn btn-logout" style="color: white;">حسابي</a>
@@ -820,7 +904,7 @@ function updateHeaderUI(user) {
             updateRemainingGamesDisplay(latestUser.uid);
             const purchaseDropdownElement = document.getElementById('purchase-dropdown');
             if (purchaseDropdownElement) {
-                window.currentPurchaseDropdownSetup = setupPurchaseDropdown(latestUser);
+                window.currentPurchaseDropdownSetup = setupPurchaseDropdown(latestUser); 
             }
         }
     } else {
@@ -828,7 +912,6 @@ function updateHeaderUI(user) {
         window.currentPurchaseDropdownSetup = null;
     }
 }
-
 
 // --- تفويض الأحداث لزر فتح/إغلاق القائمة المنسدلة (يُضاف مرة واحدة) ---
 if (userActionsContainer && !userActionsContainer.dataset.delegatedListenerAttached) {
@@ -853,7 +936,7 @@ if (userActionsContainer && !userActionsContainer.dataset.delegatedListenerAttac
 if (!document.body.dataset.globalDropdownCloseListener) {
     document.addEventListener('click', function(event) {
         const purchaseDropdownElement = document.getElementById('purchase-dropdown');
-        const gamesCounterContainer = document.querySelector('.games-counter-container');
+        const gamesCounterContainer = document.querySelector('.games-counter-container'); 
 
         if (purchaseDropdownElement && purchaseDropdownElement.classList.contains('show')) {
             if (gamesCounterContainer && !gamesCounterContainer.contains(event.target)) {
@@ -875,7 +958,7 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         await syncGamesBalanceWithBackend(user.uid);
 
-        if (currentPage === 'logged.html') {
+        if (currentPage === 'logged.html' && typeof setupProfilePage === 'function') {
             await setupProfilePage(user);
         }
         if (currentPage === 'auth.html') {
@@ -926,11 +1009,10 @@ if (mainPlayButtonEl && (window.location.pathname.endsWith('/') || window.locati
     });
 }
 
-
 // --- Expose functions needed by game.js or other modules ---
 window.firebaseAuth = auth;
 window.getRemainingGamesForUser = getRemainingGames;
 window.deductGameFromUserBalance = deductGameFromBalance;
 window.RENDER_API_BASE_URL = RENDER_API_BASE_URL;
 
-console.log("main.js loaded with event delegation for purchase dropdown trigger. Full code restored.");
+console.log("main.js loaded and updated. RENDER_API_BASE_URL is set to:", RENDER_API_BASE_URL);
