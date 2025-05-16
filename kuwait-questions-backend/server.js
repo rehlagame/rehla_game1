@@ -22,8 +22,11 @@ const corsOptions = {
   origin: function (origin, callback) {
     // قائمة المصادر المسموح بها
     const allowedOrigins = [
-      'https://rehla-game1.vercel.app', // نطاق Vercel الخاص بك (تأكد من صحته)
-      'http://localhost:63342',         // للسماح بالوصول من WebStorm IDE (أو أي خادم تطوير محلي على هذا المنفذ)
+      'https://rehla-game1.vercel.app', // النطاق القديم من Vercel (يمكنك الاحتفاظ به أو إزالته)
+      'https://rehlagame.com',          // النطاق المخصص الجديد
+      'https://www.rehlagame.com',    // النطاق المخصص الجديد مع www
+      'null',                         // إذا كنت لا تزال تستخدم admin.html من file:///
+      'http://localhost:63342'      // إذا كنت لا تزال تستخدم admin.html من WebStorm
       // 'null' // عادةً، إذا كان origin هو 'null' (من file:///)، فإن !origin سيكون true
                 // ولكن يمكننا إضافته صراحة إذا لزم الأمر لبعض المتصفحات أو الحالات
     ];
