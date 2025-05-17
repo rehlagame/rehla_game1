@@ -272,7 +272,7 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
                     localStorage.setItem(getUserGamesKey(user.uid), backendProfile.games_balance.toString());
                 } else {
                     console.warn("Backend profile registration response did not contain a valid games_balance. Using default. Profile:", backendProfile);
-                    localStorage.setItem(getUserGamesKey(user.uid), '5');
+                    localStorage.setItem(getUserGamesKey(user.uid), '1');
                 }
             }
         } catch (error) {
