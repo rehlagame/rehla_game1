@@ -264,7 +264,7 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
                 let errorData = { message: "Unknown error during profile registration." };
                 try { errorData = JSON.parse(responseText); } catch (e) { console.error("Could not parse error response as JSON:", e); }
                 console.error("Failed to save new user profile to backend:", response.status, errorData.message);
-                localStorage.setItem(getUserGamesKey(user.uid), '5'); // رصيد ابتدائي افتراضي
+                localStorage.setItem(getUserGamesKey(user.uid), '1'); // رصيد ابتدائي افتراضي
             } else {
                 console.log("New user profile successfully saved/retrieved from backend.");
                 const backendProfile = JSON.parse(responseText); // الآن يمكننا تحليل JSON بأمان
