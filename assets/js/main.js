@@ -356,7 +356,7 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
             console.error("Registration Error:", error);
             showAuthError(getFriendlyErrorMessage(error.code));
         }
-    });
+    })
 }
 
 if (loginEmailFormEl) {
