@@ -270,17 +270,17 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
             alert(`حدث خطأ في الاتصال بالخادم أو إعداد الطلب أثناء محاولة إعداد ملفك الشخصي (Code: FE-SETUP). رصيد الألعاب قد لا يكون صحيحًا. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.\n${fetchError.message}`);
             localStorage.setItem(getUserGamesKey(user.uid), '1');
         }
-    } else if (isNewUser && !registrationData) {
+    } else if (isNewUser && !registrationData) { 
         console.error("[MainJS] CRITICAL: isNewUser is true, but registrationData is null or undefined! Cannot register profile with backend. User UID:", user.uid);
         alert("حدث خطأ داخلي حرج أثناء محاولة إعداد ملفك الشخصي (Code: FE-REGDATA-MISSING). يرجى المحاولة مرة أخرى أو الاتصال بالدعم.");
         localStorage.setItem(getUserGamesKey(user.uid), '1');
-        profileRegistrationAttempted = true;
+        profileRegistrationAttempted = true; 
         profileRegistrationSuccess = false;
     } else if (!isNewUser) {
         console.log("[MainJS] Existing user, attempting to sync balance for UID:", user.uid);
         await syncGamesBalanceWithBackend(user.uid);
         profileRegistrationSuccess = true;
-    } else {
+    } else { 
         console.warn("[MainJS] Unexpected state in handleAuthSuccess. isNewUser:", isNewUser, "registrationData:", registrationData, "UID:", user.uid, "Attempting sync as fallback.");
         await syncGamesBalanceWithBackend(user.uid);
         profileRegistrationSuccess = true;
@@ -324,7 +324,10 @@ if (registerEmailFormEl) {
             await updateProfile(userCredential.user, { displayName: displayName });
 
             const registrationData = { firstName, lastName, countryCode, phone, displayName };
+            console.log("[MainJS RegisterForm] Prepared registrationData:", registrationData, "for user:", userCredential.user.uid); // <--- سجل هنا
+            console.log("[MainJS RegisterForm] About to call handleAuthSuccess for new user:", userCredential.user.uid); // <--- سجل هنا
             await handleAuthSuccess(userCredential.user, true, registrationData);
+            console.log("[MainJS RegisterForm] Returned from handleAuthSuccess for new user:", userCredential.user.uid); // <--- سجل هنا
         } catch (error) {
             console.error("Registration Error:", error);
             showAuthError(getFriendlyErrorMessage(error.code));
@@ -338,8 +341,12 @@ if (loginEmailFormEl) {
         hideAuthMessages();
         const email = loginEmailFormEl['login-email'].value;
         const password = loginEmailFormEl['login-password'].value;
+        console.log("[MainJS LoginForm] About to call handleAuthSuccess for existing user login:", email); // <--- سجل هنا
         signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => handleAuthSuccess(userCredential.user, false))
+            .then((userCredential) => {
+                console.log("[MainJS LoginForm] signInWithEmailAndPassword successful for:", email); // <--- سجل هنا
+                handleAuthSuccess(userCredential.user, false);
+            })
             .catch((error) => {
                 console.error("Login Error:", error);
                 showAuthError(getFriendlyErrorMessage(error.code));
@@ -379,8 +386,11 @@ const handleSocialSignIn = async (provider) => {
                 firstName: nameParts[0] || '',
                 lastName: nameParts.slice(1).join(' ') || '',
             };
+            console.log("[MainJS SocialSignIn] Prepared registrationData for new social user:", registrationData, "for user:", user.uid);
         }
+        console.log("[MainJS SocialSignIn] About to call handleAuthSuccess. User:", user.uid, "isNewUser:", isNewUser);
         await handleAuthSuccess(user, isNewUser, registrationData);
+        console.log("[MainJS SocialSignIn] Returned from handleAuthSuccess for social user:", user.uid);
     } catch (error) {
         console.error("Social Sign-In Error:", error);
         if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
