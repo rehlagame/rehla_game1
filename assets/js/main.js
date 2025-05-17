@@ -270,17 +270,17 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
             alert(`حدث خطأ في الاتصال بالخادم أو إعداد الطلب أثناء محاولة إعداد ملفك الشخصي (Code: FE-SETUP). رصيد الألعاب قد لا يكون صحيحًا. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.\n${fetchError.message}`);
             localStorage.setItem(getUserGamesKey(user.uid), '1');
         }
-    } else if (isNewUser && !registrationData) { 
+    } else if (isNewUser && !registrationData) {
         console.error("[MainJS] CRITICAL: isNewUser is true, but registrationData is null or undefined! Cannot register profile with backend. User UID:", user.uid);
         alert("حدث خطأ داخلي حرج أثناء محاولة إعداد ملفك الشخصي (Code: FE-REGDATA-MISSING). يرجى المحاولة مرة أخرى أو الاتصال بالدعم.");
         localStorage.setItem(getUserGamesKey(user.uid), '1');
-        profileRegistrationAttempted = true; 
+        profileRegistrationAttempted = true;
         profileRegistrationSuccess = false;
     } else if (!isNewUser) {
         console.log("[MainJS] Existing user, attempting to sync balance for UID:", user.uid);
         await syncGamesBalanceWithBackend(user.uid);
         profileRegistrationSuccess = true;
-    } else { 
+    } else {
         console.warn("[MainJS] Unexpected state in handleAuthSuccess. isNewUser:", isNewUser, "registrationData:", registrationData, "UID:", user.uid, "Attempting sync as fallback.");
         await syncGamesBalanceWithBackend(user.uid);
         profileRegistrationSuccess = true;
@@ -324,10 +324,10 @@ if (registerEmailFormEl) {
             await updateProfile(userCredential.user, { displayName: displayName });
 
             const registrationData = { firstName, lastName, countryCode, phone, displayName };
-            console.log("[MainJS RegisterForm] Prepared registrationData:", registrationData, "for user:", userCredential.user.uid); // <--- سجل هنا
-            console.log("[MainJS RegisterForm] About to call handleAuthSuccess for new user:", userCredential.user.uid); // <--- سجل هنا
+            console.log("[MainJS RegisterForm] Prepared registrationData:", registrationData, "for user:", userCredential.user.uid);
+            console.log("[MainJS RegisterForm] About to call handleAuthSuccess for new user:", userCredential.user.uid);
             await handleAuthSuccess(userCredential.user, true, registrationData);
-            console.log("[MainJS RegisterForm] Returned from handleAuthSuccess for new user:", userCredential.user.uid); // <--- سجل هنا
+            console.log("[MainJS RegisterForm] Returned from handleAuthSuccess for new user:", userCredential.user.uid);
         } catch (error) {
             console.error("Registration Error:", error);
             showAuthError(getFriendlyErrorMessage(error.code));
@@ -341,10 +341,10 @@ if (loginEmailFormEl) {
         hideAuthMessages();
         const email = loginEmailFormEl['login-email'].value;
         const password = loginEmailFormEl['login-password'].value;
-        console.log("[MainJS LoginForm] About to call handleAuthSuccess for existing user login:", email); // <--- سجل هنا
+        console.log("[MainJS LoginForm] About to call handleAuthSuccess for existing user login:", email);
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                console.log("[MainJS LoginForm] signInWithEmailAndPassword successful for:", email); // <--- سجل هنا
+                console.log("[MainJS LoginForm] signInWithEmailAndPassword successful for:", email);
                 handleAuthSuccess(userCredential.user, false);
             })
             .catch((error) => {
@@ -643,7 +643,75 @@ function setupPurchaseDropdown(user) {
     function updateFinalPrice() { if (!totalPriceDisplay || !payNowBtn) return; payNowBtn.disabled = true; if (currentPromo && currentPromo.type === 'free_games') { finalPrice = 0; if (gamesToGrantFromPromo > 0) { payNowBtn.disabled = false; payNowBtn.textContent = `الحصول على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجاناً`; } else payNowBtn.textContent = 'اختر عرضًا صالحًا'; } else if (selectedGames > 0) { let discountMultiplier = 0; if (currentPromo && currentPromo.type === 'percentage' && currentPromo.value > 0) { discountMultiplier = currentPromo.value / 100; } finalPrice = selectedPrice * (1 - discountMultiplier); payNowBtn.disabled = false; payNowBtn.textContent = 'ادفع الآن'; } else { finalPrice = 0; payNowBtn.textContent = 'اختر باقة أولاً'; } totalPriceDisplay.textContent = `${finalPrice.toFixed(2)} KWD`; }
     purchaseOptions.forEach(option => { option.addEventListener('click', () => { if (currentPromo && currentPromo.type === 'free_games') return; purchaseOptions.forEach(opt => opt.classList.remove('selected')); option.classList.add('selected'); selectedPrice = parseFloat(option.dataset.price) || 0; selectedGames = parseInt(option.dataset.games) || 0; selectedPackageName = option.querySelector('span:first-child').textContent; updateFinalPrice(); }); });
     if (applyPromoBtn) { applyPromoBtn.addEventListener('click', async () => { if (!promoInput || !auth.currentUser) { if (!auth.currentUser) alert("الرجاء تسجيل الدخول أولاً لتطبيق كود الخصم."); return; } const promoCodeValue = promoInput.value.trim().toUpperCase(); if (!promoCodeValue) { showPromoStatus("الرجاء إدخال كود الخصم.", "error"); return; } applyPromoBtn.disabled = true; applyPromoBtn.textContent = 'جار التحقق...'; showPromoStatus("جار التحقق من الكود...", "info"); try { const token = await getIdToken(auth.currentUser); const response = await fetch(`${PROMO_API_URL}/validate/${promoCodeValue}`, { headers: { 'Authorization': `Bearer ${token}` }}); const responseData = await response.json(); if (!response.ok) { throw new Error(responseData.message || "كود الخصم غير صالح أو منتهي الصلاحية."); } currentPromo = responseData; if (responseData.type === 'free_games' && responseData.value > 0) { gamesToGrantFromPromo = responseData.value; selectedGames = 0; selectedPrice = 0; selectedPackageName = `${responseData.value} لعبة/ألعاب مجانية (عرض)`; showPromoStatus(`تم تطبيق العرض! ستحصل على ${gamesToGrantFromPromo} ألعاب مجانية.`, "success"); purchaseOptions.forEach(opt => { opt.classList.remove('selected'); opt.style.pointerEvents = 'none'; opt.style.opacity = '0.5'; }); if (promoInput) promoInput.disabled = true; } else if (responseData.type === 'percentage' && responseData.value > 0) { gamesToGrantFromPromo = 0; showPromoStatus(`تم تطبيق خصم ${responseData.value}% بنجاح!`, "success"); if (selectedGames === 0) { showPromoStatus(`تم تطبيق خصم ${responseData.value}%. اختر باقة للاستفادة من الخصم.`, "info"); } } else { throw new Error("نوع كود الخصم غير مدعوم أو قيمة الخصم غير صالحة."); } } catch (error) { console.error("Promo validation error:", error); showPromoStatus(error.message || "خطأ في تطبيق كود الخصم.", "error"); currentPromo = null; gamesToGrantFromPromo = 0; resetPromoState(false); } finally { if(applyPromoBtn) { applyPromoBtn.disabled = (currentPromo && currentPromo.type === 'free_games'); applyPromoBtn.textContent = 'تطبيق';} updateFinalPrice(); } }); }
-    if (payNowBtn) { payNowBtn.addEventListener('click', async () => { if (!auth.currentUser) { alert("الرجاء تسجيل الدخول أولاً لإتمام العملية."); return; } payNowBtn.disabled = true; payNowBtn.textContent = 'جاري المعالجة...'; const userId = auth.currentUser.uid; const token = await getIdToken(auth.currentUser); const currentPurchaseDropdownElement = document.getElementById('purchase-dropdown'); if (currentPromo && currentPromo.type === 'free_games' && gamesToGrantFromPromo > 0) { try { const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${userId}/grant-free-games`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ promoCode: currentPromo.code, gamesToGrant: gamesToGrantFromPromo, source: `Promo: ${currentPromo.code}` }) }); const responseData = await response.json(); if (!response.ok) { throw new Error(responseData.message || 'فشل في الحصول على الألعاب المجانية من الخادم.'); } if (responseData && typeof responseData.newBalance === 'number') { localStorage.setItem(getUserGamesKey(userId), responseData.newBalance.toString()); updateRemainingGamesDisplay(userId); alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية. رصيدك الآن ${responseData.newBalance}.`); } else { console.warn("Grant free games response did not contain newBalance, syncing from profile."); await syncGamesBalanceWithBackend(userId); alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية. يتم تحديث رصيدك.`); } if(currentPurchaseDropdownElement) currentPurchaseDropdownElement.classList.remove('show'); if (window.currentPurchaseDropdownSetup && typeof window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen === 'function') { window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen(); } } catch (error) { console.error("Error granting free games:", error); alert(error.message || `حدث خطأ أثناء الحصول على الألعاب المجانية. حاول مرة أخرى أو تواصل مع الدعم.`); } finally { if(payNowBtn) {payNowBtn.disabled = false; updateFinalPrice();} } } else if (selectedGames > 0 && finalPrice >= 0) { try { const paymentPayload = { amount: finalPrice, currency: "KWD", packageName: selectedPackageName, gamesInPackage: selectedGames, customerName: auth.currentUser.displayName || auth.currentUser.email, customerEmail: auth.currentUser.email, appliedPromoCode: (currentPromo && currentPromo.type === 'percentage') ? currentPromo.code : null }; console.log("Initiating payment with payload:", paymentPayload); const paymentResponse = await fetch(`${RENDER_API_BASE_URL}/api/payment/initiate-myfatoorah`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(paymentPayload) }); if (!paymentResponse.ok) { const errorData = await paymentResponse.json().catch(() => ({ message: "فشل في بدء عملية الدفع." })); throw new Error(errorData.message); } const paymentData = await paymentResponse.json(); if (paymentData.paymentURL) { window.location.href = paymentData.paymentURL; } else { throw new Error("لم يتم استلام رابط الدفع من الخادم."); } } catch (error) { console.error("Payment initiation error:", error); alert(`خطأ في بدء عملية الدفع: ${error.message}`); if(payNowBtn) {payNowBtn.disabled = false; payNowBtn.textContent = 'ادفع الآن';} } } else { alert("الرجاء اختيار باقة أولاً."); if(payNowBtn) {payNowBtn.disabled = false; updateFinalPrice();} } }); }
+    
+    // التعديل المقترح: التأكد من استخدام auth.currentUser.uid الحالي عند الضغط على زر الدفع
+    if (payNowBtn) {
+        payNowBtn.addEventListener('click', async () => {
+            if (!auth.currentUser) {
+                alert("الرجاء تسجيل الدخول أولاً لإتمام العملية.");
+                if(payNowBtn) {payNowBtn.disabled = false; updateFinalPrice();} // إعادة تعيين حالة الزر
+                return;
+            }
+            
+            payNowBtn.disabled = true;
+            payNowBtn.textContent = 'جاري المعالجة...';
+            
+            const userId = auth.currentUser.uid; // <--- الحصول على الـ UID الحالي هنا
+            const token = await getIdToken(auth.currentUser);
+            const currentPurchaseDropdownElement = document.getElementById('purchase-dropdown');
+
+            console.log("[MainJS PayNowBtn] Attempting purchase/grant. Current User UID:", userId); // سجل مهم
+
+            if (currentPromo && currentPromo.type === 'free_games' && gamesToGrantFromPromo > 0) {
+                console.log("[MainJS PayNowBtn] Granting free games. Promo:", currentPromo.code, "Games:", gamesToGrantFromPromo);
+                try {
+                    const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${userId}/grant-free-games`, { // <--- استخدام userId هنا
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify({ promoCode: currentPromo.code, gamesToGrant: gamesToGrantFromPromo, source: `Promo: ${currentPromo.code}` })
+                    });
+                    const responseData = await response.json();
+                    if (!response.ok) { throw new Error(responseData.message || 'فشل في الحصول على الألعاب المجانية من الخادم.'); }
+                    if (responseData && typeof responseData.newBalance === 'number') {
+                        localStorage.setItem(getUserGamesKey(userId), responseData.newBalance.toString());
+                        updateRemainingGamesDisplay(userId);
+                        alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية. رصيدك الآن ${responseData.newBalance}.`);
+                    } else {
+                        console.warn("Grant free games response did not contain newBalance, syncing from profile. UID:", userId);
+                        await syncGamesBalanceWithBackend(userId);
+                        alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية. يتم تحديث رصيدك.`);
+                    }
+                    if(currentPurchaseDropdownElement) currentPurchaseDropdownElement.classList.remove('show');
+                    if (window.currentPurchaseDropdownSetup && typeof window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen === 'function') {
+                        window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen();
+                    }
+                } catch (error) {
+                    console.error("Error granting free games. UID:", userId, "Error:", error);
+                    alert(error.message || `حدث خطأ أثناء الحصول على الألعاب المجانية. حاول مرة أخرى أو تواصل مع الدعم.`);
+                } finally {
+                    if(payNowBtn) {payNowBtn.disabled = false; updateFinalPrice();}
+                }
+            } else if (selectedGames > 0 && finalPrice >= 0) {
+                console.log("[MainJS PayNowBtn] Initiating MyFatoorah payment. UID:", userId, "Amount:", finalPrice, "Package:", selectedPackageName);
+                try {
+                    const paymentPayload = { amount: finalPrice, currency: "KWD", packageName: selectedPackageName, gamesInPackage: selectedGames, customerName: auth.currentUser.displayName || auth.currentUser.email, customerEmail: auth.currentUser.email, appliedPromoCode: (currentPromo && currentPromo.type === 'percentage') ? currentPromo.code : null };
+                    const paymentResponse = await fetch(`${RENDER_API_BASE_URL}/api/payment/initiate-myfatoorah`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(paymentPayload) });
+                    if (!paymentResponse.ok) { const errorData = await paymentResponse.json().catch(() => ({ message: "فشل في بدء عملية الدفع." })); throw new Error(errorData.message); }
+                    const paymentData = await paymentResponse.json();
+                    if (paymentData.paymentURL) { window.location.href = paymentData.paymentURL; } else { throw new Error("لم يتم استلام رابط الدفع من الخادم."); }
+                } catch (error) {
+                    console.error("Payment initiation error. UID:", userId, "Error:", error);
+                    alert(`خطأ في بدء عملية الدفع: ${error.message}`);
+                    if(payNowBtn) {payNowBtn.disabled = false; payNowBtn.textContent = 'ادفع الآن';}
+                }
+            } else {
+                alert("الرجاء اختيار باقة أولاً.");
+                if(payNowBtn) {payNowBtn.disabled = false; updateFinalPrice();}
+            }
+        });
+    }
+    // نهاية التعديل المقترح
+
     updateRemainingGamesDisplay(user.uid); updateFinalPrice(); return { resetDropdownStateForNewOpen };
 }
 
