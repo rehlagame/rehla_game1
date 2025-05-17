@@ -196,9 +196,6 @@ async function syncGamesBalanceWithBackend(userId) {
     }
 }
 
-
-// (لا حاجة لـ addGamesToBalanceClientSide و deductGameFromBalance إذا كانت كل العمليات تتم عبر الخادم)
-
 // --- Authentication Logic ---
 const handleAuthSuccess = async (user, isNewUser = false, registrationData = null) => {
     console.log("[MainJS] handleAuthSuccess called. User UID:", user.uid, "Is new user:", isNewUser);
@@ -213,7 +210,11 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
         try {
             console.log("[MainJS] About to get ID token for UID:", user.uid);
             const token = await getIdToken(user);
-            console.log("[MainJS] ID token obtained for UID:", user.uid, "Token (first 20 chars):", token ? token.substring(0, 20) + "..." : "null");
+            if (!token) {
+                console.error("[MainJS] CRITICAL: getIdToken returned null or undefined! Cannot proceed with backend registration. UID:", user.uid);
+                throw new Error("Failed to obtain authentication token for backend registration.");
+            }
+            console.log("[MainJS] ID token obtained for UID:", user.uid, "Token (first 20 chars):", token.substring(0, 20) + "...");
 
             const profilePayload = {
                 firebaseUid: user.uid,
@@ -251,8 +252,7 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
                 }
                 console.error("[MainJS] Failed to save new user profile to backend. UID:", user.uid, "Status:", responseStatus, "Error message:", errorDataFromServer.message);
                 alert(`حدث خطأ أثناء إعداد ملفك الشخصي على الخادم (Code: BE-${responseStatus}). رصيد الألعاب قد لا يكون صحيحًا. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.\nتفاصيل: ${errorDataFromServer.message || responseText}`);
-                localStorage.setItem(getUserGamesKey(user.uid), '1'); // القيمة الاحتياطية (1 لعبة)
-                // profileRegistrationSuccess يبقى false
+                localStorage.setItem(getUserGamesKey(user.uid), '1');
             } else {
                 console.log("[MainJS] New user profile successfully processed by backend. UID:", user.uid);
                 const backendProfile = JSON.parse(responseText);
@@ -266,17 +266,22 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
                 profileRegistrationSuccess = true;
             }
         } catch (fetchError) {
-            console.error("[MainJS] CRITICAL FETCH ERROR for /register-profile. UID:", user.uid, "Error name:", fetchError.name, "Error message:", fetchError.message, "Error stack:", fetchError.stack);
-            alert(`حدث خطأ في الاتصال بالخادم أثناء محاولة إعداد ملفك الشخصي (Code: FE-NET). رصيد الألعاب قد لا يكون صحيحًا. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.\n${fetchError.message}`);
+            console.error("[MainJS] CRITICAL FETCH ERROR or error during token/payload prep for /register-profile. UID:", user.uid, "Error name:", fetchError.name, "Error message:", fetchError.message, "Error stack:", fetchError.stack);
+            alert(`حدث خطأ في الاتصال بالخادم أو إعداد الطلب أثناء محاولة إعداد ملفك الشخصي (Code: FE-SETUP). رصيد الألعاب قد لا يكون صحيحًا. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.\n${fetchError.message}`);
             localStorage.setItem(getUserGamesKey(user.uid), '1');
-            // profileRegistrationSuccess يبقى false
         }
+    } else if (isNewUser && !registrationData) { // التحقق من registrationData
+        console.error("[MainJS] CRITICAL: isNewUser is true, but registrationData is null or undefined! Cannot register profile with backend. User UID:", user.uid);
+        alert("حدث خطأ داخلي حرج أثناء محاولة إعداد ملفك الشخصي (Code: FE-REGDATA-MISSING). يرجى المحاولة مرة أخرى أو الاتصال بالدعم.");
+        localStorage.setItem(getUserGamesKey(user.uid), '1');
+        profileRegistrationAttempted = true; 
+        profileRegistrationSuccess = false;
     } else if (!isNewUser) {
         console.log("[MainJS] Existing user, attempting to sync balance for UID:", user.uid);
         await syncGamesBalanceWithBackend(user.uid);
         profileRegistrationSuccess = true;
-    } else {
-        console.warn("[MainJS] Unexpected state: isNewUser true but no registrationData. UID:", user.uid, "Attempting sync.");
+    } else { // هذه الحالة يجب ألا تحدث منطقيًا
+        console.warn("[MainJS] Unexpected state in handleAuthSuccess. isNewUser:", isNewUser, "registrationData:", registrationData, "UID:", user.uid, "Attempting sync as fallback.");
         await syncGamesBalanceWithBackend(user.uid);
         profileRegistrationSuccess = true;
     }
@@ -297,7 +302,6 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
 };
 // *** نهاية التعريف الصحيح لدالة handleAuthSuccess ***
 
-// تأكد من عدم وجود تعريف آخر لـ handleAuthSuccess بعد هذه النقطة
 
 if (registerEmailFormEl) {
     registerEmailFormEl.addEventListener('submit', async (e) => {
@@ -320,7 +324,7 @@ if (registerEmailFormEl) {
             await updateProfile(userCredential.user, { displayName: displayName });
 
             const registrationData = { firstName, lastName, countryCode, phone, displayName };
-            await handleAuthSuccess(userCredential.user, true, registrationData); // <--- يستدعي النسخة الصحيحة
+            await handleAuthSuccess(userCredential.user, true, registrationData);
         } catch (error) {
             console.error("Registration Error:", error);
             showAuthError(getFriendlyErrorMessage(error.code));
@@ -335,7 +339,7 @@ if (loginEmailFormEl) {
         const email = loginEmailFormEl['login-email'].value;
         const password = loginEmailFormEl['login-password'].value;
         signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => handleAuthSuccess(userCredential.user, false)) // <--- يستدعي النسخة الصحيحة
+            .then((userCredential) => handleAuthSuccess(userCredential.user, false))
             .catch((error) => {
                 console.error("Login Error:", error);
                 showAuthError(getFriendlyErrorMessage(error.code));
@@ -376,7 +380,7 @@ const handleSocialSignIn = async (provider) => {
                 lastName: nameParts.slice(1).join(' ') || '',
             };
         }
-        await handleAuthSuccess(user, isNewUser, registrationData); // <--- يستدعي النسخة الصحيحة
+        await handleAuthSuccess(user, isNewUser, registrationData);
     } catch (error) {
         console.error("Social Sign-In Error:", error);
         if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
