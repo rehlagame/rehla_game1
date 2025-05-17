@@ -231,12 +231,16 @@ function deductGameFromBalance(userId) {
 
 // --- Authentication Logic ---
 const handleAuthSuccess = async (user, isNewUser = false, registrationData = null) => {
-    console.log("Authentication successful for user:", user.uid, "Is new user:", isNewUser);
+    console.log("[MainJS] handleAuthSuccess called for user:", user.uid, "Is new user:", isNewUser);
     hideAuthMessages();
 
+    let profileRegistrationAttempted = false;
+    let profileRegistrationSuccess = false;
+
     if (isNewUser && registrationData) {
+        profileRegistrationAttempted = true;
         try {
-            const token = await getIdToken(user);
+            const token = await getIdToken(user); // انتظر حتى يتم الحصول على التوكن
             const profilePayload = {
                 firebaseUid: user.uid,
                 email: user.email,
@@ -247,7 +251,7 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
                 photoURL: user.photoURL || null,
             };
 
-            console.log("Attempting to register new user profile with backend:", profilePayload);
+            console.log("[MainJS] Attempting to register new user profile with backend for UID:", user.uid, "Payload:", profilePayload);
             const response = await fetch(`${RENDER_API_BASE_URL}/api/user/register-profile`, {
                 method: 'POST',
                 headers: {
@@ -257,44 +261,73 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
                 body: JSON.stringify(profilePayload)
             });
 
-            const responseText = await response.text(); // اقرأ الرد كنص أولاً لتشخيص المشكلة
-            console.log("Response from /register-profile:", response.status, responseText);
+            const responseStatus = response.status;
+            const responseText = await response.text(); // اقرأ الرد كنص دائماً
+            console.log("[MainJS] Response from /register-profile - Status:", responseStatus, "Body:", responseText);
 
-            if (!response.ok) {
-                let errorData = { message: "Unknown error during profile registration." };
-                try { errorData = JSON.parse(responseText); } catch (e) { console.error("Could not parse error response as JSON:", e); }
-                console.error("Failed to save new user profile to backend:", response.status, errorData.message);
-                localStorage.setItem(getUserGamesKey(user.uid), '1'); // رصيد ابتدائي افتراضي
+            if (!response.ok) { // تحقق من response.ok (true إذا كانت الحالة 200-299)
+                let errorData = { message: `Backend registration failed with status ${responseStatus}. Response: ${responseText}` };
+                try {
+                    errorData = JSON.parse(responseText); // حاول تحليل الرد كـ JSON إذا كان خطأً
+                } catch (e) {
+                    console.warn("[MainJS] Could not parse error response from backend as JSON:", e);
+                    // إذا فشل التحليل، استخدم responseText كرسالة
+                    errorData.message = `Backend registration failed with status ${responseStatus}. Raw response: ${responseText}`;
+                }
+                console.error("[MainJS] Failed to save new user profile to backend. Status:", responseStatus, "Error message:", errorData.message);
+
+                // عرض رسالة خطأ للمستخدم
+                alert(`حدث خطأ أثناء إعداد ملفك الشخصي على الخادم (Code: BE-${responseStatus}). رصيد الألعاب قد لا يكون صحيحًا. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.\nتفاصيل الخطأ: ${errorData.message}`);
+                localStorage.setItem(getUserGamesKey(user.uid), '1'); // القيمة الاحتياطية (1 لعبة)
+                // profileRegistrationSuccess يبقى false
             } else {
-                console.log("New user profile successfully saved/retrieved from backend.");
+                console.log("[MainJS] New user profile successfully processed by backend.");
                 const backendProfile = JSON.parse(responseText); // الآن يمكننا تحليل JSON بأمان
                 if (backendProfile && typeof backendProfile.games_balance === 'number') {
                     localStorage.setItem(getUserGamesKey(user.uid), backendProfile.games_balance.toString());
+                    console.log("[MainJS] Set games_balance from backend response:", backendProfile.games_balance);
                 } else {
-                    console.warn("Backend profile registration response did not contain a valid games_balance. Using default. Profile:", backendProfile);
-                    localStorage.setItem(getUserGamesKey(user.uid), '1');
+                    console.warn("[MainJS] Backend profile registration response did not contain a valid games_balance. Using default (1). Profile:", backendProfile);
+                    localStorage.setItem(getUserGamesKey(user.uid), '1'); // القيمة الافتراضية إذا لم يرجع الخادم رصيدًا
                 }
+                profileRegistrationSuccess = true; // <--- تم تسجيل الملف الشخصي بنجاح في الخلفية
             }
-        } catch (error) {
-            console.error("Error in try-catch during new user profile registration with backend:", error);
-            localStorage.setItem(getUserGamesKey(user.uid), '5');
+        } catch (error) { // هذا الـ catch لأخطاء fetch نفسها (مثل فشل الشبكة أو CORS إذا لم يتم تكوينه بشكل صحيح في الخادم)
+            console.error("[MainJS] Network or other client-side error during new user profile registration with backend:", error);
+            alert(`حدث خطأ في الشبكة أثناء محاولة إعداد ملفك الشخصي (Code: FE-NET). رصيد الألعاب قد لا يكون صحيحًا. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.\n${error.message}`);
+            localStorage.setItem(getUserGamesKey(user.uid), '1'); // القيمة الاحتياطية
+            // profileRegistrationSuccess يبقى false
         }
     } else if (!isNewUser) {
-        await syncGamesBalanceWithBackend(user.uid);
+        console.log("[MainJS] Existing user, attempting to sync balance...");
+        await syncGamesBalanceWithBackend(user.uid); // هذا بالفعل await
+        profileRegistrationSuccess = true; // افترض النجاح هنا (لأن المزامنة هي العملية الرئيسية)
     } else {
-        // هذه الحالة لا يجب أن تحدث (مستخدم غير جديد ولكن registrationData هو null)
+        // هذه الحالة لا يجب أن تحدث (isNewUser هو true ولكن registrationData هو null)
         // كإجراء احتياطي، حاول المزامنة
-        console.warn("handleAuthSuccess: Unexpected state - not new user but no prior sync. Attempting sync.");
+        console.warn("[MainJS] handleAuthSuccess: Unexpected state - isNewUser is true but no registrationData. Attempting sync.");
         await syncGamesBalanceWithBackend(user.uid);
+        profileRegistrationSuccess = true; // افترض النجاح
     }
 
     updateRemainingGamesDisplay(user.uid);
-    // تأخير بسيط قبل إعادة التوجيه للسماح ببعض العمليات غير المتزامنة بالانتهاء إذا لزم الأمر
-    setTimeout(() => {
-        window.location.href = 'index.html';
-    }, 100);
-};
 
+    // --- منطق إعادة التوجيه المعدل ---
+    if (profileRegistrationAttempted) { // إذا كانت هذه محاولة تسجيل مستخدم جديد
+        if (profileRegistrationSuccess) {
+            console.log("[MainJS] Backend profile registration for new user was successful. Redirecting to index.html.");
+            window.location.href = 'index.html';
+        } else {
+            // إذا فشل التسجيل في الخلفية، لا تقم بإعادة التوجيه مباشرة من صفحة المصادقة
+            // رسالة الخطأ للمستخدم يجب أن تكون قد ظهرت بالفعل من داخل try/catch
+            console.warn("[MainJS] Backend profile registration for new user FAILED. Not redirecting automatically from auth page. User should see an error alert.");
+            // يمكنك هنا اختيارياً تحديث واجهة المستخدم في صفحة auth.html لتعكس المشكلة بشكل أوضح إذا أردت
+        }
+    } else { // إذا كان تسجيل دخول لمستخدم موجود أو حالة أخرى غير تسجيل جديد
+        console.log("[MainJS] Not a new user registration attempt or flow completed. Redirecting to index.html.");
+        window.location.href = 'index.html';
+    }
+};
 if (registerEmailFormEl) {
     registerEmailFormEl.addEventListener('submit', async (e) => {
         e.preventDefault();
