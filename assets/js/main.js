@@ -270,17 +270,17 @@ const handleAuthSuccess = async (user, isNewUser = false, registrationData = nul
             alert(`حدث خطأ في الاتصال بالخادم أو إعداد الطلب أثناء محاولة إعداد ملفك الشخصي (Code: FE-SETUP). رصيد الألعاب قد لا يكون صحيحًا. يرجى المحاولة مرة أخرى أو الاتصال بالدعم.\n${fetchError.message}`);
             localStorage.setItem(getUserGamesKey(user.uid), '1');
         }
-    } else if (isNewUser && !registrationData) { // التحقق من registrationData
+    } else if (isNewUser && !registrationData) {
         console.error("[MainJS] CRITICAL: isNewUser is true, but registrationData is null or undefined! Cannot register profile with backend. User UID:", user.uid);
         alert("حدث خطأ داخلي حرج أثناء محاولة إعداد ملفك الشخصي (Code: FE-REGDATA-MISSING). يرجى المحاولة مرة أخرى أو الاتصال بالدعم.");
         localStorage.setItem(getUserGamesKey(user.uid), '1');
-        profileRegistrationAttempted = true; 
+        profileRegistrationAttempted = true;
         profileRegistrationSuccess = false;
     } else if (!isNewUser) {
         console.log("[MainJS] Existing user, attempting to sync balance for UID:", user.uid);
         await syncGamesBalanceWithBackend(user.uid);
         profileRegistrationSuccess = true;
-    } else { // هذه الحالة يجب ألا تحدث منطقيًا
+    } else {
         console.warn("[MainJS] Unexpected state in handleAuthSuccess. isNewUser:", isNewUser, "registrationData:", registrationData, "UID:", user.uid, "Attempting sync as fallback.");
         await syncGamesBalanceWithBackend(user.uid);
         profileRegistrationSuccess = true;
