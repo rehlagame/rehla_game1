@@ -319,7 +319,20 @@ if (loginEmailFormEl) {
 
 // --- Password Reset ---
 if (resetPasswordFormEl) {
-    resetPasswordFormEl.addEventListener('submit', (e) => { /* ... (as before) ... */ });
+    resetPasswordFormEl.addEventListener('submit', (e) => {
+        e.preventDefault();
+        hideAuthMessages(authErrorMessageDiv, resetSuccessMessageDiv);
+        const email = resetPasswordFormEl['reset-email'].value;
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                showSuccessMessage("تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني.", resetSuccessMessageDiv);
+                resetPasswordFormEl.reset();
+            })
+            .catch((error) => {
+                console.error("Password Reset Error:", error);
+                showAuthError(getFriendlyErrorMessage(error.code), authErrorMessageDiv);
+            });
+    });
 }
 
 // --- Social Sign-In (Google & Apple) ---
@@ -329,11 +342,25 @@ const handleSocialSignIn = async (provider) => {
     try {
         const result = await signInWithPopup(auth, provider);
         console.log("[MainJS SocialSignIn] Firebase social sign-in successful. User UID:", result.user.uid);
-    } catch (error) { /* ... (as before) ... */ }
+    } catch (error) {
+        console.error("Social Sign-In Error:", error);
+        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+            showAuthError(getFriendlyErrorMessage(error.code));
+        }
+    }
 };
 
-if (googleSignInButtonEl) { /* ... (as before) ... */ }
-if (appleSignInButtonEl) { /* ... (as before) ... */ }
+if (googleSignInButtonEl) {
+    const googleProvider = new GoogleAuthProvider();
+    googleSignInButtonEl.addEventListener('click', () => handleSocialSignIn(googleProvider));
+}
+
+if (appleSignInButtonEl) {
+    const appleProvider = new OAuthProvider('apple.com');
+    appleProvider.addScope('email'); appleProvider.addScope('name');
+    appleSignInButtonEl.addEventListener('click', () => handleSocialSignIn(appleProvider));
+}
+
 
 // --- Auth State Listener (MAIN LOGIC) ---
 onAuthStateChanged(auth, async (user) => {
@@ -365,13 +392,11 @@ onAuthStateChanged(auth, async (user) => {
                 console.log("[MainJS onAuthStateChanged] User is on auth.html but logged in. Redirecting to index.html.");
                 window.location.href = 'index.html';
             } else {
-                 handleAuthSuccess(user); // Call simplified success handler for other general UI updates
+                handleAuthSuccess(user); // Call simplified success handler for other general UI updates
             }
 
         } catch (error) {
             console.error(`[MainJS onAuthStateChanged] CRITICAL ERROR during post-authentication setup for UID ${user.uid}:`, error);
-            // Potentially sign out user or show persistent error if ensureAndSync failed critically
-            // showAuthError("فشل إعداد الحساب بشكل كامل. يرجى محاولة تسجيل الخروج والدخول مرة أخرى.");
         }
     } else {
         _pendingRegistrationData = null; // Clear on logout
@@ -385,10 +410,6 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // --- Profile Page (Logged.html) Logic ---
-async function setupProfilePage(user) { /* ... (Code remains the same as your last complete version) ... */ }
-// ... (The entire setupProfilePage function and its internal event listeners)
-// ... (This includes photoUploadInput, infoForm, changePasswordForm, tabLinks, logoutBtnSidebar, deleteAccountBtn event listeners)
-// --- Re-insert the full setupProfilePage function here ---
 async function setupProfilePage(user) {
     const els = profilePageElements;
     if (!els.infoForm || !user) {
@@ -414,7 +435,6 @@ async function setupProfilePage(user) {
             if (!response.ok && response.status !== 404) { // Handle non-404 errors specifically
                 const errorText = await response.text().catch(() => `فشل جلب تفاصيل الملف الشخصي (Code: SPP-BE-${response.status})`);
                 console.error(`Failed to fetch profile from backend (setupProfilePage): ${response.status} - ${errorText}`);
-                // Fallback to Firebase data if backend fetch fails for reasons other than 404
                 const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
                 if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
                 if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
@@ -439,29 +459,25 @@ async function setupProfilePage(user) {
                     if (els.phoneInput) els.phoneInput.value = phoneNum;
                 }
                 if (els.displayNameInput && profileData.display_name) els.displayNameInput.value = profileData.display_name;
-                // Update photo and summary name from backend data if available, overriding Firebase initial set
                 if (els.userPhoto && profileData.photo_url) els.userPhoto.src = profileData.photo_url;
                 if (els.summaryName && profileData.display_name) els.summaryName.textContent = profileData.display_name;
             } else if (response.status === 404) {
-                 console.warn(`[MainJS setupProfilePage] Profile for user ${user.uid} still not found in backend. This should have been created by ensureAndSync. Using Firebase data as fallback.`);
-                 // Fallback to Firebase data if backend profile is (unexpectedly) still not found
-                 const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
-                 if (els.firstNameInput) els.firstNameInput.value = nameParts[0] || '';
-                 if (els.lastNameInput) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
+                console.warn(`[MainJS setupProfilePage] Profile for user ${user.uid} still not found in backend. This should have been created by ensureAndSync. Using Firebase data as fallback.`);
+                const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
+                if (els.firstNameInput) els.firstNameInput.value = nameParts[0] || '';
+                if (els.lastNameInput) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
             }
         } catch (error) {
             console.error("Error in try-catch fetching/processing profile data (setupProfilePage):", error);
-            // Fallback to Firebase data on any other exception
             const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
             if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
             if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
         }
     } else {
-         console.warn(`[MainJS setupProfilePage] Backend profile not ready for UID: ${user.uid}. Displaying data from Firebase Auth only.`);
-         // Fallback to Firebase data if backend profile sync failed earlier
-         const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
-         if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
-         if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
+        console.warn(`[MainJS setupProfilePage] Backend profile not ready for UID: ${user.uid}. Displaying data from Firebase Auth only.`);
+        const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
+        if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
+        if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
     }
 
 
@@ -476,12 +492,11 @@ async function setupProfilePage(user) {
                     await uploadBytes(imageRef, file);
                     const downloadURL = await getDownloadURL(imageRef);
                     await updateProfile(auth.currentUser, { photoURL: downloadURL }); // Update Firebase Auth profile
-                    // Update backend profile
                     const token = await getIdToken(auth.currentUser);
                     const updateResponse = await fetch(`${RENDER_API_BASE_URL}/api/user/${auth.currentUser.uid}/profile`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ photo_url: downloadURL }) // Use photo_url as expected by backend
+                        body: JSON.stringify({ photo_url: downloadURL })
                     });
                     if (!updateResponse.ok) {
                         const errorData = await updateResponse.json().catch(() => ({message: "فشل تحديث الصورة في الخادم."}));
@@ -493,7 +508,7 @@ async function setupProfilePage(user) {
                 } catch (error) {
                     console.error("Error uploading profile picture or updating backend:", error);
                     showAuthError(error.message || getFriendlyErrorMessage(error.code || 'PROFILE_PIC_UPLOAD_ERROR'), els.updateErrorDiv);
-                    if (els.userPhoto && auth.currentUser) els.userPhoto.src = auth.currentUser.photoURL || 'assets/images/default-avatar.png'; // Revert to old or default
+                    if (els.userPhoto && auth.currentUser) els.userPhoto.src = auth.currentUser.photoURL || 'assets/images/default-avatar.png';
                 }
             });
             els.photoUploadInput.dataset.listenerAttached = 'true';
@@ -512,7 +527,7 @@ async function setupProfilePage(user) {
             const newPhone = els.phoneInput.value;
             let newDisplayName = els.displayNameInput.value.trim();
 
-            if (!newDisplayName) { // Default display name if empty
+            if (!newDisplayName) {
                 newDisplayName = `${newFirstName} ${newLastName}`.trim() || auth.currentUser.email.split('@')[0];
             }
 
@@ -521,16 +536,12 @@ async function setupProfilePage(user) {
                 lastName: newLastName,
                 displayName: newDisplayName,
                 phone: newCountryCode && newPhone ? `${newCountryCode}${newPhone}` : null,
-                // photo_url is handled separately by image upload
             };
 
             try {
-                // Update Firebase Auth profile (only displayName here, photoURL is separate)
                 if (auth.currentUser.displayName !== newDisplayName) {
                     await updateProfile(auth.currentUser, { displayName: newDisplayName });
                 }
-
-                // Update backend profile
                 const token = await getIdToken(auth.currentUser);
                 const response = await fetch(`${RENDER_API_BASE_URL}/api/user/${auth.currentUser.uid}/profile`, {
                     method: 'PUT',
@@ -542,7 +553,7 @@ async function setupProfilePage(user) {
                     const errorData = await response.json().catch(() => ({message: "فشل تحديث الملف الشخصي في الخادم."}));
                     throw new Error(errorData.message);
                 }
-                if (els.summaryName) els.summaryName.textContent = newDisplayName; // Update summary name
+                if (els.summaryName) els.summaryName.textContent = newDisplayName;
                 showSuccessMessage("تم تحديث بيانات الملف الشخصي بنجاح!", els.updateSuccessDiv);
                 setTimeout(() => { if (els.updateSuccessDiv) els.updateSuccessDiv.style.display = 'none'; }, 3000);
             } catch (error) {
@@ -586,7 +597,7 @@ async function setupProfilePage(user) {
         els.changePasswordForm.dataset.listenerAttached = 'true';
     }
 
-    if (els.tabLinks.length > 0 && (!els.tabLinks[0] || !els.tabLinks[0].dataset.tabListenerAttached)) { // Check if first link is not null before accessing dataset
+    if (els.tabLinks.length > 0 && (!els.tabLinks[0] || !els.tabLinks[0].dataset.tabListenerAttached)) {
         els.tabLinks.forEach(link => {
             link.addEventListener('click', () => {
                 const tabId = link.dataset.tab;
@@ -704,7 +715,7 @@ function setupPurchaseDropdown(userInstance) {
                 payNowBtn.disabled = false;
                 payNowBtn.textContent = `الحصول على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجاناً`;
             } else {
-                 payNowBtn.textContent = 'اختر عرضًا صالحًا';
+                payNowBtn.textContent = 'اختر عرضًا صالحًا';
             }
         } else if (selectedGames > 0) {
             let discountMultiplier = 0;
@@ -724,7 +735,7 @@ function setupPurchaseDropdown(userInstance) {
     purchaseOptions.forEach(option => {
         if (!option.dataset.listenerAttachedPurchase) {
             option.addEventListener('click', () => {
-                if (currentPromo && currentPromo.type === 'free_games') return; // Don't allow package selection if free games promo is active
+                if (currentPromo && currentPromo.type === 'free_games') return;
                 purchaseOptions.forEach(opt => opt.classList.remove('selected'));
                 option.classList.add('selected');
                 selectedPrice = parseFloat(option.dataset.price) || 0;
@@ -768,7 +779,7 @@ function setupPurchaseDropdown(userInstance) {
                 console.error("Promo validation error:", error);
                 showPromoStatus(error.message || "خطأ في تطبيق كود الخصم.", "error");
                 currentPromo = null; gamesToGrantFromPromo = 0;
-                resetPromoState(false); // Don't clear input on error, let user correct
+                resetPromoState(false);
             } finally {
                 if(applyPromoBtn) { applyPromoBtn.disabled = (currentPromo && currentPromo.type === 'free_games'); applyPromoBtn.textContent = 'تطبيق';}
                 updateFinalPrice();
@@ -807,7 +818,7 @@ function setupPurchaseDropdown(userInstance) {
                         alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية. رصيدك الآن ${responseData.newBalance}.`);
                     } else {
                         console.warn("Grant free games response did not contain newBalance, syncing from profile. UID:", userId);
-                        await ensureAndSyncBackendProfile(currentUserForPayment, null); // Re-sync to get latest balance
+                        await ensureAndSyncBackendProfile(currentUserForPayment, null);
                         alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ألعاب مجانية. يتم تحديث رصيدك.`);
                     }
                     if(currentPurchaseDropdownElement) currentPurchaseDropdownElement.classList.remove('show');
@@ -848,9 +859,6 @@ function setupPurchaseDropdown(userInstance) {
 }
 
 // --- Header UI Update ---
-function updateHeaderUI(user) { /* ... (Code remains the same as your last complete version) ... */ }
-// ... (The entire updateHeaderUI function)
-// --- Re-insert the full updateHeaderUI function here ---
 function updateHeaderUI(user) {
     if (!userActionsContainer) return;
     if (user) {
@@ -878,18 +886,34 @@ function updateHeaderUI(user) {
 
 // --- Event Delegation for Purchase Dropdown ---
 if (userActionsContainer && !userActionsContainer.dataset.delegatedListenerAttached) {
-    userActionsContainer.addEventListener('click', function(event) { /* ... (as before) ... */ });
+    userActionsContainer.addEventListener('click', function(event) {
+        const gamesTriggerButton = event.target.closest('#games-trigger');
+        const purchaseDropdownElement = document.getElementById('purchase-dropdown');
+        if (gamesTriggerButton && purchaseDropdownElement) {
+            event.stopPropagation();
+            const isOpening = !purchaseDropdownElement.classList.contains('show');
+            if (isOpening && window.currentPurchaseDropdownSetup && typeof window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen === 'function') {
+                window.currentPurchaseDropdownSetup.resetDropdownStateForNewOpen();
+            }
+            purchaseDropdownElement.classList.toggle('show');
+        }
+    });
     userActionsContainer.dataset.delegatedListenerAttached = 'true';
 }
 if (!document.body.dataset.globalDropdownCloseListener) {
-    document.addEventListener('click', function(event) { /* ... (as before) ... */ });
+    document.addEventListener('click', function(event) {
+        const purchaseDropdownElement = document.getElementById('purchase-dropdown');
+        const gamesCounterContainer = document.querySelector('.games-counter-container');
+        if (purchaseDropdownElement && purchaseDropdownElement.classList.contains('show')) {
+            if (gamesCounterContainer && !gamesCounterContainer.contains(event.target)) {
+                purchaseDropdownElement.classList.remove('show');
+            }
+        }
+    });
     document.body.dataset.globalDropdownCloseListener = 'true';
 }
 
 // --- Play Button Logic (index.html - Balance Check Only) ---
-function handlePlayAttemptCheckBalanceOnly() { /* ... (Code remains the same as your last complete version) ... */ }
-// ... (The entire handlePlayAttemptCheckBalanceOnly function)
-// --- Re-insert the full handlePlayAttemptCheckBalanceOnly function here ---
 function handlePlayAttemptCheckBalanceOnly() {
     const currentUser = auth.currentUser;
     if (!currentUser) {
@@ -932,8 +956,8 @@ if (mainPlayButtonEl && (window.location.pathname.endsWith('/') || window.locati
 
 // --- Expose functions/variables needed by game.js or other modules ---
 window.firebaseAuth = auth;
-window.getRemainingGamesForUser = getRemainingGames; // Make sure this is what game.js expects
-window.updateRemainingGamesDisplay = updateRemainingGamesDisplay; // Renamed to avoid conflict
+window.getRemainingGamesForUser = getRemainingGames;
+window.updateRemainingGamesDisplay = updateRemainingGamesDisplay;
 window.RENDER_API_BASE_URL = RENDER_API_BASE_URL;
 window.isUserBackendProfileReady = () => isBackendProfileReady;
 
