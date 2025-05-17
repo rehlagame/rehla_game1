@@ -21,7 +21,7 @@ router.post('/register-profile', /* verifyFirebaseToken, */ async (req, res, nex
         return res.status(400).json({ message: "Firebase UID and Email are required for profile registration." });
     }
 
-    const initialGamesBalance = 5; // رصيد ألعاب ابتدائي عند التسجيل (يمكنك تغييره)
+    const initialGamesBalance = 1; // رصيد ألعاب ابتدائي عند التسجيل (يمكنك تغييره)
 
     const insertSql = `
         INSERT INTO users (firebase_uid, email, display_name, first_name, last_name, phone, photo_url, games_balance)
