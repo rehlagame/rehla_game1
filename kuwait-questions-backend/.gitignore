@@ -1,0 +1,40 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Node modules
+node_modules/
+
+# Firebase service account key
+rehlaapp-9a985-firebase-adminsdk-fbsvc-01e9f23075.json # <--- أضف هذا السطر هنا
+
+# Build output
+dist/
+build/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# SQLite database files (if you were using them locally for testing)
+*.sqlite
+*.sqlite3
+*.db
+
+# Temporary files from some editors
+*.swp
+*~
