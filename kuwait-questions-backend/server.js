@@ -45,7 +45,7 @@ if (serviceAccount) {
     try {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
-            storageBucket: "rehlaapp-9a985.appspot.com" // <--- اسم الـ Bucket الصحيح من Firebase Storage
+            storageBucket: "rehlaapp-9a985.firebasestorage.app" // <--- اسم الـ Bucket الصحيح من Firebase Storage
         });
         console.log("Firebase Admin SDK initialized successfully.");
     } catch (initError) {
