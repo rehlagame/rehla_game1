@@ -15,7 +15,11 @@
     --success-color: #28a745;
     --apple-btn-bg: #000000;
     --apple-btn-text: #ffffff;
-    --footer-bg-color: #5F6972; /* لون خلفية الفوتر الجديد */
+    /* --footer-bg-color: #5F6972;  (اللون القديم) */
+    --footer-bg-color: #2c3e50; /* لون جديد: أزرق مسود / رمادي غامق أنيق */
+    --footer-text-color: #bdc3c7; /* لون نص فاتح يتناسب مع الخلفية الداكنة */
+    --footer-icon-bg-hover: var(--primary-color); /* لون خلفية الأيقونة عند المرور */
+    --footer-icon-color: #ecf0f1; /* لون الأيقونات الأساسي */
     --profile-red-accent: #E74C3C; /* لون أحمر مميز لصفحة الحساب */
 }
 
@@ -83,72 +87,102 @@ section { scroll-margin-top: 80px; }
 
 /* --- الفوتر --- */
 footer {
-    background-color: var(--footer-bg-color); /* Updated background color */
-    color: var(--bg-color-light);
-    padding: 30px 0; /* Adjusted padding */
-    margin-top: 40px;
+    background-color: var(--footer-bg-color);
+    color: var(--footer-text-color); /* استخدام لون النص الجديد */
+    padding: 40px 0 30px 0; /* تعديل الـ padding ليتناسب مع التصميم الجديد */
+    margin-top: 50px; /* زيادة المسافة فوق الفوتر قليلاً */
     font-size: 0.9em;
+    position: relative; /* لإضافة عناصر تزيينية إذا لزم الأمر */
+    border-top: 3px solid var(--primary-color); /* إضافة خط علوي بلون مميز */
 }
 
 .footer-main-container {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 20px; /* Gap between left and right columns when wrapped */
+    align-items: center; /* محاذاة رأسية أفضل للعناصر */
+    flex-wrap: wrap;
+    gap: 25px; /* زيادة المسافة قليلاً عند الالتفاف */
 }
 
 .footer-column {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Gap between icon group and text within a column */
+    gap: 15px; /* مسافة بين مجموعة الأيقونات والنص تحتها */
 }
 
 .footer-content-left {
-    align-items: flex-start; /* Aligns items to the start (right in RTL) of the column */
+    align-items: flex-start;
 }
 
 .footer-content-right {
-    align-items: flex-end; /* Aligns items to the end (left in RTL) of the column */
+    align-items: flex-end;
 }
 
 .app-store-icons,
 .social-media-icons {
     display: flex;
-    gap: 18px; /* Space between icons */
+    gap: 15px; /* المسافة بين الأيقونات الفردية */
+}
+
+/* تصميم جديد وعصري للأيقونات */
+.app-store-icons .app-icon-link,
+.social-media-icons .social-icon-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 42px;  /* حجم موحد للخلفية */
+    height: 42px; /* حجم موحد للخلفية */
+    border-radius: 50%; /* جعل الخلفية دائرية تمامًا */
+    background-color: rgba(255, 255, 255, 0.07); /* خلفية شفافة قليلاً بلون فاتح */
+    color: var(--footer-icon-color); /* لون الأيقونة الداخلية */
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    text-decoration: none; /* إزالة أي خطوط تحت الرابط */
 }
 
 .app-store-icons .app-icon-link i,
 .social-media-icons .social-icon-link i {
-    font-size: 1.8em; /* Icon size */
-    color: var(--white-color);
-    transition: color 0.3s ease, transform 0.3s ease;
-}
-.app-store-icons .app-icon-link:hover i,
-.social-media-icons .social-icon-link:hover i {
-    color: var(--accent-color);
-    transform: scale(1.1);
+    font-size: 1.5em; /* حجم الأيقونة نفسها */
+    line-height: 1; /* لضمان توسيط الأيقونة إذا كانت font-awesome تضيف line-height */
 }
 
+/* تأثيرات المرور (Hover) للأيقونات */
+.app-store-icons .app-icon-link:hover,
+.social-media-icons .social-icon-link:hover {
+    background-color: var(--footer-icon-bg-hover); /* استخدام لون التمييز كخلفية عند المرور */
+    color: var(--white-color); /* تغيير لون الأيقونة إلى الأبيض عند المرور لتبرز */
+    transform: translateY(-3px) scale(1.05); /* تأثير رفع طفيف وتكبير */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* ظل خفيف لإعطاء عمق */
+}
+
+/* يمكن تخصيص ألوان hover لكل أيقونة إذا أردت (اختياري) */
+.social-media-icons a[aria-label="Instagram"]:hover { background-color: #C13584; /* لون إنستغرام */ }
+.social-media-icons a[aria-label="TikTok"]:hover { background-color: #000000; /* لون تيك توك (يمكن تعديله إذا كان هناك لون رسمي أفضل) */ }
+.app-store-icons a[aria-label="Get it on Google Play"]:hover { background-color: #A4C639; /* لون أندرويد */ }
+.app-store-icons a[aria-label="Download on the App Store"]:hover { background-color: #7d7d7d; /* لون أبل (رمادي) */ }
+
+
 .developer-credit {
-    font-size: 0.85em;
-    color: var(--grey-color-light);
-    text-align: start; /* Ensures text aligns with icons in RTL */
+    font-size: 0.88em; /* تكبير طفيف للخط */
+    color: var(--footer-text-color);
+    text-align: start;
 }
 .developer-credit a {
-    color: var(--white-color);
-    font-weight: bold;
+    color: var(--accent-color); /* استخدام لون التمييز للرابط */
+    font-weight: 500; /* خط متوسط الوزن */
     text-decoration: none;
+    padding-bottom: 1px;
+    border-bottom: 1px dashed rgba(255, 193, 7, 0.5); /* خط سفلي متقطع بلون التمييز الشفاف */
+    transition: color 0.3s ease, border-bottom-color 0.3s ease;
 }
 .developer-credit a:hover {
-    color: var(--accent-color);
-    text-decoration: underline;
+    color: var(--white-color); /* تغيير لون الرابط إلى الأبيض عند المرور */
+    border-bottom-color: var(--white-color);
 }
 
 .copyright-text {
-    font-size: 0.85em;
-    color: var(--grey-color-light);
-    text-align: end; /* Ensures text aligns with icons in RTL */
+    font-size: 0.88em;
+    color: var(--footer-text-color);
+    text-align: end;
 }
 .copyright-text sup {
     font-size: 0.75em;
@@ -698,7 +732,7 @@ main.account-main-content.new-account-layout {
     .footer-main-container {
         flex-direction: column; /* Stack columns */
         align-items: center; /* Center items when stacked */
-        gap: 25px;
+        gap: 30px;  /* زيادة المسافة عند التكديس */
     }
     .footer-column {
         width: 100%; /* Make columns take full width */
@@ -712,6 +746,11 @@ main.account-main-content.new-account-layout {
     .copyright-text {
         text-align: center; /* Center text in stacked view */
     }
+    .app-store-icons,
+    .social-media-icons {
+        justify-content: center; /* لضمان توسيط الأيقونات */
+    }
+
 
     /* تجاوبية صفحة الحساب الجديدة */
     .form-row {
@@ -755,14 +794,23 @@ main.account-main-content.new-account-layout {
     }
 
     /* تجاوبية الفوتر لشاشات أصغر */
+    .app-store-icons .app-icon-link,
+    .social-media-icons .social-icon-link {
+        width: 38px;  /* تصغير حجم خلفية الأيقونات قليلاً */
+        height: 38px;
+    }
     .app-store-icons .app-icon-link i,
     .social-media-icons .social-icon-link i {
-        font-size: 1.6em; /* Slightly smaller icons on very small screens */
+        font-size: 1.3em; /* تصغير حجم الأيقونة الداخلية قليلاً */
     }
     .app-store-icons,
     .social-media-icons {
-        gap: 15px;
+        gap: 12px; /* تقليل المسافة بين الأيقونات */
     }
+    .developer-credit, .copyright-text {
+        font-size: 0.82em; /* تصغير الخطوط قليلاً في الشاشات الصغيرة جداً */
+    }
+
 
     /* تجاوبية صفحة الحساب الجديدة */
     .account-sidebar {
