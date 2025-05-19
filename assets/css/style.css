@@ -111,7 +111,7 @@ footer {
 }
 
 .footer-content-left {
-    align-items: flex-start;
+    align-items: center; /* Changed from flex-start to center */
 }
 
 .footer-content-right {
@@ -164,7 +164,7 @@ footer {
 .developer-credit {
     font-size: 0.88em; /* تكبير طفيف للخط */
     color: var(--footer-text-color);
-    text-align: start;
+    text-align: center; /* Changed from start to center */
 }
 .developer-credit a {
     color: var(--accent-color); /* استخدام لون التمييز للرابط */
