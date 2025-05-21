@@ -4,19 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تواصل معنا - لعبة رحلة</title>
-    <!-- ربط ملف CSS الرئيسي للمتغيرات والأنماط الأساسية -->
     <link rel="stylesheet" href="assets/css/style.css">
-    <!-- (اختياري) ربط ملف CSS خاص بهذه الصفحة إذا احتجت لتنسيقات معقدة -->
-    <!-- <link rel="stylesheet" href="Frontend/contact.css"> -->
-    <!-- خط Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <!-- أيقونات Font Awesome (ضروري لأيقونات التواصل الاجتماعي) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* يمكن إضافة تنسيقات بسيطة هنا مباشرة أو في ملف منفصل */
+        /* ... (نفس الأنماط المضمنة التي كانت موجودة مسبقًا) ... */
         .contact-page-content {
             padding: 60px 0;
             text-align: center;
@@ -33,8 +28,6 @@
             margin: 0 auto 40px auto;
             line-height: 1.7;
         }
-
-        /* قسم روابط التواصل الاجتماعي */
         .social-media-links {
             margin-bottom: 50px;
         }
@@ -46,48 +39,42 @@
         .social-icons {
             display: flex;
             justify-content: center;
-            gap: 25px; /* مسافة بين الأيقونات */
+            gap: 25px;
         }
         .social-icons a {
             color: var(--white-color);
-            background-color: var(--primary-color); /* خلفية الأيقونة */
+            background-color: var(--primary-color);
             width: 55px;
             height: 55px;
-            border-radius: 50%; /* جعلها دائرية */
-            display: inline-flex; /* استخدام inline-flex للتوسيط */
+            border-radius: 50%;
+            display: inline-flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.8em; /* حجم الأيقونة */
+            font-size: 1.8em;
             text-decoration: none;
             transition: background-color 0.3s ease, transform 0.3s ease;
         }
         .social-icons a:hover {
-            background-color: var(--secondary-color); /* تغيير اللون عند المرور */
-            transform: translateY(-3px); /* تأثير رفع بسيط */
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
         }
-        /* ألوان خاصة لتيك توك وانستغرام (اختياري) */
         .social-icons a.instagram:hover { background-color: #E1306C; }
         .social-icons a.tiktok:hover { background-color: #000000; }
-
-
-        /* قسم نموذج الاتصال */
         .contact-form-container {
             background-color: var(--white-color);
             padding: 40px;
             border-radius: 10px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
             max-width: 700px;
-            margin: 0 auto; /* توسيط النموذج */
-            text-align: right; /* محاذاة محتويات النموذج لليمين */
+            margin: 0 auto;
+            text-align: right;
         }
         .contact-form-container h3 {
             font-size: 1.5em;
             color: var(--secondary-color);
             margin-bottom: 25px;
-            text-align: center; /* عنوان النموذج في المنتصف */
+            text-align: center;
         }
-
-        /* إعادة استخدام تنسيقات حقول الإدخال من auth.css مع بعض التعديلات إذا لزم الأمر */
         .input-group {
             margin-bottom: 20px;
             text-align: right;
@@ -112,10 +99,9 @@
             background-color: #f8f9fa;
         }
         .input-group textarea {
-            min-height: 120px; /* ارتفاع أدنى لحقل الرسالة */
-            resize: vertical; /* السماح بتغيير الحجم رأسيًا فقط */
+            min-height: 120px;
+            resize: vertical;
         }
-
         .input-group input[type="text"]:focus,
         .input-group input[type="email"]:focus,
         .input-group textarea:focus {
@@ -124,43 +110,38 @@
             box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
             outline: none;
         }
-
-        .btn.btn-accent {
+        .btn.btn-accent { /* هذا الكلاس يستخدمه الزر */
             background-color: var(--accent-color);
             color: var(--text-color);
-            padding: 12px 30px; /* زيادة الحشو الأفقي قليلاً */
+            padding: 12px 30px;
             font-size: 1.1em;
             border-radius: 8px;
-            width: 100%; /* زر بعرض كامل */
+            width: 100%;
             margin-top: 10px;
             border: none;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
-        .btn.btn-accent:hover {
+        .btn.btn-accent:hover:not(:disabled) { /* إضافة not(:disabled) */
             background-color: #ffca2c;
             transform: translateY(-2px);
         }
+        .btn.btn-accent:disabled { /* تنسيق الزر عند تعطيله */
+            background-color: var(--grey-color-light);
+            color: var(--grey-color-dark);
+            cursor: not-allowed;
+            transform: none;
+        }
 
-        /* تجاوبية بسيطة */
         @media (max-width: 768px) {
-            .contact-page-content h1 {
-                font-size: 2.2em;
-            }
-            .contact-form-container {
-                padding: 30px 20px;
-            }
-            .social-icons a {
-                width: 50px;
-                height: 50px;
-                font-size: 1.6em;
-            }
+            .contact-page-content h1 { font-size: 2.2em; }
+            .contact-form-container { padding: 30px 20px; }
+            .social-icons a { width: 50px; height: 50px; font-size: 1.6em; }
         }
     </style>
 </head>
 <body>
 
-<!-- نسخ الهيدر من الصفحات الأخرى مع تعديل الرابط النشط -->
 <header>
     <div class="container">
         <div class="logo">
@@ -170,7 +151,6 @@
             <ul>
                 <li><a href="game.html">العب</a></li>
                 <li><a href="how-to-play.html">طريقة اللعب</a></li>
-                <!-- إضافة كلاس active لرابط هذه الصفحة -->
                 <li><a href="contact.html" class="active">تواصل معنا</a></li>
             </ul>
         </nav>
@@ -180,7 +160,6 @@
     </div>
 </header>
 
-<!-- محتوى الصفحة -->
 <main class="contact-page-content">
     <div class="container">
         <h1>تواصل معنا</h1>
@@ -190,30 +169,22 @@
             نسعد دائمًا بسماع آرائكم واقتراحاتكم! سواء كان لديكم استفسار عن اللعبة، فكرة تودون مشاركتها، أو واجهتكم مشكلة تقنية، لا تترددوا في التواصل معنا عبر القنوات التالية أو باستخدام نموذج الاتصال.
         </p>
 
-
-        <!-- روابط التواصل الاجتماعي -->
         <div class="social-media-links">
             <h3>تابعنا على:</h3>
             <div class="social-icons">
-                <!-- استبدل # بالروابط الفعلية لحساباتك -->
                 <a href="https://www.instagram.com/rehlagame?igsh=MW1haWtleXRqcWo0MA%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer" class="instagram" aria-label="تابعنا على انستغرام">
                     <i class="fab fa-instagram"></i>
                 </a>
                 <a href="https://www.tiktok.com/@rehlagame" target="_blank" rel="noopener noreferrer" class="tiktok" aria-label="تابعنا على تيك توك">
                     <i class="fab fa-tiktok"></i>
                 </a>
-                <!-- يمكنك إضافة المزيد من الروابط هنا بنفس الطريقة (فيسبوك، تويتر، الخ) -->
-                <!--
-                <a href="#" target="_blank" rel="noopener noreferrer" class="facebook" aria-label="تابعنا على فيسبوك"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" target="_blank" rel="noopener noreferrer" class="twitter" aria-label="تابعنا على تويتر"><i class="fab fa-twitter"></i></a>
-                -->
             </div>
         </div>
 
-        <!-- نموذج الاتصال -->
         <div class="contact-form-container">
             <h3>أو أرسل لنا رسالة مباشرة:</h3>
-            <form action="mailto:rehlagame@gmail.com" method="GET" enctype="text/plain">
+            <!-- تم تعديل الفورم هنا -->
+            <form id="contact-us-form">
                 <div class="input-group">
                     <label for="contact-name">الاسم</label>
                     <input type="text" id="contact-name" name="name" placeholder="اسمك الكامل" required>
@@ -230,17 +201,16 @@
                     <label for="contact-message">الرسالة</label>
                     <textarea id="contact-message" name="body" placeholder="اكتب رسالتك هنا..." required></textarea>
                 </div>
-                <button type="submit" class="btn btn-accent">إرسال الرسالة عبر البريد</button>
+                <button type="submit" class="btn btn-accent" id="submit-contact-form-btn">إرسال الرسالة</button>
+                <p id="contact-form-status" style="margin-top: 15px; text-align: center; font-weight: bold; min-height: 1.2em;"></p>
             </form>
         </div>
 
-    </div> <!-- نهاية container -->
+    </div>
 </main>
 
 <footer>
     <div class="container footer-container-modern">
-
-        <!-- الصف الأول: أيقونات التواصل الاجتماعي والتطبيقات -->
         <div class="footer-icons-row">
             <div class="social-media-icons">
                 <a href="https://www.instagram.com/rehlagame?igsh=MW1haWtleXRqcWo0MA%3D%3D&utm_source=qr" class="social-icon-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
@@ -251,22 +221,20 @@
                 <a href="#" class="app-icon-link" aria-label="Download on the App Store"><i class="fab fa-apple"></i></a>
             </div>
         </div>
-
-        <!-- الصف الثاني: الروابط النصية (الشروط والمطور) -->
         <div class="footer-links-row">
             <a href="terms.html" class="footer-text-link">Term and Conditions</a>
             <span class="developer-credit-modern">
                 Created by <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer">Google Gemini pro 2.5</a>
             </span>
         </div>
-
-        <!-- الصف الثالث: حقوق النشر -->
         <div class="footer-copyright-row">
             <p>Copyright Rehla - All Rights Reserved 2025 <sup>®</sup></p>
         </div>
-
     </div>
 </footer>
+
 <script src="assets/js/main.js" type="module"></script>
+<!-- تم إضافة استدعاء ملف الجافاسكريبت الجديد هنا -->
+<script src="assets/js/contact-form.js" defer></script>
 </body>
 </html>
