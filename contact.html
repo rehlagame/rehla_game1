@@ -11,23 +11,67 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* ... (نفس الأنماط المضمنة التي كانت موجودة مسبقًا) ... */
+        /* الأنماط الأصلية والجديدة مدموجة هنا */
         .contact-page-content {
             padding: 60px 0;
             text-align: center;
         }
         .contact-page-content h1 {
             font-size: 2.8em;
-            margin-bottom: 20px;
+            margin-bottom: 20px; /* تم تقليل الهامش السفلي قليلاً لإفساح المجال لقسم الدعم */
             color: var(--primary-color);
         }
-        .contact-page-content .intro-text {
+
+        /* === قسم معلومات الدعم الفني الجديد === */
+        .support-contact-section {
+            background-color: var(--bg-color-alt); /* لون خلفية خفيف لتمييز القسم */
+            padding: 30px 20px;
+            border-radius: 12px;
+            margin: 0 auto 40px auto; /* توسيط القسم وإضافة هامش سفلي */
+            max-width: 750px; /* تحديد عرض أقصى للقسم */
+            border: 1px solid var(--grey-color-light);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+
+        .support-intro {
+            font-size: 1.15em;
+            color: var(--text-color);
+            line-height: 1.8;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .support-email-link {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1.25em;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(23, 162, 184, 0.2);
+        }
+        .support-email-link:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 6px 15px rgba(19, 132, 150, 0.3);
+        }
+        .support-email-link i.fa-envelope {
+            margin-left: 10px; /* مسافة بين الأيقونة والنص (يُعكس تلقائيًا في RTL ليكون يمين الأيقونة) */
+        }
+        /* === نهاية قسم معلومات الدعم الفني === */
+
+        .contact-page-content .intro-text { /* هذا النص أصبح الآن للاقتراحات العامة */
             font-size: 1.1em;
             color: var(--grey-color-dark);
             max-width: 700px;
-            margin: 0 auto 40px auto;
+            margin: 30px auto 40px auto; /* تعديل الهامش العلوي */
             line-height: 1.7;
         }
+
+        /* قسم روابط التواصل الاجتماعي */
         .social-media-links {
             margin-bottom: 50px;
         }
@@ -39,42 +83,47 @@
         .social-icons {
             display: flex;
             justify-content: center;
-            gap: 25px;
+            gap: 25px; /* مسافة بين الأيقونات */
         }
         .social-icons a {
             color: var(--white-color);
-            background-color: var(--primary-color);
+            background-color: var(--primary-color); /* خلفية الأيقونة */
             width: 55px;
             height: 55px;
-            border-radius: 50%;
-            display: inline-flex;
+            border-radius: 50%; /* جعلها دائرية */
+            display: inline-flex; /* استخدام inline-flex للتوسيط */
             justify-content: center;
             align-items: center;
-            font-size: 1.8em;
+            font-size: 1.8em; /* حجم الأيقونة */
             text-decoration: none;
             transition: background-color 0.3s ease, transform 0.3s ease;
         }
         .social-icons a:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-3px);
+            background-color: var(--secondary-color); /* تغيير اللون عند المرور */
+            transform: translateY(-3px); /* تأثير رفع بسيط */
         }
+        /* ألوان خاصة لتيك توك وانستغرام (اختياري) */
         .social-icons a.instagram:hover { background-color: #E1306C; }
         .social-icons a.tiktok:hover { background-color: #000000; }
+
+
+        /* قسم نموذج الاتصال */
         .contact-form-container {
             background-color: var(--white-color);
             padding: 40px;
             border-radius: 10px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
             max-width: 700px;
-            margin: 0 auto;
-            text-align: right;
+            margin: 0 auto; /* توسيط النموذج */
+            text-align: right; /* محاذاة محتويات النموذج لليمين */
         }
         .contact-form-container h3 {
             font-size: 1.5em;
             color: var(--secondary-color);
             margin-bottom: 25px;
-            text-align: center;
+            text-align: center; /* عنوان النموذج في المنتصف */
         }
+
         .input-group {
             margin-bottom: 20px;
             text-align: right;
@@ -99,9 +148,10 @@
             background-color: #f8f9fa;
         }
         .input-group textarea {
-            min-height: 120px;
-            resize: vertical;
+            min-height: 120px; /* ارتفاع أدنى لحقل الرسالة */
+            resize: vertical; /* السماح بتغيير الحجم رأسيًا فقط */
         }
+
         .input-group input[type="text"]:focus,
         .input-group input[type="email"]:focus,
         .input-group textarea:focus {
@@ -110,7 +160,8 @@
             box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
             outline: none;
         }
-        .btn.btn-accent { /* هذا الكلاس يستخدمه الزر */
+
+        .btn.btn-accent {
             background-color: var(--accent-color);
             color: var(--text-color);
             padding: 12px 30px;
@@ -120,23 +171,53 @@
             margin-top: 10px;
             border: none;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease; /* إضافة opacity للتعطيل */
         }
-        .btn.btn-accent:hover:not(:disabled) { /* إضافة not(:disabled) */
+        .btn.btn-accent:hover:not(:disabled) {
             background-color: #ffca2c;
             transform: translateY(-2px);
         }
-        .btn.btn-accent:disabled { /* تنسيق الزر عند تعطيله */
+        .btn.btn-accent:disabled {
             background-color: var(--grey-color-light);
             color: var(--grey-color-dark);
             cursor: not-allowed;
             transform: none;
+            opacity: 0.7; /* جعل الزر المعطل باهتاً قليلاً */
         }
 
+
+        /* تجاوبية بسيطة */
         @media (max-width: 768px) {
-            .contact-page-content h1 { font-size: 2.2em; }
-            .contact-form-container { padding: 30px 20px; }
-            .social-icons a { width: 50px; height: 50px; font-size: 1.6em; }
+            .contact-page-content h1 {
+                font-size: 2.2em;
+            }
+            .support-contact-section {
+                padding: 25px 15px;
+            }
+            .support-intro {
+                font-size: 1.05em;
+            }
+            .support-email-link {
+                font-size: 1.1em;
+                padding: 10px 20px;
+            }
+            .contact-form-container {
+                padding: 30px 20px;
+            }
+            .social-icons a {
+                width: 50px;
+                height: 50px;
+                font-size: 1.6em;
+            }
+        }
+        @media (max-width: 480px) {
+            .support-email-link {
+                font-size: 1em; /* تصغير الخط قليلاً للشاشات الصغيرة جداً */
+                padding: 10px 15px;
+            }
+            .support-intro {
+                font-size: 1em;
+            }
         }
     </style>
 </head>
@@ -163,11 +244,19 @@
 <main class="contact-page-content">
     <div class="container">
         <h1>تواصل معنا</h1>
-        <p class="intro-text">
-            للدعم الفني: <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a>
-            <br><br>
-            نسعد دائمًا بسماع آرائكم واقتراحاتكم! سواء كان لديكم استفسار عن اللعبة، فكرة تودون مشاركتها، أو واجهتكم مشكلة تقنية، لا تترددوا في التواصل معنا عبر القنوات التالية أو باستخدام نموذج الاتصال.
-        </p>
+        <div class="support-contact-section">
+            <p class="support-intro">
+                نحن هنا لمساعدتك! إذا واجهتك أي مشكلة فنية أو كان لديك استفسار بخصوص لعبة رحلة،
+                <br>فريق الدعم الفني جاهز لخدمتك عبر البريد الإلكتروني:
+            </p>
+            <a href="mailto:Rehlagame@gmail.com" class="support-email-link">
+                <i class="fas fa-envelope"></i> rehlagame@gmail.com
+            </a>
+            <p class="intro-text" style="margin-top: 30px;">
+                ونسعد دائمًا بسماع آرائكم واقتراحاتكم الأخرى! سواء كان لديكم فكرة تودون مشاركتها،
+                أو أي ملاحظات عامة، لا تترددوا في التواصل معنا عبر القنوات التالية أو باستخدام نموذج الاتصال أدناه.
+            </p>
+        </div>
 
         <div class="social-media-links">
             <h3>تابعنا على:</h3>
