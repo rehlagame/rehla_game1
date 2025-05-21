@@ -87,6 +87,10 @@ const mainPlayButtonEl = document.querySelector('main.hero .btn-play');
 // --- Global State ---
 let isBackendProfileReady = false;
 
+// --- تم حذف دالة adjustMainContentPadding من هنا، script.js سيتعامل معها ---
+// --- وكذلك window.adjustMainContentPadding = adjustMainContentPadding; إذا كانت موجودة سابقاً ---
+
+
 // --- Helper Functions ---
 const showAuthError = (message, targetDiv = authErrorMessageDiv) => {
     if (targetDiv) {
@@ -368,45 +372,40 @@ onAuthStateChanged(auth, async (user) => {
     console.log(`[MainJS onAuthStateChanged] Fired on page: ${currentPage}. User state: ${user ? `Logged in (UID: ${user.uid})` : 'Logged out'}`);
     isBackendProfileReady = false; // Reset flag
 
+    let dataFromRegistrationForm = null;
+
     if (user) {
-        let dataFromRegistrationForm = null;
         if (_pendingRegistrationData) {
             dataFromRegistrationForm = _pendingRegistrationData;
-            _pendingRegistrationData = null; // Consume it
-            console.log(`[MainJS onAuthStateChanged] Using pending registration data for UID ${user.uid}:`, dataFromRegistrationForm);
+            _pendingRegistrationData = null;
         }
 
         try {
-            console.log(`[MainJS onAuthStateChanged] User logged in. Calling ensureAndSyncBackendProfile for UID: ${user.uid}`);
             await ensureAndSyncBackendProfile(user, dataFromRegistrationForm);
-            console.log(`[MainJS onAuthStateChanged] ensureAndSyncBackendProfile COMPLETED for UID: ${user.uid}. isBackendProfileReady: ${isBackendProfileReady}`);
-
             updateHeaderUI(user);
 
             if (currentPage === 'logged.html' && typeof setupProfilePage === 'function') {
                 await setupProfilePage(user);
             }
-
-            // Redirect AFTER profile sync and UI update for auth page
             if (currentPage === 'auth.html') {
-                console.log("[MainJS onAuthStateChanged] User is on auth.html but logged in. Redirecting to index.html.");
                 window.location.href = 'index.html';
             } else {
-                handleAuthSuccess(user); // Call simplified success handler for other general UI updates
+                handleAuthSuccess(user);
             }
-
         } catch (error) {
             console.error(`[MainJS onAuthStateChanged] CRITICAL ERROR during post-authentication setup for UID ${user.uid}:`, error);
         }
     } else {
-        _pendingRegistrationData = null; // Clear on logout
+        _pendingRegistrationData = null;
         updateHeaderUI(null);
         const protectedPages = ['logged.html', 'game.html'];
         if (protectedPages.includes(currentPage)) {
-            console.log("[MainJS onAuthStateChanged] User not logged in, on protected page. Redirecting to auth.html from:", currentPage);
             window.location.href = 'auth.html';
         }
     }
+
+    // script.js سيتولى الآن مسؤولية استدعاء adjustMainContentPaddingLocal عند DOMContentLoaded و resize.
+    // لا حاجة لاستدعاء صريح هنا بعد الآن إذا كان script.js يُحمَّل بشكل صحيح.
 });
 
 // --- Profile Page (Logged.html) Logic ---
@@ -432,13 +431,13 @@ async function setupProfilePage(user) {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            if (!response.ok && response.status !== 404) { // Handle non-404 errors specifically
+            if (!response.ok && response.status !== 404) {
                 const errorText = await response.text().catch(() => `فشل جلب تفاصيل الملف الشخصي (Code: SPP-BE-${response.status})`);
                 console.error(`Failed to fetch profile from backend (setupProfilePage): ${response.status} - ${errorText}`);
                 const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
                 if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
                 if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
-            } else if (response.ok) { // Only process if response is OK (2xx)
+            } else if (response.ok) {
                 const profileData = await response.json();
                 console.log("Backend profile data for setupProfilePage:", profileData);
                 if (els.firstNameInput) els.firstNameInput.value = profileData.first_name || '';
@@ -488,10 +487,10 @@ async function setupProfilePage(user) {
                 if (!file || !auth.currentUser) return;
                 const imageRef = storageRef(storage, `profile_pictures/${auth.currentUser.uid}/${file.name}`);
                 try {
-                    if (profilePageElements.userPhoto) profilePageElements.userPhoto.src = 'assets/images/loading-spinner.gif'; // Show loading
+                    if (profilePageElements.userPhoto) profilePageElements.userPhoto.src = 'assets/images/loading-spinner.gif';
                     await uploadBytes(imageRef, file);
                     const downloadURL = await getDownloadURL(imageRef);
-                    await updateProfile(auth.currentUser, { photoURL: downloadURL }); // Update Firebase Auth profile
+                    await updateProfile(auth.currentUser, { photoURL: downloadURL });
                     const token = await getIdToken(auth.currentUser);
                     const updateResponse = await fetch(`${RENDER_API_BASE_URL}/api/user/${auth.currentUser.uid}/profile`, {
                         method: 'PUT',
@@ -861,6 +860,8 @@ function setupPurchaseDropdown(userInstance) {
 // --- Header UI Update ---
 function updateHeaderUI(user) {
     if (!userActionsContainer) return;
+    // const headerElement = document.querySelector('header'); // لا حاجة لتعريفه هنا إذا لم نستخدمه مباشرة في هذه الدالة
+
     if (user) {
         const latestUser = auth.currentUser || user;
         const displayName = latestUser?.displayName || (latestUser?.email ? latestUser.email.split('@')[0] : 'مستخدم رحلة');
@@ -881,6 +882,11 @@ function updateHeaderUI(user) {
         userActionsContainer.innerHTML = `<a href="auth.html" class="btn btn-register">تسجيل / دخول</a>`;
         window.currentPurchaseDropdownSetup = null;
     }
+
+    // لم نعد بحاجة لاستدعاء adjustMainContentPadding صراحة من هنا،
+    // لأن script.js لديه مستمع لـ DOMContentLoaded و resize.
+    // إذا كان هناك تغيير في ارتفاع الهيدر بسبب تحديث محتواه هنا،
+    // فإن مستمع resize في script.js (الذي يراقب header) سيتولى الأمر.
 }
 
 
@@ -960,5 +966,8 @@ window.getRemainingGamesForUser = getRemainingGames;
 window.updateRemainingGamesDisplay = updateRemainingGamesDisplay;
 window.RENDER_API_BASE_URL = RENDER_API_BASE_URL;
 window.isUserBackendProfileReady = () => isBackendProfileReady;
+window.getUserGamesKey = getUserGamesKey;
 
 console.log("main.js loaded and updated. RENDER_API_BASE_URL is set to:", RENDER_API_BASE_URL);
+
+// --- تم حذف مستمع resize الخاص بـ adjustMainContentPadding من هنا، script.js سيتعامل معه ---
