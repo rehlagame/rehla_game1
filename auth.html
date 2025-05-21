@@ -4,17 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول / إنشاء حساب - لعبة رحلة</title>
-    <link rel="stylesheet" href="assets/css/style.css"> <!-- الربط بملف الأنماط العام -->
-    <link rel="stylesheet" href="assets/css/auth.css"> <!-- الربط بملف الأنماط الخاص بهذه الصفحة -->
+    <link rel="stylesheet" href="assets/css/style.css"> <!-- ملف الأنماط العام -->
+    <link rel="stylesheet" href="assets/css/auth.css"> <!-- ملف الأنماط الخاص بصفحة المصادقة -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-    <!-- *** تمت إضافة السطر التالي لاستدعاء Font Awesome *** -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- لا حاجة لـ <style> لإخفاء الهيدر أو تعديل padding هنا بشكل خاص لهذه الصفحة -->
+    <!-- style.css و script.js سيتوليان ذلك بشكل عام -->
 </head>
 <body>
 
-<header>
+<header> <!-- الهيدر القياسي -->
     <div class="container">
         <div class="logo">
             <h1><a href="index.html">رحلة</a></h1>
@@ -26,13 +28,13 @@
                 <li><a href="contact.html">تواصل معنا</a></li>
             </ul>
         </nav>
-        <div class="user-actions">
+        <div class="user-actions"> <!-- سيتم ملؤه بواسطة main.js -->
             <a href="auth.html" class="btn btn-register">تسجيل / دخول</a>
         </div>
     </div>
 </header>
 
-<main class="auth-main-content">
+<main class="auth-main-content"> <!-- هذا هو header.nextElementSibling -->
     <div class="container">
         <div class="auth-container">
             <div id="auth-error-message" class="auth-error" style="display: none;"></div>
@@ -53,7 +55,6 @@
                         <div class="form-options">
                             <a href="#" class="forgot-password" id="show-forgot-password">نسيت كلمة المرور؟</a>
                         </div>
-
                         <button type="submit" class="btn btn-accent">تسجيل الدخول</button>
                     </form>
                     <p class="switch-form">
@@ -75,12 +76,10 @@
                                 <input type="text" id="register-last-name" name="lastName" placeholder="مثال: الأحمد" required>
                             </div>
                         </div>
-
                         <div class="input-group">
                             <label for="register-email">البريد الإلكتروني</label>
                             <input type="email" id="register-email" name="email" placeholder="ادخل بريدك الإلكتروني" required>
                         </div>
-
                         <div class="input-group phone-group">
                             <label for="register-phone">رقم الهاتف</label>
                             <div class="phone-input-container">
@@ -95,8 +94,6 @@
                                 <input type="tel" id="register-phone" name="phone" placeholder="مثال: 9999xxxx" required pattern="[0-9]{8,10}">
                             </div>
                         </div>
-
-
                         <div class="input-group">
                             <label for="register-password">كلمة المرور</label>
                             <input type="password" id="register-password" name="password" placeholder="6 أحرف على الأقل" required minlength="6">
@@ -144,7 +141,6 @@
                         Apple
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
@@ -152,8 +148,6 @@
 
 <footer>
     <div class="container footer-container-modern">
-
-        <!-- الصف الأول: أيقونات التواصل الاجتماعي والتطبيقات -->
         <div class="footer-icons-row">
             <div class="social-media-icons">
                 <a href="https://www.instagram.com/rehlagame?igsh=MW1haWtleXRqcWo0MA%3D%3D&utm_source=qr" class="social-icon-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
@@ -164,24 +158,20 @@
                 <a href="#" class="app-icon-link" aria-label="Download on the App Store"><i class="fab fa-apple"></i></a>
             </div>
         </div>
-
-        <!-- الصف الثاني: الروابط النصية (الشروط والمطور) -->
         <div class="footer-links-row">
             <a href="terms.html" class="footer-text-link">Term and Conditions</a>
             <span class="developer-credit-modern">
                 Created by <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer">Google Gemini pro 2.5</a>
             </span>
         </div>
-
-        <!-- الصف الثالث: حقوق النشر -->
         <div class="footer-copyright-row">
             <p>Copyright Rehla - All Rights Reserved 2025 <sup>®</sup></p>
         </div>
-
     </div>
 </footer>
 
 <script>
+    // شيفرة JavaScript الخاصة بتبديل النماذج في auth.html
     document.addEventListener('DOMContentLoaded', () => {
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
@@ -218,5 +208,6 @@
     });
 </script>
 <script src="assets/js/main.js" type="module"></script>
+<script src="assets/js/script.js" defer></script> <!-- ملف script.js العام مهم هنا -->
 </body>
 </html>
