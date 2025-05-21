@@ -148,13 +148,14 @@
     text-align: center;
     font-size: 1.25em;
     font-weight: 700;
-    padding: 15px;
+    padding: 15px; /* قد تحتاج لتعديل الحشو إذا أضفت أيقونة هنا */
     background-color: var(--white-color);
     color: var(--black-color);
     border-radius: 10px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.07);
     border: 1px solid var(--grey-color-medium);
     flex-shrink: 0;
+    /* position: relative; <-- إذا أضفت أيقونة بداخلها، قد تحتاج هذا */
 }
 .team-name-highlight {
     color: var(--primary-color);
@@ -201,8 +202,6 @@
     padding-bottom: 0;
 }
 
-/* تنسيق تسمية النقاط والمحطة مباشرة */
-/* .team-info-card .score, *//* Removed redundant rules here, handled below */
 .team-info-card .current-station {
     font-size: 0.85em;
     color: var(--grey-color-dark);
@@ -211,7 +210,6 @@
     border-top: 1px solid var(--grey-color-light);
     padding-top: 8px;
 }
-/* .team-info-card .score { border-top: none; padding-top: 0; } *//* Removed redundant rule */
 
 .team-info-card .current-station span { /* Span للمحطة الحالية فقط */
     display: block;
@@ -282,34 +280,31 @@
 
 /* تنسيق منطقة السؤال */
 #question-interaction-area h3 { margin-top: 0; margin-bottom: 10px; color: var(--primary-color); font-size: 1.7em; text-align: center; padding-top: 10px; }
-#question-details { text-align: center; margin-bottom: 15px; /* تقليل المسافة قليلاً */ font-size: 1.1em; color: var(--grey-color-dark); }
+#question-details { text-align: center; margin-bottom: 15px; font-size: 1.1em; color: var(--grey-color-dark); }
 #question-difficulty { font-weight: bold; padding: 5px 12px; border-radius: 6px; color: white; display: inline-block; vertical-align: middle; font-size: 0.9em; }
 #question-difficulty.easy { background-color: var(--success-color); }
 #question-difficulty.medium { background-color: var(--warning-color); color: var(--black-color); }
 #question-difficulty.hard { background-color: var(--danger-color); }
 #question-points { font-weight: bold; vertical-align: middle; margin-right: 5px; }
 
-/* ======================= تنسيقات الصورة المضافة ======================= */
 #question-image-container {
-    margin-top: 10px; /* مسافة فوق الصورة */
-    margin-bottom: 20px; /* مسافة تحت الصورة */
-    text-align: center; /* لتوسيط الصورة إذا كانت أصغر من الحاوية */
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: center;
 }
 #question-image {
-    display: block; /* لإزالة أي مسافات إضافية تحت الصورة */
-    max-width: 100%; /* أهم خاصية: الصورة لا تتجاوز عرض الحاوية */
-    max-height: 220px; /* تحديد أقصى ارتفاع للصورة (عدّل حسب الحاجة) */
-    margin: 0 auto; /* توسيط الصورة أفقياً */
-    border-radius: 8px; /* حواف دائرية */
-    border: 1px solid var(--grey-color-medium); /* حدود بسيطة */
-    background-color: var(--white-color); /* خلفية بيضاء إذا كانت الصورة شفافة */
-    object-fit: contain; /* للحفاظ على أبعاد الصورة دون قص أو تشويه */
-    object-position: center; /* توسيط محتوى الصورة داخل الإطار */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08); /* ظل بسيط */
+    display: block;
+    max-width: 100%;
+    max-height: 220px;
+    margin: 0 auto;
+    border-radius: 8px;
+    border: 1px solid var(--grey-color-medium);
+    background-color: var(--white-color);
+    object-fit: contain;
+    object-position: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
-/* ====================================================================== */
 
-/* ===> حجم ووزن خط السؤال <=== */
 #question-text {
     font-size: 1.5em;
     font-weight: 600;
@@ -320,7 +315,6 @@
     flex-grow: 1;
 }
 
-/* حاوية خيارات الإجابة وزر العرض */
 #answer-options-wrapper {
     margin-bottom: 30px;
     display: flex;
@@ -336,7 +330,6 @@
     flex-grow: 1;
 }
 
-/* ===> حجم ووزن خط أزرار الخيارات <=== */
 .option-btn {
     padding: 16px 22px;
     font-size: 1.25em;
@@ -352,7 +345,6 @@
 .option-btn:hover:not(:disabled) { background-color: var(--grey-color-medium); border-color: var(--secondary-color); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
 .option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; background-color: var(--grey-color-light); border-color: var(--grey-color-medium);}
 
-/* زر عرض الإجابة */
 #reveal-answer-btn {
     display: block;
     width: 60%;
@@ -384,7 +376,6 @@
     transform: none;
 }
 
-/* قسم عرض الإجابة الصحيحة وتحديد النقاط */
 #answer-reveal-section {
     background-color: #e9f7fd;
     border: 1px solid var(--primary-color);
@@ -466,7 +457,6 @@
 .btn-assign-points.none-btn { background-color: var(--secondary-color); color: white; }
 .btn-assign-points.none-btn:hover { background-color: #5a6268; }
 
-/* *** تنسيق قسم إجابة السؤال السابق *** */
 #previous-correct-answer-display {
     margin-top: 20px;
     padding: 15px 20px;
@@ -489,18 +479,17 @@
     color: var(--grey-color-dark);
 }
 #previous-question-image {
-     max-width: 100px;
-     max-height: 100px;
-     display: none; /* Controlled by JS */
-     margin: 10px auto;
-     border-radius: 4px;
-     border: 1px solid var(--grey-color-medium);
-     background-color: var(--white-color);
-     object-fit: contain;
-     object-position: center;
+    max-width: 100px;
+    max-height: 100px;
+    display: none;
+    margin: 10px auto;
+    border-radius: 4px;
+    border: 1px solid var(--grey-color-medium);
+    background-color: var(--white-color);
+    object-fit: contain;
+    object-position: center;
 }
 
-/* رسالة التغذية الراجعة */
 #feedback-message {
     margin-top: 20px;
     padding: 15px;
@@ -515,7 +504,6 @@
 #feedback-message.no-points { background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; }
 
 
-/* أزرار التنقل بين الأسئلة */
 .question-navigation-btns {
     margin-top: 25px;
     display: flex;
@@ -529,7 +517,6 @@
 #return-to-current-btn { background-color: var(--primary-color); color: white; }
 #return-to-current-btn:hover { background-color: #138496; }
 
-/* منطقة نهاية اللعبة */
 #game-over-section {
     display: none;
     position: fixed;
@@ -585,127 +572,112 @@
     background-color: #117a8b;
 }
 
-
-/* --- START: Styles for Modern Manual Score Adjustment Buttons --- */
-
-/* حاوية النقاط الكلية */
 .team-info-card .score {
-    position: relative; /* Needed for absolute positioning of buttons */
-    padding-top: 5px;  /* Add some padding for spacing */
+    position: relative;
+    padding-top: 5px;
     padding-bottom: 5px;
-    overflow: hidden; /* Hide buttons initially if needed (can be removed if not sliding) */
-    text-align: center; /* Center the label */
-    border-top: none; /* Override previous border */
-    margin-bottom: 8px; /* Maintain spacing */
+    overflow: hidden;
+    text-align: center;
+    border-top: none;
+    margin-bottom: 8px;
 }
 
-/* تسمية "النقاط:" */
 .team-info-card .score > span:first-child {
     display: inline-block;
-    margin-left: 8px; /* Space after label */
+    margin-left: 8px;
     vertical-align: middle;
-    font-size: 0.85em; /* Match original label size */
+    font-size: 0.85em;
     color: var(--grey-color-dark);
 }
 
-/* حاوية القيمة والأزرار */
 .score-value-container {
-    display: inline-flex; /* Use inline-flex for alignment */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    position: relative; /* Crucial for button positioning */
-    background-color: var(--grey-color-light); /* Subtle background */
-    border-radius: 18px; /* Rounded pill shape */
-    padding: 4px 8px; /* Padding inside the pill */
-    min-width: 90px; /* Ensure enough space */
+    position: relative;
+    background-color: var(--grey-color-light);
+    border-radius: 18px;
+    padding: 4px 8px;
+    min-width: 90px;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     vertical-align: middle;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06); /* Subtle inner shadow */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-/* عرض قيمة النقاط نفسها */
 .score-value-container #team1-score,
 .score-value-container #team2-score {
     display: inline-block;
     font-weight: 700;
     color: var(--black-color);
-    font-size: 1.15em; /* Original score size */
-    margin: 0 12px; /* Space between score and potential button areas */
+    font-size: 1.15em;
+    margin: 0 12px;
     min-width: 30px;
     text-align: center;
-    z-index: 2; /* Ensure score is above button pseudo-elements if used */
-    position: relative; /* Needed for z-index */
+    z-index: 2;
+    position: relative;
 }
 
-/* أزرار تعديل النقاط (مخفية مبدئياً، تظهر عند مرور الماوس) */
 .btn-adjust-score {
-    position: absolute; /* Position relative to score-value-container */
+    position: absolute;
     top: 50%;
-    transform: translateY(-50%) scale(0.8); /* Start slightly smaller */
-    width: 28px; /* Slightly larger */
+    transform: translateY(-50%) scale(0.8);
+    width: 28px;
     height: 28px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    font-size: 0.9em; /* Icon size */
+    font-size: 0.9em;
     border-radius: 50%;
-    border: none; /* No border initially */
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent dark */
+    border: none;
+    background-color: rgba(0, 0, 0, 0.5);
     color: var(--white-color);
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Smooth transition */
-    opacity: 0; /* Hidden by default */
-    z-index: 3; /* Above container background */
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    z-index: 3;
     box-shadow: 0 2px 5px rgba(0,0,0,0.15);
 }
 
-/* تحديد موقع الأزرار */
 .btn-adjust-score.btn-decrement {
-    right: 5px; /* Position minus button on the right (RTL) */
+    right: 5px;
 }
 .btn-adjust-score.btn-increment {
-    left: 5px; /* Position plus button on the left (RTL) */
+    left: 5px;
 }
 
-/* إظهار الأزرار وتغيير خلفية الحاوية عند مرور الماوس فوق الحاوية */
 .score-value-container:hover {
-    background-color: var(--grey-color-medium); /* Darken background on hover */
+    background-color: var(--grey-color-medium);
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 .score-value-container:hover .btn-adjust-score {
     opacity: 1;
-    transform: translateY(-50%) scale(1); /* Scale to full size */
+    transform: translateY(-50%) scale(1);
 }
 
-/* تأثيرات Hover/Active للأزرار */
 .btn-adjust-score:hover {
     background-color: rgba(0, 0, 0, 0.7);
-    transform: translateY(-50%) scale(1.08); /* Slightly larger on hover */
+    transform: translateY(-50%) scale(1.08);
     box-shadow: 0 3px 7px rgba(0,0,0,0.2);
 }
 
 .btn-adjust-score.btn-increment:hover {
-    background-color: var(--success-color); /* Use theme color */
+    background-color: var(--success-color);
 }
 .btn-adjust-score.btn-decrement:hover {
-    background-color: var(--danger-color); /* Use theme color */
+    background-color: var(--danger-color);
 }
 
 .btn-adjust-score:active {
-    transform: translateY(-50%) scale(0.95); /* Press down effect */
+    transform: translateY(-50%) scale(0.95);
     transition-duration: 0.1s;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* --- END: Styles for Modern Manual Score Adjustment Buttons --- */
-
-
-/* --- الاستجابة للشاشات الصغيرة --- */
 @media (max-width: 992px) {
     #game-play-area {
         display: block;
-        grid-template-columns: 1fr;
+        /* grid-template-columns: 1fr; <-- تم التعليق لأنه لم يعد grid */
     }
     #game-sidebar {
         position: static;
@@ -715,37 +687,37 @@
         width: 100%;
         padding-bottom: 0;
     }
-     .teams-dashboard {
-         flex-direction: column;
-     }
-      .team-info-card {
-         flex-basis: auto;
-         min-width: unset;
-     }
+    .teams-dashboard {
+        flex-direction: column;
+    }
+    .team-info-card {
+        flex-basis: auto;
+        min-width: unset;
+    }
     #question-interaction-area { min-height: auto; }
-     .team-setup {
+    .team-setup {
         flex-basis: 100%;
     }
 }
 
 @media (max-width: 768px) {
-    /* إعداد اللعبة */
     .team-setup-container { flex-direction: column; gap: 20px; }
     #game-setup-form { padding: 20px; }
     .btn-start-game { width: 100%; }
 
-    /* منطقة اللعب */
-    :root { --sidebar-width: 100%; }
-     #game-play-area { gap: 20px; }
+    :root { /* --sidebar-width: 100%; <-- لا حاجة لهذا هنا إذا لم يعد grid */ }
+    /* #game-play-area { gap: 20px; } <-- لا حاجة لهذا هنا إذا لم يعد grid */
     #current-turn-info { font-size: 1.15em; padding: 12px; }
+    /* تعديل الحشو إذا أضيفت أيقونة */
+    #current-turn-info { padding-left: 45px; /* مساحة للأيقونة على اليسار في RTL */ }
+
     .team-info-card { padding: 15px; }
     .team-info-card h2 { font-size: 1.2em; }
     .team-info-card .current-station { font-size: 0.8em; padding-top: 6px; }
     .team-info-card .current-station span { font-size: 1.05em; margin-top: 2px; }
     .path-display li { font-size: 0.8em; }
-     .path-display li::before { min-width: 18px; height: 18px; line-height: 18px; font-size: 0.75em; }
+    .path-display li::before { min-width: 18px; height: 18px; line-height: 18px; font-size: 0.75em; }
 
-    /* منطقة السؤال */
     #question-interaction-area { padding: 20px; margin-top: 25px; }
     #question-interaction-area h3 { font-size: 1.5em; padding-top: 5px; }
     #question-timer { top: 15px; left: 15px; font-size: 1em; padding: 6px 12px; min-width: 50px; }
@@ -761,15 +733,14 @@
     #previous-correct-answer-display p { font-size: 1.1em; }
     #question-image { max-height: 180px; }
 
-    /* تعديل أزرار النقاط للشاشات المتوسطة */
-     .btn-adjust-score {
+    .btn-adjust-score {
         width: 26px;
         height: 26px;
         font-size: 0.8em;
     }
     .score-value-container #team1-score,
     .score-value-container #team2-score {
-        margin: 0 8px; /* تقليل المسافة قليلاً */
+        margin: 0 8px;
         font-size: 1.05em;
     }
     .score-value-container {
@@ -782,41 +753,38 @@
     #reveal-answer-btn { width: 95%; }
     .btn-assign-points { width: 95%; min-width: unset;}
     .question-navigation-btns .btn { width: 95%; }
-    #current-turn-info { font-size: 1.1em; }
+    #current-turn-info { font-size: 1.1em; padding-left: 40px; /* تعديل الحشو للأيقونة الأصغر */ }
     .team-info-card { padding: 12px; border-radius: 10px;}
     .team-info-card h2 { font-size: 1.1em; }
     .team-info-card .current-station { font-size: 0.75em; padding-top: 5px; margin-bottom: 6px; }
     .team-info-card .current-station span { font-size: 1em; margin-top: 2px; }
     .path-display li { font-size: 0.75em; padding: 6px 8px; margin-bottom: 5px;}
-     .path-display li::before { min-width: 16px; height: 16px; line-height: 16px; font-size: 0.7em; margin-left: 6px;}
-     #question-interaction-area h3 { font-size: 1.4em; padding-top: 0; }
-     #question-timer { top: 10px; left: 10px; font-size: 0.9em; padding: 5px 10px; min-width: 45px; }
-     #question-text { font-size: 1.2em; }
-     .option-btn { font-size: 1em; padding: 12px 15px; }
-     .correct-answer-display { font-size: 1.3em; }
-     .assign-points-prompt { font-size: 1.1em; }
-     #previous-correct-answer-display p { font-size: 1em; }
-     #question-image { max-height: 150px; }
+    .path-display li::before { min-width: 16px; height: 16px; line-height: 16px; font-size: 0.7em; margin-left: 6px;}
+    #question-interaction-area h3 { font-size: 1.4em; padding-top: 0; }
+    #question-timer { top: 10px; left: 10px; font-size: 0.9em; padding: 5px 10px; min-width: 45px; }
+    #question-text { font-size: 1.2em; }
+    .option-btn { font-size: 1em; padding: 12px 15px; }
+    .correct-answer-display { font-size: 1.3em; }
+    .assign-points-prompt { font-size: 1.1em; }
+    #previous-correct-answer-display p { font-size: 1em; }
+    #question-image { max-height: 150px; }
 
-    /* تعديل أزرار النقاط للشاشات الصغيرة */
     .btn-adjust-score {
         width: 24px;
         height: 24px;
         font-size: 0.75em;
     }
-     .score-value-container #team1-score,
+    .score-value-container #team1-score,
     .score-value-container #team2-score {
         margin: 0 6px;
-        font-size: 1.05em; /* تصغير حجم خط النقاط قليلاً */
+        font-size: 1.05em;
     }
-     .score-value-container {
+    .score-value-container {
         min-width: 70px;
         padding: 2px 5px;
     }
 }
 
-
-/* إزالة حقل الإجابة النصية غير المستخدم */
 #text-answer-input { display: none !important; }
 
 /* --- END OF FILE assets/css/game.css --- */
