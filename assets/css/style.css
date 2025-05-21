@@ -32,7 +32,31 @@ ul { list-style: none; }
 h1, h2 { color: var(--primary-color); margin-bottom: 15px; }
 
 /* --- الهيدر --- */
-header { background-color: var(--white-color); padding: 15px 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); position: sticky; top: 0; z-index: 1000; transition: background-color 0.4s ease, box-shadow 0.4s ease; }
+header {
+    background-color: var(--white-color);
+    padding: 15px 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    position: fixed; /* مهم لسلوك الاختفاء/الظهور */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transition: top 0.3s ease-in-out, background-color 0.4s ease, box-shadow 0.4s ease; /* إضافة transition لـ top */
+}
+
+/* كلاس جديد لإخفاء الهيدر */
+header.header-hidden {
+    top: -150px; /* قيمة أكبر من ارتفاع الهيدر لضمان اختفائه بالكامل. قد تحتاج لتعديل هذه القيمة. */
+    /* إذا كان ارتفاع الهيدر يتغير ديناميكيًا، تأكد أن هذه القيمة كافية دائمًا. */
+}
+
+/* القاعدة header.scrolled يمكن أن تبقى أو تعدل حسب الرغبة */
+/* يتم التحكم بها الآن من خلال JavaScript في دالة hasScrolled */
+header.scrolled {
+    background-color: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
 header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
 .logo { flex-shrink: 0; }
 .logo h1 { margin: 0; font-size: 2em; font-weight: 700; }
@@ -74,7 +98,7 @@ nav ul li a:hover, nav ul li a.active { color: var(--primary-color); border-bott
 .main-actions .btn-secondary:hover { background-color: var(--white-color); color: var(--primary-color); }
 
 /* --- أقسام المحتوى --- */
-section { scroll-margin-top: 80px; }
+section { scroll-margin-top: 80px; } /* قد تحتاج لتعديل هذه إذا كان الهيدر يختفي/يظهر */
 .content-section { padding: 60px 0; text-align: center; }
 .content-section h2 { font-size: 2.5em; margin-bottom: 30px; color: var(--primary-color); }
 .content-section p { font-size: 1.1em; max-width: 800px; margin: 0 auto 20px auto; color: var(--grey-color-dark); }
