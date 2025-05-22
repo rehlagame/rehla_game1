@@ -1,27 +1,25 @@
 // routes/userRoutes.js
 const express = require('express');
-const pool    = require('../database/database'); // تأكد أن المسار إلى ملف قاعدة البيانات صحيح
+const pool    = require('../database/database');
 const router  = express.Router();
-
-// (اختياري ولكن موصى به) Middleware للتحقق من Firebase Token
-// const { verifyFirebaseToken } = require('../middleware/authMiddleware'); // قم بإنشاء هذا الملف إذا أردت حماية المسارات
+const { verifyFirebaseToken } = require('../middleware/authMiddleware'); // استيراد middleware المصادقة
 
 // ===== POST /api/user/register-profile =====
 // يتم استدعاؤه عند إنشاء حساب مستخدم جديد في الواجهة الأمامية
-router.post('/register-profile', /* verifyFirebaseToken, */ async (req, res, next) => {
+// لا يتطلب verifyFirebaseToken هنا لأن التوكن قد لا يكون متاحًا بعد للمستخدم الجديد تمامًا،
+// أو أن الواجهة الأمامية سترسله إذا كان التسجيل يتم بعد المصادقة الأولية (مثل التسجيل عبر جوجل).
+// القرار يعتمد على تدفق المصادقة لديك. إذا كان يُفترض أن المستخدم *دائمًا* مصادق عليه
+// قبل أن يتمكن من استدعاء هذا، فيجب إضافة verifyFirebaseToken.
+// حاليًا، سأفترض أن الواجهة الأمامية قد ترسل firebaseUid مباشرة بعد إنشائه في Firebase.
+router.post('/register-profile', async (req, res, next) => {
     const { firebaseUid, email, displayName, firstName, lastName, phone, photoURL } = req.body;
     console.log('[API /register-profile] Received payload for UID:', firebaseUid, req.body);
-
-    // (اختياري) إذا كنت تستخدم middleware للتحقق من التوكن، يمكنك التحقق هنا
-    // if (req.user?.uid !== firebaseUid) {
-    //     return res.status(403).json({ message: "Unauthorized to register this profile." });
-    // }
 
     if (!firebaseUid || !email) {
         return res.status(400).json({ message: "Firebase UID and Email are required for profile registration." });
     }
 
-    const initialGamesBalance = 1; // رصيد ألعاب ابتدائي عند التسجيل
+    const initialGamesBalance = 1;
 
     const insertSql = `
         INSERT INTO users (firebase_uid, email, display_name, first_name, last_name, phone, photo_url, games_balance)
@@ -34,22 +32,11 @@ router.post('/register-profile', /* verifyFirebaseToken, */ async (req, res, nex
             phone = EXCLUDED.phone,
             photo_url = EXCLUDED.photo_url,
             updated_at = CURRENT_TIMESTAMP
-            -- لا تقم بتحديث games_balance هنا عند التعارض، إلا إذا كان هذا مقصودًا
         RETURNING firebase_uid, email, display_name, first_name, last_name, phone, photo_url, games_balance;
     `;
-    // ON CONFLICT (firebase_uid) DO UPDATE ... : هذا سيقوم بتحديث بيانات المستخدم إذا كان موجودًا بالفعل،
-    // بدلاً من مجرد DO NOTHING. هذا قد يكون مفيدًا إذا تغيرت بيانات المستخدم في Firebase.
-    // إذا كنت تفضل عدم التحديث عند التعارض، استخدم DO NOTHING.
-
     const params = [
-        firebaseUid,
-        email,
-        displayName || null,
-        firstName || null,
-        lastName || null,
-        phone || null,
-        photoURL || null,
-        initialGamesBalance
+        firebaseUid, email, displayName || null, firstName || null, lastName || null,
+        phone || null, photoURL || null, initialGamesBalance
     ];
 
     try {
@@ -58,8 +45,6 @@ router.post('/register-profile', /* verifyFirebaseToken, */ async (req, res, nex
             console.log('[API /register-profile] User profile created/updated successfully for UID:', firebaseUid, result.rows[0]);
             res.status(201).json(result.rows[0]);
         } else {
-            // هذه الحالة يجب ألا تحدث مع RETURNING * و ON CONFLICT ... DO UPDATE/NOTHING
-            // ولكن كإجراء احتياطي، حاول جلب المستخدم
             console.warn('[API /register-profile] Insert/Update did not return rows, attempting to fetch user for UID:', firebaseUid);
             const existingUser = await pool.query("SELECT firebase_uid, email, display_name, first_name, last_name, phone, photo_url, games_balance FROM users WHERE firebase_uid = $1", [firebaseUid]);
             if (existingUser.rows.length > 0) {
@@ -75,16 +60,14 @@ router.post('/register-profile', /* verifyFirebaseToken, */ async (req, res, nex
     }
 });
 
-
 // ===== GET /api/user/:firebaseUid/profile =====
-// لجلب بيانات ملف المستخدم (بما في ذلك رصيد الألعاب)
-router.get('/:firebaseUid/profile', /* verifyFirebaseToken, */ async (req, res, next) => {
+router.get('/:firebaseUid/profile', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
     console.log(`[API /profile] Request to fetch profile for UID: ${firebaseUid}`);
 
-    // if (req.user?.uid !== firebaseUid) {
-    //     return res.status(403).json({ message: "Unauthorized to access this profile." });
-    // }
+    if (req.user.uid !== firebaseUid) {
+        return res.status(403).json({ message: "Forbidden: You are not authorized to access this profile." });
+    }
 
     try {
         const result = await pool.query(
@@ -103,19 +86,16 @@ router.get('/:firebaseUid/profile', /* verifyFirebaseToken, */ async (req, res, 
     }
 });
 
-
 // ===== PUT /api/user/:firebaseUid/profile =====
-// لتحديث بيانات ملف المستخدم (مثل الاسم، الهاتف، صورة الملف الشخصي)
-router.put('/:firebaseUid/profile', /* verifyFirebaseToken, */ async (req, res, next) => {
+router.put('/:firebaseUid/profile', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
-    const { firstName, lastName, displayName, phone, photoURL } = req.body; // تأكد من أن الواجهة الأمامية ترسل photo_url وليس photoURL
+    const { firstName, lastName, displayName, phone, photoURL } = req.body;
     console.log(`[API PUT /profile] Request to update profile for UID: ${firebaseUid}`, req.body);
 
-    // if (req.user?.uid !== firebaseUid) {
-    //     return res.status(403).json({ message: "Unauthorized to update this profile." });
-    // }
+    if (req.user.uid !== firebaseUid) {
+        return res.status(403).json({ message: "Forbidden: You are not authorized to update this profile." });
+    }
 
-    // بناء جملة SQL ديناميكيًا لتحديث الحقول المقدمة فقط
     const fieldsToUpdate = [];
     const values = [];
     let paramIndex = 1;
@@ -124,14 +104,14 @@ router.put('/:firebaseUid/profile', /* verifyFirebaseToken, */ async (req, res, 
     if (lastName !== undefined) { fieldsToUpdate.push(`last_name = $${paramIndex++}`); values.push(lastName); }
     if (displayName !== undefined) { fieldsToUpdate.push(`display_name = $${paramIndex++}`); values.push(displayName); }
     if (phone !== undefined) { fieldsToUpdate.push(`phone = $${paramIndex++}`); values.push(phone); }
-    if (photoURL !== undefined) { fieldsToUpdate.push(`photo_url = $${paramIndex++}`); values.push(photoURL); } // الخادم يتوقع photo_url
+    if (photoURL !== undefined) { fieldsToUpdate.push(`photo_url = $${paramIndex++}`); values.push(photoURL); }
 
     if (fieldsToUpdate.length === 0) {
         return res.status(400).json({ message: "No fields provided for update." });
     }
 
     fieldsToUpdate.push(`updated_at = CURRENT_TIMESTAMP`);
-    values.push(firebaseUid); // آخر قيمة لـ WHERE clause
+    values.push(firebaseUid);
 
     const updateSql = `
         UPDATE users
@@ -153,17 +133,15 @@ router.put('/:firebaseUid/profile', /* verifyFirebaseToken, */ async (req, res, 
     }
 });
 
-
 // ===== POST /api/user/:firebaseUid/grant-free-games =====
-// لمنح ألعاب مجانية للمستخدم (عادةً من خلال كود خصم)
-router.post('/:firebaseUid/grant-free-games', /* verifyFirebaseToken, */ async (req, res, next) => {
+router.post('/:firebaseUid/grant-free-games', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
     const { promoCode, gamesToGrant, source } = req.body;
     console.log(`[API /grant-free-games] Request for UID: ${firebaseUid}`, req.body);
 
-    // if (req.user?.uid !== firebaseUid) {
-    //     return res.status(403).json({ message: "Unauthorized action." });
-    // }
+    if (req.user.uid !== firebaseUid) {
+        return res.status(403).json({ message: "Forbidden: You are not authorized to perform this action for this user." });
+    }
 
     if (!promoCode || typeof gamesToGrant !== 'number' || gamesToGrant <= 0) {
         return res.status(400).json({ message: "بيانات منح الألعاب المجانية غير كاملة أو غير صالحة." });
@@ -216,16 +194,14 @@ router.post('/:firebaseUid/grant-free-games', /* verifyFirebaseToken, */ async (
     }
 });
 
-
 // ===== POST /api/user/:firebaseUid/deduct-game =====
-// هذا هو المسار الجديد لخصم لعبة واحدة عند بدء اللعب
-router.post('/:firebaseUid/deduct-game', /* verifyFirebaseToken, */ async (req, res, next) => {
+router.post('/:firebaseUid/deduct-game', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
     console.log(`[API /deduct-game] Request to deduct game for UID: ${firebaseUid}`);
 
-    // if (req.user?.uid !== firebaseUid) {
-    //     return res.status(403).json({ message: "Unauthorized action." });
-    // }
+    if (req.user.uid !== firebaseUid) {
+        return res.status(403).json({ message: "Forbidden: You are not authorized to perform this action for this user." });
+    }
 
     const client = await pool.connect();
     try {
@@ -271,25 +247,22 @@ router.post('/:firebaseUid/deduct-game', /* verifyFirebaseToken, */ async (req, 
     }
 });
 
-
-// (اختياري) مسار لحذف حساب المستخدم من قاعدة البيانات (يتم استدعاؤه من main.js)
-router.delete('/:firebaseUid/delete-account', /* verifyFirebaseToken, */ async (req, res, next) => {
+// ===== DELETE /api/user/:firebaseUid/delete-account =====
+router.delete('/:firebaseUid/delete-account', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
     console.log(`[API /delete-account] Request to delete account for UID: ${firebaseUid}`);
 
-    // if (req.user?.uid !== firebaseUid) {
-    //     return res.status(403).json({ message: "Unauthorized to delete this account." });
-    // }
+    if (req.user.uid !== firebaseUid) {
+        return res.status(403).json({ message: "Forbidden: You are not authorized to delete this account." });
+    }
 
     try {
-        // يمكنك هنا حذف أي بيانات مرتبطة بالمستخدم من جداول أخرى إذا لزم الأمر
-        // قبل حذف المستخدم نفسه، باستخدام معاملات (transactions).
-
+        // في بيئة الإنتاج، قد ترغب في استخدام "soft delete" بدلاً من الحذف الفعلي،
+        // أو حذف البيانات المرتبطة في جداول أخرى ضمن معاملة.
+        // حاليًا، سيقوم ON DELETE CASCADE في جدول payment_logs بحذف السجلات المرتبطة.
         const result = await pool.query("DELETE FROM users WHERE firebase_uid = $1 RETURNING firebase_uid", [firebaseUid]);
         if (result.rowCount === 0) {
-            // حتى لو لم يتم العثور على المستخدم، اعتبرها عملية "ناجحة" من وجهة نظر الحذف
-            // لأن الهدف هو ألا يكون المستخدم موجودًا.
-            console.warn(`[API /delete-account] User not found for deletion, UID: ${firebaseUid}, but proceeding as success.`);
+            console.warn(`[API /delete-account] User not found for deletion, UID: ${firebaseUid}, but proceeding as success from client's perspective.`);
             return res.status(200).json({ message: "User data (if any) cleared from backend." });
         }
         console.log(`[API /delete-account] User data deleted successfully from backend for UID: ${firebaseUid}`);
@@ -299,6 +272,5 @@ router.delete('/:firebaseUid/delete-account', /* verifyFirebaseToken, */ async (
         next(new Error("Failed to delete user data from backend."));
     }
 });
-
 
 module.exports = router;
