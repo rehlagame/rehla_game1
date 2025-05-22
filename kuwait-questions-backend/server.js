@@ -2,20 +2,21 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // لا يزال مطلوبًا لـ path.join لملف المفتاح المحلي
-const fs = require('fs'); // لا يزال مطلوبًا لـ fs.existsSync لملف المفتاح المحلي
-const pool = require('./database/database'); // تم تغيير اسم الملف ليتوافق مع ما لديك
+const path = require('path');
+const fs = require('fs');
+const pool = require('./database/database');
 const questionRoutes = require('./routes/questionRoutes');
 const promoRoutes = require('./routes/promoRoutes');
 const userRoutes = require('./routes/userRoutes');
 const gameDataRoutes = require('./routes/gameDataRoutes');
-const multer = require('multer'); // multer يُستخدم في questionRoutes
+const paymentRoutes = require('./routes/paymentRoutes'); // <-- إضافة استيراد مسارات الدفع
+const { verifyFirebaseToken } = require('./middleware/authMiddleware'); // <-- إضافة استيراد middleware المصادقة
+const multer = require('multer');
 
 // ================== Firebase Admin SDK Initialization ==================
 const admin = require('firebase-admin');
 let serviceAccount;
 
-// تحميل المفتاح من ملف محلي (للتطوير) أو من متغير بيئة (لـ Render/الإنتاج)
 if (process.env.NODE_ENV === 'production' && process.env.FIREBASE_CONFIG_JSON) {
     try {
         serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG_JSON);
@@ -24,15 +25,13 @@ if (process.env.NODE_ENV === 'production' && process.env.FIREBASE_CONFIG_JSON) {
         console.error("FATAL ERROR: Could not parse FIREBASE_CONFIG_JSON.", e);
         process.exit(1);
     }
-} else { // بيئة التطوير أو لم يتم توفير متغير البيئة
+} else {
     try {
-        // اسم ملف المفتاح الذي أرفقته. تأكد من أنه في جذر مجلد kuwait-questions-backend
         const serviceAccountPath = path.join(__dirname, 'rehlaapp-9a985-firebase-adminsdk-fbsvc-01e9f23075.json');
         if (fs.existsSync(serviceAccountPath)) {
             serviceAccount = require(serviceAccountPath);
             console.log("Firebase Admin SDK: Initializing with local service account key file.");
         } else {
-            // هذا الخطأ سيظهر إذا كان الملف غير موجود محليًا ولم تكن في بيئة الإنتاج
             throw new Error(`Local service account key file not found at: ${serviceAccountPath}. \nEnsure the file exists or set FIREBASE_CONFIG_JSON for production.`);
         }
     } catch (e) {
@@ -45,7 +44,7 @@ if (serviceAccount) {
     try {
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
-            storageBucket: "rehlaapp-9a985.firebasestorage.app" // <--- اسم الـ Bucket الصحيح من Firebase Storage
+            storageBucket: "rehlaapp-9a985.firebasestorage.app"
         });
         console.log("Firebase Admin SDK initialized successfully.");
     } catch (initError) {
@@ -53,7 +52,6 @@ if (serviceAccount) {
         process.exit(1);
     }
 } else {
-    // يجب ألا نصل إلى هنا إذا كانت معالجة الأخطاء أعلاه تعمل بشكل صحيح
     console.error("FATAL ERROR: Firebase serviceAccount object is undefined. Cannot initialize Firebase Admin SDK.");
     process.exit(1);
 }
@@ -72,8 +70,6 @@ const corsOptions = {
             'http://localhost:63342', // لـ WebStorm أو IDEs أخرى
             // يمكنك إضافة أي نطاقات localhost أخرى تستخدمها للتطوير
         ];
-        // السماح بالطلبات التي ليس لها origin (مثل file:///) أو إذا كان Origin ضمن المصادر المسموح بها
-        // أو إذا كنا في بيئة تطوير ونريد السماح بـ localhost
         if (!origin || origin === 'null' || allowedOrigins.includes(origin) || (process.env.NODE_ENV !== 'production' && origin && origin.startsWith('http://localhost:'))) {
             callback(null, true);
         } else {
@@ -91,15 +87,19 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// تم إزالة خدمة الملفات الساكنة من public/uploads لأن الصور ستُخدم من Firebase
-// app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-// console.log('Serving static files for /uploads from:', path.join(__dirname, 'public/uploads'));
-
 // --- Routes ---
-app.use('/api/questions', questionRoutes);
-app.use('/api/promos', promoRoutes);
+// المسارات العامة التي لا تتطلب مصادقة بالضرورة (مثل جلب الأسئلة العامة أو التحقق من كود خصم)
+// يمكن تركها بدون verifyFirebaseToken إذا كان هذا هو السلوك المطلوب
+app.use('/api/questions', questionRoutes); // بعض مسارات الأسئلة قد تحتاج حماية (مثل الإضافة والتعديل)
+app.use('/api/promos', promoRoutes);     // بعض مسارات أكواد الخصم قد تحتاج حماية
+app.use('/api/game', gameDataRoutes);    // هذا المسار لجلب بيانات اللعبة، قد يكون عامًا
+
+// المسارات التي تتطلب مصادقة المستخدم بشكل مؤكد
+// لاحظ أننا سنحتاج إلى تطبيق verifyFirebaseToken داخل userRoutes و paymentRoutes بشكل انتقائي
+// أو تطبيقها هنا بشكل عام إذا كانت *كل* المسارات الفرعية تتطلبها.
+// لتوفير مرونة، من الأفضل تطبيقها داخل ملفات المسارات نفسها.
 app.use('/api/user', userRoutes);
-app.use('/api/game', gameDataRoutes);
+app.use('/api/payment', paymentRoutes); // <-- إضافة استخدام مسار الدفع
 
 app.get('/', (req, res) => {
     res.send('Rehla Game API is running smoothly with Firebase Admin SDK integrated!');
@@ -110,8 +110,6 @@ app.use((err, req, res, next) => {
     console.error('Global Error Handler Triggered:');
     console.error('Error Message:', err.message);
     console.error('Error Stack:', err.stack || 'No stack available');
-    // console.error('Request URL:', req.originalUrl); // يمكنك تفعيلها للتحقق من الأخطاء
-    // console.error('Request Method:', req.method); // يمكنك تفعيلها للتحقق من الأخطاء
 
     if (err instanceof multer.MulterError) {
         return res.status(400).json({ message: `Multer error: ${err.message}` });
@@ -124,22 +122,20 @@ app.use((err, req, res, next) => {
             message: 'Conflict: A resource with this identifier already exists or a unique constraint was violated.',
         });
     }
+    // معالجة أخطاء المصادقة من Firebase
+    if (err.code && err.code.startsWith('auth/')) {
+        return res.status(401).json({ message: `Authentication error: ${err.message}` });
+    }
+
     res.status(500).json({ message: 'An unexpected server error occurred. Please try again later.' });
 });
-
-// تم إزالة إنشاء مجلد public/uploads لأنه لم يعد ضروريًا
-// const uploadsDir = path.join(__dirname, 'public/uploads');
-// if (!fs.existsSync(uploadsDir)) {
-//     fs.mkdirSync(uploadsDir, { recursive: true });
-//     console.log(`Created uploads directory: ${uploadsDir}`);
-// }
 
 // --- Start Server ---
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server for Rehla Game is running on http://0.0.0.0:${PORT}`);
     console.log(`NODE_ENV is set to: ${process.env.NODE_ENV}`);
     console.log(`DATABASE_URL (first 20 chars): ${process.env.DATABASE_URL ? process.env.DATABASE_URL.substring(0, 20) + '...' : 'Not Set'}`);
-    if (admin.apps.length) { // تحقق من أن تطبيق Firebase Admin قد تم تهيئته
+    if (admin.apps.length) {
         console.log('Firebase Admin App Name:', admin.app().name);
     } else {
         console.error("Firebase Admin App was not initialized prior to server start!");
