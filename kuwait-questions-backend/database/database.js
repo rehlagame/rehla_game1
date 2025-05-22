@@ -31,8 +31,6 @@ async function initializeDatabase() {
     console.log("Initializing PostgreSQL database tables if they don't exist...");
 
     // --- Questions Table ---
-    // Adjusted for PostgreSQL syntax and data types
-    // q_id can be UUID or SERIAL depending on how you generate it. Using TEXT for flexibility with UUIDs from app.
     const createQuestionsTableSql = `
         CREATE TABLE IF NOT EXISTS questions (
             q_id VARCHAR(255) PRIMARY KEY,    -- Unique identifier (e.g., UUID as string)
@@ -50,28 +48,21 @@ async function initializeDatabase() {
     `;
 
     // --- Promo Codes Table ---
-    // Adjusted for PostgreSQL syntax and data types
-    // Using VARCHAR for code, and BOOLEAN for is_active
     const createPromoCodesTableSql = `
         CREATE TABLE IF NOT EXISTS promo_codes (
-            code VARCHAR(50) PRIMARY KEY,    -- Promo code (consider making it case-insensitive at DB level if needed, or handle in app)
-                                             -- PostgreSQL is case-sensitive by default for strings.
-                                             -- To make it effectively case-insensitive for comparisons, you might use functions like LOWER() in queries.
-                                             -- Or, store all codes in a consistent case (e.g., uppercase) from the application.
-            type VARCHAR(20) NOT NULL CHECK(type IN ('percentage', 'free_games')), -- Type of promo
-            value INTEGER NOT NULL,              -- Discount percentage or number of free games
-            description TEXT,                    -- Optional description for admin
-            is_active BOOLEAN NOT NULL DEFAULT TRUE -- TRUE for active, FALSE for inactive
-            -- Consider adding:
-            -- created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            -- expiry_date TIMESTAMP WITH TIME ZONE,
-            -- max_uses INTEGER,
-            -- current_uses INTEGER DEFAULT 0
+            code VARCHAR(50) PRIMARY KEY,
+            type VARCHAR(20) NOT NULL CHECK(type IN ('percentage', 'free_games')),
+            value INTEGER NOT NULL,
+            description TEXT,
+            is_active BOOLEAN NOT NULL DEFAULT TRUE,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            expiry_date TIMESTAMP WITH TIME ZONE,
+            max_uses INTEGER,
+            current_uses INTEGER DEFAULT 0
         );
     `;
 
-    // --- Users Table (Placeholder - you might need this for game balance sync from backend) ---
-    // This is a basic example. You'll likely have more fields.
+    // --- Users Table ---
     const createUsersTableSql = `
         CREATE TABLE IF NOT EXISTS users (
             firebase_uid VARCHAR(255) PRIMARY KEY,
@@ -81,12 +72,75 @@ async function initializeDatabase() {
             last_name VARCHAR(255),
             phone VARCHAR(50),
             photo_url TEXT,
-            games_balance INTEGER DEFAULT 0,
+            games_balance INTEGER DEFAULT 0 NOT NULL, -- Ensure games_balance is not null
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
     `;
-    // You might also want a trigger to update `updated_at` automatically.
+
+    // --- Payment Logs Table (NEWLY ADDED) ---
+    const createPaymentLogsTableSql = `
+        CREATE TABLE IF NOT EXISTS payment_logs (
+            id SERIAL PRIMARY KEY,
+            user_firebase_uid VARCHAR(255) NOT NULL REFERENCES users(firebase_uid) ON DELETE CASCADE, -- Foreign key to users table
+            local_invoice_id VARCHAR(255) UNIQUE, -- (اختياري) معرف فاتورة محلي فريد إذا كنت ستنشئه قبل بوابة الدفع
+            amount DECIMAL(10, 3) NOT NULL, -- KWD uses 3 decimal places
+            currency VARCHAR(3) NOT NULL,
+            package_name VARCHAR(255),
+            games_in_package INTEGER,
+            promo_code_used VARCHAR(50) REFERENCES promo_codes(code), -- Foreign key to promo_codes table (optional)
+            status VARCHAR(50) NOT NULL DEFAULT 'PENDING', -- PENDING, USER_RETURNED_SUCCESS, USER_RETURNED_FAILURE, FAILED_AT_GATEWAY, COMPLETED, ERROR_PRE_GATEWAY, CANCELED
+            gateway_name VARCHAR(50), -- e.g., 'MyFatoorah', 'UPayment'
+            gateway_invoice_id VARCHAR(255), -- ID الفاتورة من بوابة الدفع عند الإنشاء
+            gateway_payment_id_callback VARCHAR(255), -- ID الدفع المستلم في الـ callback
+            gateway_payment_id_webhook VARCHAR(255), -- ID الدفع المستلم في الـ webhook
+            gateway_response_initiation JSONB, -- استجابة بوابة الدفع الأولية
+            gateway_response_callback JSONB, -- بيانات الـ callback
+            gateway_response_webhook JSONB, -- بيانات الـ webhook
+            error_message TEXT,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, -- To track status changes
+            completed_at TIMESTAMP WITH TIME ZONE -- When payment is successfully confirmed and games granted
+        );
+    `;
+    // Index for faster lookups on payment_logs
+    const createPaymentLogsIndexesSql = `
+        CREATE INDEX IF NOT EXISTS idx_payment_logs_user_firebase_uid ON payment_logs(user_firebase_uid);
+        CREATE INDEX IF NOT EXISTS idx_payment_logs_gateway_invoice_id ON payment_logs(gateway_invoice_id);
+        CREATE INDEX IF NOT EXISTS idx_payment_logs_local_invoice_id ON payment_logs(local_invoice_id);
+        CREATE INDEX IF NOT EXISTS idx_payment_logs_status ON payment_logs(status);
+    `;
+
+
+    // --- Trigger function to update 'updated_at' column ---
+    // This is a common pattern for PostgreSQL.
+    const createUpdatedAtTriggerFunctionSql = `
+      CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+      RETURNS TRIGGER AS $$
+      BEGIN
+        NEW.updated_at = NOW();
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+    `;
+
+    // --- Apply trigger to 'users' table ---
+    const createUsersUpdatedAtTriggerSql = `
+      DROP TRIGGER IF EXISTS set_timestamp_users ON users; -- Drop if exists to avoid errors on re-run
+      CREATE TRIGGER set_timestamp_users
+      BEFORE UPDATE ON users
+      FOR EACH ROW
+      EXECUTE PROCEDURE trigger_set_timestamp();
+    `;
+
+    // --- Apply trigger to 'payment_logs' table (NEWLY ADDED) ---
+    const createPaymentLogsUpdatedAtTriggerSql = `
+      DROP TRIGGER IF EXISTS set_timestamp_payment_logs ON payment_logs;
+      CREATE TRIGGER set_timestamp_payment_logs
+      BEFORE UPDATE ON payment_logs
+      FOR EACH ROW
+      EXECUTE PROCEDURE trigger_set_timestamp();
+    `;
 
 
     const client = await pool.connect();
@@ -99,18 +153,30 @@ async function initializeDatabase() {
         await client.query(createPromoCodesTableSql);
         console.log('Promo Codes table checked/created successfully in PostgreSQL.');
 
-        // Example: Add an index for case-insensitive searching on promo_codes.code if you don't store them consistently cased
-        // This is more advanced and might not be needed if your application layer handles case consistently.
-        // await client.query('CREATE UNIQUE INDEX IF NOT EXISTS idx_promo_code_lower_unique ON promo_codes (LOWER(code));');
-
-        await client.query(createUsersTableSql); // Add users table if you plan to manage user profiles in backend
+        await client.query(createUsersTableSql);
         console.log('Users table checked/created successfully in PostgreSQL.');
 
+        await client.query(createPaymentLogsTableSql); // إضافة إنشاء جدول سجلات الدفع
+        console.log('Payment Logs table checked/created successfully in PostgreSQL.');
+
+        await client.query(createPaymentLogsIndexesSql); // إضافة إنشاء فهارس لسجلات الدفع
+        console.log('Indexes for Payment Logs table checked/created successfully.');
+
+        // Create the trigger function first
+        await client.query(createUpdatedAtTriggerFunctionSql);
+        console.log('Updated_at trigger function checked/created successfully.');
+
+        // Then apply it to tables
+        await client.query(createUsersUpdatedAtTriggerSql);
+        console.log('Updated_at trigger for Users table checked/created successfully.');
+
+        await client.query(createPaymentLogsUpdatedAtTriggerSql); // تطبيق التريجر لجدول سجلات الدفع
+        console.log('Updated_at trigger for Payment Logs table checked/created successfully.');
 
         await client.query('COMMIT'); // Commit transaction
     } catch (err) {
         await client.query('ROLLBACK'); // Rollback transaction on error
-        console.error('Error initializing PostgreSQL tables:', err.message);
+        console.error('Error initializing PostgreSQL tables:', err.message, err.stack);
         // Propagate the error to stop the server from starting if initialization fails critically
         throw err;
     } finally {
