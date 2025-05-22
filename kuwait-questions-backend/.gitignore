@@ -1,27 +1,34 @@
-# Environment variables
+# Environment Variables
+# Ignore all .env files, but not .env.example (template)
 .env
 .env.*
 !.env.example
 
-# Node modules
+# Node.js
+# Ignore node_modules folder
 node_modules/
 
-# Firebase service account key
-rehlaapp-9a985-firebase-adminsdk-fbsvc-01e9f23075.json # <--- أضف هذا السطر هنا
-
-# Build output
-dist/
-build/
-
 # Logs
-logs
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+pnpm-debug.log*
 
-# OS generated files
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.svelte-kit/
+
+# Firebase service account key (CRITICAL - DO NOT COMMIT)
+rehlaapp-9a985-firebase-adminsdk-fbsvc-01e9f23075.json
+
+# Operating System generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -29,12 +36,44 @@ lerna-debug.log*
 .Trashes
 ehthumbs.db
 Thumbs.db
+desktop.ini
 
-# SQLite database files (if you were using them locally for testing)
+# Editor directories and files
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-project
+*.sublime-workspace
+*.komodoproject
+*.project
+.history/
+
+# SQLite database files (if used locally for testing)
 *.sqlite
 *.sqlite3
 *.db
+*.db-journal
 
-# Temporary files from some editors
+# Temporary files from some editors and tools
 *.swp
 *~
+*.tmp
+*.bak
+*.orig
+
+# Coverage directory
+coverage/
+.nyc_output/
+
+# Yarn Integrity file
+.yarnclean
+
+# dotenv vault file
+.env.vault
+
+# Miscellaneous
+.eslintcache
+.prettierrc.js.map # if you use prettier with source maps
