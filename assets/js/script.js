@@ -1,82 +1,76 @@
-// script.js
-
 // انتظر حتى يتم تحميل محتوى الصفحة بالكامل قبل تشغيل الكود
 document.addEventListener('DOMContentLoaded', () => {
 
-    const header = document.querySelector('header');
-    // لقد أُزيلت هنا جميع منطق ضبط padding للمحتوى الرئيسي
-    // (كان يُستخدم لتعويض ارتفاع الهيدر الثابت الذي أزلناه)
+    // --- 1. التمرير السلس (Smooth Scrolling) ---
+    const navLinks = document.querySelectorAll('header nav a[href^="#"], .hero a[href^="#"]'); // اختر روابط القائمة وروابط قسم الهيرو التي تبدأ بـ #
 
-    // --- 1. تأثير إضافة/إزالة كلاس .scrolled للهيدر عند التمرير ---
-    // يسمح بتغييرات بصرية طفيفة مثل الظل عند النزول
-    if (header) {
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 10) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-        // تطبيق الكلاس مباشرة إذا كانت الصفحة قد بدأت بتمرير سابق
-        if (window.pageYOffset > 10) {
-            header.classList.add('scrolled');
-        }
-    }
-
-    // --- 2. التمرير السلس (Smooth Scrolling) ---
-    // خاص بالروابط الداخلية في الهيدر أو في الهيرو
-    const navLinks = document.querySelectorAll('header nav a[href^="#"], .hero a[href^="#"]');
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            const targetId = this.getAttribute('href');
-            if (targetId.startsWith('#')) {
-                e.preventDefault();
-                const targetElement = document.querySelector(targetId);
-                if (!targetElement) return;
+            e.preventDefault(); // منع السلوك الافتراضي للرابط (القفز)
 
-                // حساب الموضع مع تعويض ارتفاع الهيدر إذا كان ثابتاً
-                const headerHeight = header && getComputedStyle(header).position === 'fixed'
-                    ? header.offsetHeight
-                    : 0;
+            const targetId = this.getAttribute('href'); // الحصول على معرف القسم المستهدف (مثل #how-to-play)
+            const targetElement = document.querySelector(targetId); // العثور على العنصر المستهدف
+
+            if (targetElement) {
+                // حساب موقع العنصر مع الأخذ في الاعتبار ارتفاع الهيدر (إذا كان ثابتًا)
+                const headerOffset = document.querySelector('header').offsetHeight;
                 const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
-                const offsetPosition = elementPosition - headerHeight - 10;
+                const offsetPosition = elementPosition - headerOffset - 10; // طرح ارتفاع الهيدر ومسافة إضافية صغيرة
 
+                // التمرير السلس إلى الموقع المحسوب
                 window.scrollTo({
                     top: offsetPosition,
-                    behavior: 'smooth'
+                    behavior: 'smooth' // هذا هو مفتاح التمرير السلس!
                 });
+
+                // (اختياري) إغلاق قائمة الجوال إذا كانت مفتوحة (للتطوير المستقبلي)
+                // closeMobileMenu();
             }
         });
     });
 
-    // --- 3. تمييز الرابط النشط (Active Link Highlighting) ---
-    const sections = document.querySelectorAll('section[id]');
-    const headerNavLinks = document.querySelectorAll('header nav a');
-    if (sections.length > 0 && headerNavLinks.length > 0 && header) {
-        // مراقب لتغيّر ارتفاع الهيدر لوظيفته كـ fixed
-        let currentHeaderHeight = header.offsetHeight;
-        const resizeObserver = new ResizeObserver(() => {
-            currentHeaderHeight = header.offsetHeight;
-        });
-        resizeObserver.observe(header);
+    // --- 2. تمييز الرابط النشط (Active Link Highlighting) ---
+    const sections = document.querySelectorAll('section[id]'); // اختر كل الأقسام التي لها ID
+    const headerNavLinks = document.querySelectorAll('header nav a'); // اختر روابط القائمة في الهيدر فقط
 
-        const observerOptions = {
-            root: null,
-            rootMargin: `-${currentHeaderHeight}px 0px -40% 0px`,
-            threshold: 0.1
-        };
+    // استخدام Intersection Observer لمراقبة دخول الأقسام إلى الشاشة (أكثر كفاءة من مراقبة التمرير)
+    const observerOptions = {
+        root: null, // نسبة إلى إطار العرض (viewport)
+        rootMargin: `-${document.querySelector('header').offsetHeight}px 0px -40% 0px`, // تعديل منطقة المراقبة لتناسب الهيدر الثابت ولتفعيل التمييز عندما يكون القسم ظاهرًا بشكل جيد
+        threshold: 0 // يتم التفعيل بمجرد ظهور أي جزء من القسم (يمكن زيادته مثل 0.3 لـ 30%)
+    };
 
-        const sectionObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                const link = document.querySelector(`header nav a[href="#${entry.target.id}"]`);
-                if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
-                    headerNavLinks.forEach(l => l.classList.remove('active'));
-                    if (link) link.classList.add('active');
+    const sectionObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const targetLink = document.querySelector(`header nav a[href="#${entry.target.id}"]`);
+
+                // قم بإزالة التمييز من جميع الروابط أولاً
+                headerNavLinks.forEach(link => link.classList.remove('active'));
+
+                // أضف التمييز إلى الرابط المطابق للقسم الظاهر
+                if (targetLink) {
+                    targetLink.classList.add('active');
                 }
-            });
-        }, observerOptions);
+            }
+        });
+    }, observerOptions);
 
-        sections.forEach(section => sectionObserver.observe(section));
-    }
+    // ابدأ بمراقبة كل قسم
+    sections.forEach(section => {
+        sectionObserver.observe(section);
+    });
 
-}); // end of DOMContentLoaded
+    // --- 3. تحسينات طفيفة (مثال: تأثير ظهور بسيط عند التمرير) ---
+    // يمكنك إضافة مكتبة مثل AOS (Animate On Scroll) أو كتابة كود مخصص
+    // مثال بسيط جداً: تغيير شفافية الهيدر عند التمرير لأسفل
+    const header = document.querySelector('header');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) { // إذا تم التمرير لأكثر من 50 بكسل
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
+}); // نهاية DOMContentLoaded
