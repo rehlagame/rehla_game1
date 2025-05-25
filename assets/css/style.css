@@ -36,11 +36,11 @@ header {
     background-color: var(--white-color);
     padding: 12px 0; /* تقليل الحشو قليلاً لارتفاع أقل للهيدر */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    position: fixed; /* هذا يجعله ثابتاً */
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
+    /* position: fixed; */
+    /* top: 0; */
+    /* left: 0; */
+    /* right: 0; */
+    /* z-index: 1000; */
     /* تمت إزالة transition لـ top. يمكن إبقاء transitions أخرى إذا أردت استخدام .scrolled */
     transition: background-color 0.4s ease, box-shadow 0.4s ease;
 }
@@ -354,7 +354,7 @@ p.developer-credit {
         gap: 6px;
         margin-top: 0; /* Reset margin-top if header items are on one line */
     }
-     /* If user-actions wrap to a new line */
+    /* If user-actions wrap to a new line */
     header .container > .user-actions:nth-child(3) { /* More specific selector if it's the 3rd child due to wrapping */
         width: 100%;
         justify-content: center;
@@ -422,7 +422,7 @@ p.developer-credit {
         padding: 4px 10px;
         font-size: 0.75em;
     }
-     .user-greeting {
+    .user-greeting {
         font-size: 0.8em;
     }
     .games-trigger-btn {
