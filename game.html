@@ -15,37 +15,72 @@
         header {
             display: none !important; /* لإخفاء الهيدر الأصلي تمامًا في هذه الصفحة */
         }
+        /* يمكنك إضافة مسافة بسيطة في الأعلى إذا أردت بعد إخفاء الهيدر */
+        /*
+        main.game-content {
+             padding-top: 20px;
+        }
+        */
 
         /* --- أنماط أيقونة العودة للصفحة الرئيسية (العامة وفي قسم الإعداد) --- */
         .back-to-home-icon-setup {
-            position: fixed;
-            top: 20px;
-            left: 20px; /* في RTL، سيكون هذا على اليمين إذا لم يتم عكسه تلقائيًا */
-            z-index: 1010;
-            background-color: rgba(23, 162, 184, 0.9);
+            position: fixed;    /* تثبيت الأيقونة بالنسبة للشاشة */
+            top: 20px;          /* المسافة من الأعلى */
+            left: 20px;         /* المسافة من اليسار (سيتم عكسها تلقائيًا لليمين في RTL) */
+            z-index: 1010;      /* للتأكد أنها فوق معظم العناصر الأخرى */
+            background-color: rgba(23, 162, 184, 0.9); /* لون أساسي مع شفافية بسيطة var(--primary-color) */
             color: white;
-            width: 45px;
+            width: 45px;        /* حجم الزر */
             height: 45px;
-            border-radius: 50%;
-            display: flex;
+            border-radius: 50%; /* جعله دائريًا */
+            display: flex;      /* لتوسيط الأيقونة داخل الزر */
             justify-content: center;
             align-items: center;
             text-decoration: none;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s ease, transform 0.2s ease;
-            font-size: 1.2em;
+            font-size: 1.2em;   /* حجم الأيقونة الداخلية <i class="fas fa-home"></i> */
         }
         .back-to-home-icon-setup:hover {
-            background-color: var(--secondary-color);
+            background-color: var(--secondary-color); /* لون أغمق عند المرور */
             transform: scale(1.1);
         }
 
-        /* إخفاء أيقونة العودة للرئيسية "القديمة" التي كانت في current-turn-info إذا لم تعد مستخدمة */
-        /* #current-turn-info .back-to-home-icon-ingame { display: none !important; } */
+        /* تعديل div معلومات الدور ليحتوي على الأيقونة */
+        #current-turn-info {
+            position: relative; /* للسماح بتموضع الأيقونة بداخله */
+            padding-left: 55px; /* مساحة للأيقونة على اليسار (بسبب RTL، الأيقونة ستكون يسارًا) */
+            /* إذا كان اتجاه الصفحة LTR، ستكون padding-right */
+        }
+
+        /* أيقونة العودة داخل معلومات الدور */
+        .back-to-home-icon-ingame {
+            position: absolute;
+            top: 50%;
+            /* بما أن الصفحة RTL، "left" تعني الطرف الأيسر من الحاوية */
+            left: 15px;
+            transform: translateY(-50%);
+            color: var(--secondary-color); /* لون مختلف قليلاً للتمييز */
+            font-size: 1.6em; /* حجم أكبر قليلاً للأيقونة */
+            text-decoration: none;
+            transition: color 0.3s ease, transform 0.2s ease;
+            padding: 5px; /* لجعل منطقة النقر أكبر قليلاً */
+        }
+        .back-to-home-icon-ingame:hover {
+            color: var(--primary-color);
+            transform: translateY(-50%) scale(1.15); /* تكبير أكثر قليلاً عند المرور */
+        }
+
+        /* يتم التحكم في الإخفاء والإظهار بشكل رئيسي عبر JavaScript في game.js */
+        /* ولكن يمكن ترك هذه كقواعد افتراضية إذا فشل JS لسبب ما (نادر) */
+        #game-setup-section.hidden + #game-play-area .back-to-home-icon-setup,
+        #game-play-area.hidden ~ .back-to-home-icon-ingame { /* استهداف أيقونة اللعب عندما تكون منطقة اللعب مخفية */
+            /* display: none; */ /* سيتم التحكم بها من game.js */
+        }
 
     </style>
 </head>
-<body class="game-active-page"> 
+<body class="game-active-page">
 
 <!-- أيقونة العودة للصفحة الرئيسية (تظهر في مرحلة الإعداد بشكل افتراضي) -->
 <a href="index.html" class="back-to-home-icon-setup" id="back-to-home-setup" title="العودة إلى الرئيسية">
@@ -200,11 +235,6 @@
 
             <!-- العمود الأيسر (السؤال/الإجابة) -->
             <div id="question-interaction-area">
-                <!-- === زر العودة للرئيسية الجديد داخل مربع السؤال === -->
-                <a href="index.html" class="back-to-home-icon-ingame-corner" id="back-to-home-ingame-q" title="العودة إلى الرئيسية" style="display: none;">
-                    <i class="fas fa-times"></i> <!-- أو fa-home -->
-                </a>
-                <!-- =============================================== -->
                 <div id="question-timer">1:00</div>
                 <h3 id="question-title">السؤال</h3>
                 <div id="question-details">
@@ -244,7 +274,10 @@
             <!-- العمود الأيمن (الشريط الجانبي) -->
             <div id="game-sidebar">
                 <div id="current-turn-info">
-                    <!-- تم نقل أيقونة العودة للرئيسية إلى داخل #question-interaction-area -->
+                    <!-- أيقونة العودة للصفحة الرئيسية (تظهر أثناء اللعب، مخفية بشكل افتراضي) -->
+                    <a href="index.html" class="back-to-home-icon-ingame" id="back-to-home-ingame" title="العودة إلى الرئيسية" style="display: none;">
+                        <i class="fas fa-home"></i>
+                    </a>
                     الدور على: <span id="current-team-turn" class="team-name-highlight"></span>
                 </div>
                 <div class="teams-dashboard">
@@ -319,6 +352,7 @@
 
 <script src="assets/js/game.js" type="module"></script>
 <script src="assets/js/main.js" type="module"></script>
-<!-- <script src="assets/js/script.js" defer></script>  لا حاجة له هنا إذا كان الهيدر مخفيًا بالكامل -->
+<!-- لا حاجة لـ script.js هنا إذا كانت وظيفته الرئيسية هي الهيدر المخفي/الظاهر، والهيدر الآن مخفي تمامًا في هذه الصفحة -->
+<!-- <script src="assets/js/script.js" defer></script> -->
 </body>
 </html>
