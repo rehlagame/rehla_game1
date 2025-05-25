@@ -1,4 +1,3 @@
-/* --- START OF FILE assets/css/game.css (مُعدل بناءً على الكود الأصلي مع التركيز على WebView Landscape) --- */
 
 :root {
     /* تعريف متغيرات الألوان لتسهيل التعديل */
@@ -19,9 +18,9 @@
     --team2-color: #fd7e14;
 
     /* عرض الشريط الجانبي الافتراضي للشاشات الكبيرة */
-    --sidebar-width-default: 455px;
+    --sidebar-width-default: 550px; /* زيادة العرض بنسبة 20% (كان 455px، أصبح 550px) */
     /* عرض الشريط الجانبي المصغر للوضع الأفقي على الهواتف */
-    --sidebar-width-landscape-mobile: 200px; /* قيمة مبدئية، قابلة للتعديل */
+    --sidebar-width-landscape-mobile: 240px; /* زيادة العرض بنسبة 20% (كان 200px، أصبح 240px) */
 }
 
 /* === أنماط خاصة بتطبيق WebView وملء الشاشة للعبة === */
@@ -78,6 +77,11 @@ body.game-active-page #game-sidebar {
     background-color: var(--white-color);
     box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     position: relative; /* لضمان احتواء العناصر المطلقة مثل #question-timer */
+}
+
+body.game-active-page #question-interaction-area {
+    max-width: 80%; /* تصغير العرض بنسبة 20% */
+    margin: 0 auto; /* لتوسيط المربع */
 }
 
 body.game-active-page #game-sidebar {
@@ -433,7 +437,7 @@ footer .container {
 
 #reveal-answer-btn {
     display: block;
-    width: 35%; /* تعديل العرض إلى 35% */
+    width: 35%; /* العرض المطلوب */
     margin: 10px auto 0 auto; /* الموقع الأصلي متمركزًا أسفل نص السؤال */
     padding: 12px 18px;
     font-size: 1.15em;
@@ -848,7 +852,12 @@ footer .container {
         font-size: 0.85em; 
         margin: 0 4px; 
     }
-    #question-interaction-area { min-height: auto; padding: 10px; margin-bottom: 0; }
+    #question-interaction-area { 
+        min-height: auto; 
+        padding: 10px; 
+        margin-bottom: 0; 
+        max-width: 100%; /* تعديل العرض ليتناسب مع الشاشة الصغيرة */
+    }
     /* إعدادات اللعبة */
     .team-setup { flex-basis: 100%; } 
     #game-setup-form { padding: 20px; }
@@ -908,7 +917,7 @@ footer .container {
     .score-value-container span[id*="-score"] { font-size: 0.8em; margin: 0 4px; }
     .btn-adjust-score { width: 18px; height: 18px; font-size: 0.6em; }
 
-    #question-interaction-area { padding: 8px; }
+    #question-interaction-area { padding: 8px; max-width: 100%; /* تعديل العرض ليتناسب مع الشاشة الصغيرة */ }
     #question-timer { top: 8px; left: 8px; font-size: 0.75em; padding: 3px 6px; min-width: 35px; }
     #question-interaction-area h3 { font-size: 1.2em; margin-bottom: 4px; margin-top: 35px; }
     #question-details { font-size: 0.7em; margin-bottom: 5px; }
