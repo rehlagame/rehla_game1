@@ -15,7 +15,10 @@
     --success-color: #28a745;
     --apple-btn-bg: #000000;
     --apple-btn-text: #ffffff;
-    --footer-bg-color: #5F6972; /* لون خلفية الفوتر الجديد */
+    --footer-bg-color: #2c3e50; /* لون أزرق مسود / رمادي غامق أنيق للفوتر */
+    --footer-text-color: #bdc3c7; /* لون نص فاتح يتناسب مع الخلفية الداكنة للفوتر */
+    --footer-icon-bg-hover: var(--primary-color); /* لون خلفية الأيقونة عند المرور */
+    --footer-icon-color: #ecf0f1; /* لون الأيقونات الأساسي في الفوتر */
     --profile-red-accent: #E74C3C; /* لون أحمر مميز لصفحة الحساب */
 }
 
@@ -29,48 +32,34 @@ ul { list-style: none; }
 h1, h2 { color: var(--primary-color); margin-bottom: 15px; }
 
 /* --- الهيدر --- */
-header {
-    background-color: var(--white-color);
-    padding: 12px 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    /* position: fixed; */
-    /* top: 0; */
-    /* left: 0; */
-    /* right: 0; */
-    /* z-index: 1000; */
-    transition: background-color 0.4s ease, box-shadow 0.4s ease;
-}
-header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; /* Allow wrapping on smaller screens */ }
-.logo { flex-shrink: 0; /* Prevent logo from shrinking too much */ }
+header { background-color: var(--white-color); padding: 15px 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); position: sticky; top: 0; z-index: 1000; transition: background-color 0.4s ease, box-shadow 0.4s ease; }
+header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.logo { flex-shrink: 0; }
 .logo h1 { margin: 0; font-size: 2em; font-weight: 700; }
 .logo h1 a { color: var(--primary-color); }
 .logo h1 a:hover { color: var(--secondary-color); }
-nav { flex-grow: 1; display: flex; justify-content: center; margin: 0 15px; } /* Wrap nav items */
-nav ul { display: flex; flex-wrap: wrap; /* Allow nav items to wrap */ justify-content: center; }
-nav ul li { margin: 5px 15px; /* Adjust margin for wrapping */ }
-nav ul li a { color: var(--text-color); font-weight: bold; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; white-space: nowrap; /* Prevent link text from breaking */ }
+nav { flex-grow: 1; display: flex; justify-content: center; margin: 0 15px; }
+nav ul { display: flex; flex-wrap: wrap; justify-content: center; }
+nav ul li { margin: 5px 15px; }
+nav ul li a { color: var(--text-color); font-weight: bold; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; white-space: nowrap; }
 nav ul li a:hover, nav ul li a.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
-.user-actions { display: flex; align-items: center; flex-wrap: nowrap; /* Prevent user actions from wrapping initially */ justify-content: flex-end; gap: 10px; /* Add gap between user action items */ flex-shrink: 0; }
+.user-actions { display: flex; align-items: center; flex-wrap: nowrap; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
 
 /* --- الأزرار --- */
-.btn { padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-align: center; border: none; font-size: 1em; white-space: nowrap; display: inline-flex; /* Better alignment */ align-items: center; justify-content: center; }
-
-/* زر التسجيل/الدخول في الهيدر (بنمطه الجديد) */
+.btn { padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-align: center; border: none; font-size: 1em; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
 .btn-register {
-    background-color: var(--white-color); /* خلفية بيضاء */
-    color: var(--primary-color);         /* لون النص هو اللون الأساسي */
-    border: 1px solid var(--primary-color); /* إضافة حدود لتحديد الزر */
-    padding: 8px 20px; /* Slightly smaller padding */
-    border-radius: 20px; /* Match other header buttons */
-    font-size: 0.9em; /* Match other header buttons */
+    background-color: var(--white-color);
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9em;
 }
 .btn-register:hover {
-    background-color: var(--bg-color-alt); /* تغيير طفيف في الخلفية عند المرور */
-    color: var(--secondary-color);       /* تغيير لون النص إلى الثانوي */
-    border-color: var(--secondary-color); /* تغيير لون الحدود */
+    background-color: var(--bg-color-alt);
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
 }
-
-/* أزرار الأيقونات - لم يتم استخدامها حاليًا في الهيدر */
 .btn-icon { background-color: var(--accent-color); color: var(--text-color); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5em; font-weight: bold; line-height: 1; margin-left: 10px; }
 .btn-icon:hover { background-color: #ffca2c; transform: scale(1.1); }
 
@@ -91,715 +80,301 @@ section { scroll-margin-top: 80px; }
 .content-section p { font-size: 1.1em; max-width: 800px; margin: 0 auto 20px auto; color: var(--grey-color-dark); }
 .content-section.alt-bg { background-color: var(--bg-color-alt); }
 
-/* --- الفوتر --- */
+/* --- عناصر الهيدر الديناميكية --- */
+.user-greeting { font-weight: bold; color: var(--text-color); white-space: nowrap; }
+.btn-logout { background-color: var(--secondary-color); color: var(--white-color); padding: 8px 18px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 0.9em; line-height: normal; }
+.btn-logout:hover { background-color: var(--primary-color); }
+.user-actions a.btn-logout { padding: 8px 18px; text-decoration: none; }
+
+/* --- أنماط صفحة الحساب الجديدة (Logged.html - تصميم "حسابي") --- */
+main.account-main-content.new-account-layout { padding: 50px 0; background-color: var(--bg-color-alt); min-height: calc(100vh - 200px); }
+.account-page-container { display: flex; background-color: var(--white-color); border-radius: 15px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); overflow: hidden; max-width: 1000px; margin: 0 auto; }
+.account-sidebar { flex: 0 0 280px; background-color: #fdfdfd; padding: 30px 25px; display: flex; flex-direction: column; align-items: center; text-align: center; border-left: 1px solid var(--grey-color-light); }
+.profile-summary .profile-picture-wrapper-logged { position: relative; width: 120px; height: 120px; margin: 0 auto 20px auto; }
+.profile-picture-logged { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); background-color: var(--grey-color-light); }
+.photo-upload-label-logged { position: absolute; bottom: 5px; left: 5px; background-color: var(--profile-red-accent); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: background-color 0.3s ease; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); }
+.photo-upload-label-logged:hover { background-color: #c0392b; }
+.photo-upload-label-logged i { font-size: 14px; }
+#profile-summary-name { font-size: 1.4em; font-weight: 700; color: var(--text-color); margin-bottom: 5px; }
+#profile-summary-email { font-size: 0.95em; color: var(--grey-color-dark); margin-bottom: 30px; word-break: break-all; }
+.btn-logout-sidebar { background-color: transparent; color: var(--profile-red-accent); border: 1px solid var(--profile-red-accent); padding: 10px 20px; border-radius: 25px; font-weight: bold; width: 100%; margin-top: auto; transition: all 0.3s ease; }
+.btn-logout-sidebar i { margin-left: 8px; }
+.btn-logout-sidebar:hover { background-color: var(--profile-red-accent); color: var(--white-color); }
+.account-content { flex-grow: 1; padding: 30px 35px; }
+.account-title-main { font-size: 2em; color: var(--profile-red-accent); margin-bottom: 25px; font-weight: 700; }
+.tabs-container { margin-bottom: 30px; }
+.tab-nav { display: flex; border-bottom: 1px solid var(--grey-color-light); margin-bottom: 25px; }
+.tab-link { background: none; border: none; padding: 12px 20px; font-size: 1.05em; font-weight: 600; color: var(--grey-color-dark); cursor: pointer; position: relative; transition: color 0.3s ease; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.tab-link:hover { color: var(--text-color); }
+.tab-link.active { color: var(--profile-red-accent); border-bottom-color: var(--profile-red-accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.5s; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+#profile-info-form, #change-password-form-logged { display: flex; flex-direction: column; gap: 20px; }
+.form-row { display: flex; gap: 20px; }
+.form-group-logged { flex: 1; display: flex; flex-direction: column; }
+.form-group-logged label { font-size: 0.9em; font-weight: 600; color: var(--grey-color-dark); margin-bottom: 8px; }
+.form-group-logged input[type="text"], .form-group-logged input[type="email"], .form-group-logged input[type="tel"], .form-group-logged input[type="password"], .form-group-logged input[type="date"], .form-group-logged select.country-code-select-logged { width: 100%; padding: 12px 15px; border: 1px solid var(--grey-color-light); border-radius: 8px; font-size: 1em; font-family: 'Cairo', sans-serif; background-color: #fcfdff; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+.form-group-logged input:focus, .form-group-logged select:focus { border-color: var(--profile-red-accent); box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15); outline: none; }
+.form-group-logged input[readonly], .form-group-logged input[disabled] { background-color: var(--bg-color-alt); cursor: not-allowed; color: var(--grey-color-dark); }
+.form-group-logged small { font-size: 0.8em; color: var(--grey-color-dark); margin-top: 5px; }
+.phone-input-container-logged { display: flex; gap: 8px; }
+.country-code-select-logged { flex-basis: 150px; flex-shrink: 0; padding: 12px 8px !important; }
+.form-group-logged input[type="tel"] { flex-grow: 1; }
+.date-input-logged::-webkit-calendar-picker-indicator { opacity: 0.6; cursor: pointer; filter: invert(0.5) sepia(1) saturate(5) hue-rotate(350deg); }
+.btn-save-changes-logged { background-color: var(--profile-red-accent); color: var(--white-color); padding: 12px 30px; font-size: 1em; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; align-self: flex-start; margin-top: 10px; transition: background-color 0.3s ease; }
+.btn-save-changes-logged:hover { background-color: #c0392b; }
+.form-message { padding: 10px 15px; border-radius: 6px; margin-top: 15px; font-size: 0.9em; }
+.form-message.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+.form-message.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
+.btn-delete-account-logged { background-color: transparent; color: var(--danger-color); border: 1px solid var(--danger-color); padding: 8px 15px; font-size: 0.9em; border-radius: 20px; margin-top: 30px; float: left; transition: all 0.3s ease; }
+.btn-delete-account-logged:hover { background-color: var(--danger-color); color: var(--white-color); }
+
+/* --- أنماط قائمة شراء الألعاب --- */
+.games-counter-container { position: relative; display: inline-block; }
+.games-trigger-btn { background-color: #ff8c00; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; transition: background-color 0.3s ease; line-height: normal; }
+.games-trigger-btn:hover { background-color: #e07b00; }
+.games-trigger-btn #remaining-games-count { font-weight: bold; }
+.games-trigger-btn .plus-icon { background-color: rgba(255, 255, 255, 0.2); border-radius: 50%; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center; font-weight: bold; line-height: 1; }
+.purchase-dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 0; background-color: white; border-radius: 10px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18); padding: 20px 25px; min-width: 320px; z-index: 1001; border: 1px solid #e0e0e0; text-align: right; animation: fadeInScaleUp 0.35s cubic-bezier(0.165, 0.84, 0.44, 1); }
+.purchase-dropdown-menu.show { display: block; }
+.dropdown-title { margin-top: 0; margin-bottom: 20px; font-size: 1.2em; font-weight: 700; color: var(--primary-color); text-align: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; }
+.purchase-options-list { list-style: none; padding: 0; margin: 0 0 20px 0; }
+.purchase-option { display: flex; justify-content: space-between; align-items: center; padding: 15px 12px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease; border: 2px solid transparent; background-color: #fdfdfd; }
+.purchase-option:hover { background-color: #f5f9fc; transform: translateY(-2px); border-color: #d0e8ff; }
+.purchase-option.selected { background-color: #e7f3ff; border-color: var(--secondary-color); font-weight: bold; transform: translateY(0); }
+.purchase-option.selected:hover { background-color: #dbefff; }
+.purchase-option .price { color: var(--secondary-color); font-weight: bold; white-space: nowrap; margin-right: 15px; font-size: 1.05em; }
+.promo-section { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
+.promo-section input[type="text"] { flex-grow: 1; padding: 10px 12px; border: 1px solid var(--grey-color-light); border-radius: 6px; font-size: 1em; }
+.promo-section input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.2); outline: none; }
+.promo-section button { padding: 10px 15px; flex-shrink: 0; background-color: var(--grey-color-dark); color: var(--white-color); border-color: var(--grey-color-dark); border-radius: 6px; }
+.promo-section button:hover { background-color: #5a6268; border-color: #545b62; }
+.total-section { display: flex; justify-content: space-between; align-items: center; padding: 15px 5px; margin-bottom: 20px; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; font-size: 1.15em; }
+.total-section span { color: var(--grey-color-dark); }
+#total-price-display { color: var(--success-color); font-weight: 700; }
+#pay-now-btn { width: 100%; padding: 14px; font-size: 1.15em; font-weight: bold; background-color: var(--success-color); color: var(--white-color); border: none; border-radius: 8px; }
+#pay-now-btn:hover { background-color: #218838; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
+#pay-now-btn:disabled { background-color: var(--grey-color-light); cursor: not-allowed; transform: none; box-shadow: none; }
+@keyframes fadeInScaleUp { from { opacity: 0; transform: translateY(-10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+/* --- الفوتر (تصميم حديث مستوحى من harperwilde.com) --- */
 footer {
-    background-color: var(--footer-bg-color); /* Updated background color */
-    color: var(--bg-color-light);
-    padding: 30px 0; /* Adjusted padding */
-    margin-top: 40px;
-    font-size: 0.9em;
+    background-color: var(--footer-bg-color); /* #2c3e50 - لون داكن */
+    color: var(--footer-text-color);         /* #bdc3c7 - لون نص فاتح */
+    padding: 50px 20px 40px 20px; /* حشو علوي وسفلي أكبر */
+    margin-top: 60px; /* مسافة أكبر فوق الفوتر */
+    font-size: 1em; /* حجم خط أساسي للفوتر */
+    border-top: 3px solid var(--primary-color); /* الحفاظ على الخط العلوي الحالي */
+    text-align: center; /* محاذاة كل محتوى الفوتر للوسط */
+    font-family: 'Cairo', sans-serif; /* التأكيد على استخدام خط كايرو */
 }
 
-.footer-main-container {
+.footer-container-modern {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; /* ترتيب الصفوف فوق بعضها (أيقونات، روابط، حقوق) */
+    align-items: center;    /* محاذاة كل الصفوف للوسط */
+    gap: 30px;              /* زيادة المسافة بين كل صف */
+    max-width: 800px;       /* تحديد عرض أقصى لمحتوى الفوتر لتركيز أفضل */
+    margin: 0 auto;         /* توسيط الحاوية نفسها إذا كانت الصفحة أعرض */
+}
+
+.footer-icons-row {
+    display: flex;
+    flex-wrap: wrap;        /* السماح بالالتفاف في الشاشات الصغيرة */
+    justify-content: center;
     align-items: center;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    gap: 20px; /* Gap between left and right columns when wrapped */
+    gap: 25px 35px; /* مسافات مرنة (عمودي أفقي) بين مجموعات الأيقونات */
 }
 
-.footer-column {
+.social-media-icons,
+.app-store-icons {
     display: flex;
-    flex-direction: column;
-    gap: 10px; /* Gap between icon group and text within a column */
-}
-
-.footer-content-left {
-    align-items: flex-start; /* Aligns items to the start (right in RTL) of the column */
-}
-
-.footer-content-right {
-    align-items: flex-end; /* Aligns items to the end (left in RTL) of the column */
-}
-
-.app-store-icons,
-.social-media-icons {
-    display: flex;
-    gap: 18px; /* Space between icons */
+    gap: 20px; /* تعديل المسافة بين الأيقونات الفردية قليلاً */
 }
 
 .app-store-icons .app-icon-link i,
 .social-media-icons .social-icon-link i {
-    font-size: 1.8em; /* Icon size */
-    color: var(--white-color);
-    transition: color 0.3s ease, transform 0.3s ease;
+    font-size: 1.7em; /* حجم الأيقونة نفسها، يمكن تعديله حسب الرغبة */
 }
-.app-store-icons .app-icon-link:hover i,
-.social-media-icons .social-icon-link:hover i {
-    color: var(--accent-color);
-    transform: scale(1.1);
-}
-
-.developer-credit {
-    font-size: 0.85em;
-    color: var(--grey-color-light);
-    text-align: start; /* Ensures text aligns with icons in RTL */
-}
-.developer-credit a {
-    color: var(--white-color);
-    font-weight: bold;
-    text-decoration: none;
-}
-.developer-credit a:hover {
-    color: var(--accent-color);
-    text-decoration: underline;
-}
-
-.copyright-text {
-    font-size: 0.85em;
-    color: var(--grey-color-light);
-    text-align: end; /* Ensures text aligns with icons in RTL */
-}
-.copyright-text sup {
-    font-size: 0.75em;
-}
-
-
-/* --- عناصر الهيدر الديناميكية --- */
-.user-greeting { /* No margin needed due to parent gap */ font-weight: bold; color: var(--text-color); white-space: nowrap; }
-.btn-logout { background-color: var(--secondary-color); color: var(--white-color); padding: 8px 18px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 0.9em; line-height: normal; /* Reset line-height if needed */ }
-.btn-logout:hover { background-color: var(--primary-color); }
-
-/* رابط ملفي الشخصي في الهيدر - يطبق عليه نفس نمط الزر */
-.user-actions a.btn-logout {
-    /* Styles inherited from .btn and .btn-logout */
-    padding: 8px 18px; /* Ensure padding is consistent */
-    text-decoration: none; /* Remove underline */
-}
-
-
-/* --- أنماط صفحة الحساب الجديدة (Logged.html - تصميم "حسابي") --- */
-main.account-main-content.new-account-layout {
-    padding: 50px 0;
-    background-color: var(--bg-color-alt); /* #f4f7f6; */
-    min-height: calc(100vh - 200px); /* تعديل حسب الهيدر والفوتر */
-}
-
-.account-page-container {
-    display: flex;
-    background-color: var(--white-color);
-    border-radius: 15px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-    overflow: hidden; /* لضمان تناسق الحواف الدائرية */
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-/* الشريط الجانبي (يسار في RTL) */
-.account-sidebar {
-    flex: 0 0 280px; /* عرض ثابت للشريط الجانبي */
-    background-color: #fdfdfd; /* لون أفتح قليلاً من الأبيض */
-    padding: 30px 25px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    border-left: 1px solid var(--grey-color-light); /* فاصل بصري */
-}
-
-.profile-summary .profile-picture-wrapper-logged {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 20px auto;
-}
-.profile-picture-logged {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid var(--primary-color);
-    background-color: var(--grey-color-light);
-}
-.photo-upload-label-logged {
-    position: absolute;
-    bottom: 5px;
-    left: 5px; /* (right in LTR) */
-    background-color: var(--profile-red-accent);
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-.photo-upload-label-logged:hover { background-color: #c0392b; }
-.photo-upload-label-logged i { font-size: 14px; }
-
-#profile-summary-name {
-    font-size: 1.4em;
-    font-weight: 700;
-    color: var(--text-color);
-    margin-bottom: 5px;
-}
-#profile-summary-email {
-    font-size: 0.95em;
-    color: var(--grey-color-dark);
-    margin-bottom: 30px;
-    word-break: break-all;
-}
-
-.btn-logout-sidebar {
-    background-color: transparent;
-    color: var(--profile-red-accent);
-    border: 1px solid var(--profile-red-accent);
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: bold;
-    width: 100%;
-    margin-top: auto; /* لدفع الزر لأسفل */
-    transition: all 0.3s ease;
-}
-.btn-logout-sidebar i { margin-left: 8px; }
-.btn-logout-sidebar:hover {
-    background-color: var(--profile-red-accent);
-    color: var(--white-color);
-}
-
-/* محتوى الحساب (يمين في RTL) */
-.account-content {
-    flex-grow: 1;
-    padding: 30px 35px;
-}
-.account-title-main {
-    font-size: 2em;
-    color: var(--profile-red-accent); /* استخدام اللون الأحمر المميز */
-    margin-bottom: 25px;
-    font-weight: 700;
-}
-
-/* الألسنة Tabs */
-.tabs-container {
-    margin-bottom: 30px;
-}
-.tab-nav {
-    display: flex;
-    border-bottom: 1px solid var(--grey-color-light);
-    margin-bottom: 25px;
-}
-.tab-link {
-    background: none;
-    border: none;
-    padding: 12px 20px;
-    font-size: 1.05em;
-    font-weight: 600;
-    color: var(--grey-color-dark);
-    cursor: pointer;
-    position: relative;
-    transition: color 0.3s ease;
-    border-bottom: 3px solid transparent;
-    margin-bottom: -1px; /* ليتداخل مع خط الحدود السفلي */
-}
-.tab-link:hover { color: var(--text-color); }
-.tab-link.active {
-    color: var(--profile-red-accent);
-    border-bottom-color: var(--profile-red-accent);
-}
-
-.tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeIn 0.5s; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-/* تنسيق النماذج داخل الألسنة */
-#profile-info-form, #change-password-form-logged {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-.form-row {
-    display: flex;
-    gap: 20px;
-}
-.form-group-logged {
-    flex: 1; /* لتوزيع المساحة بالتساوي في الصف */
-    display: flex;
-    flex-direction: column;
-}
-.form-group-logged label {
-    font-size: 0.9em;
-    font-weight: 600;
-    color: var(--grey-color-dark);
-    margin-bottom: 8px;
-}
-.form-group-logged input[type="text"],
-.form-group-logged input[type="email"],
-.form-group-logged input[type="tel"],
-.form-group-logged input[type="password"],
-.form-group-logged input[type="date"],
-.form-group-logged select.country-code-select-logged {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid var(--grey-color-light);
-    border-radius: 8px;
-    font-size: 1em;
-    font-family: 'Cairo', sans-serif;
-    background-color: #fcfdff;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-.form-group-logged input:focus,
-.form-group-logged select:focus {
-    border-color: var(--profile-red-accent);
-    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
-    outline: none;
-}
-.form-group-logged input[readonly],
-.form-group-logged input[disabled] {
-    background-color: var(--bg-color-alt);
-    cursor: not-allowed;
-    color: var(--grey-color-dark);
-}
-.form-group-logged small {
-    font-size: 0.8em;
-    color: var(--grey-color-dark);
-    margin-top: 5px;
-}
-
-.phone-input-container-logged { display: flex; gap: 8px; }
-.country-code-select-logged { flex-basis: 150px; flex-shrink: 0; padding: 12px 8px !important; }
-.form-group-logged input[type="tel"] { flex-grow: 1; }
-/* اسم العرض في صفحة "حسابي" */
-.display-name-group-logged {
-    /* يمكن إضافة أنماط خاصة هنا إذا لزم الأمر, حاليًا يستخدم أنماط .form-group-logged العامة */
-}
-
-
-.date-input-logged::-webkit-calendar-picker-indicator {
-    opacity: 0.6; cursor: pointer; filter: invert(0.5) sepia(1) saturate(5) hue-rotate(350deg); /* لتلوين الأيقونة بلون أحمر */
-}
-
-.btn-save-changes-logged {
-    background-color: var(--profile-red-accent);
-    color: var(--white-color);
-    padding: 12px 30px;
-    font-size: 1em;
-    font-weight: bold;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    align-self: flex-start; /* محاذاة زر الحفظ */
-    margin-top: 10px;
-    transition: background-color 0.3s ease;
-}
-.btn-save-changes-logged:hover { background-color: #c0392b; }
-
-.form-message {
-    padding: 10px 15px;
-    border-radius: 6px;
-    margin-top: 15px;
-    font-size: 0.9em;
-}
-.form-message.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
-.form-message.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
-
-.btn-delete-account-logged {
-    background-color: transparent;
-    color: var(--danger-color);
-    border: 1px solid var(--danger-color);
-    padding: 8px 15px;
-    font-size: 0.9em;
-    border-radius: 20px;
-    margin-top: 30px;
-    float: left; /* لدفعه إلى اليسار (يمين في LTR) */
-    transition: all 0.3s ease;
-}
-.btn-delete-account-logged:hover {
-    background-color: var(--danger-color);
-    color: var(--white-color);
-}
-
-
-/* --- أنماط قائمة شراء الألعاب (مضافة هنا) --- */
-.games-counter-container {
-    position: relative;
-    display: inline-block;
-}
-
-.games-trigger-btn {
-    background-color: #ff8c00;
-    color: white;
-    padding: 8px 15px; /* Match other header buttons */
-    border-radius: 20px;
-    font-size: 0.9em; /* Match other header buttons */
-    cursor: pointer;
-    border: none;
-    display: inline-flex; /* Use inline-flex */
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.3s ease;
-    line-height: normal; /* Ensure normal line height */
-}
-
-.games-trigger-btn:hover {
-    background-color: #e07b00;
-}
-
-.games-trigger-btn #remaining-games-count {
-    font-weight: bold;
-}
-
-.games-trigger-btn .plus-icon {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    width: 16px; /* Slightly smaller */
-    height: 16px;
+.app-store-icons .app-icon-link,
+.social-media-icons .social-icon-link {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    font-weight: bold;
-    line-height: 1;
+    width: 45px;  /* تعديل حجم خلفية الأيقونة قليلاً */
+    height: 45px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.08); /* خلفية شفافة قليلاً أغمق قليلاً */
+    color: var(--footer-icon-color);
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    text-decoration: none;
 }
-
-.purchase-dropdown-menu {
-    display: none;
-    position: absolute;
-    top: calc(100% + 8px); /* Increased gap */
-    left: 0; /* Align to the left in LTR, will be right in RTL */
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18); /* Enhanced shadow */
-    padding: 20px 25px; /* More padding */
-    min-width: 320px; /* Wider */
-    z-index: 1001;
-    border: 1px solid #e0e0e0;
-    text-align: right;
-    animation: fadeInScaleUp 0.35s cubic-bezier(0.165, 0.84, 0.44, 1); /* Smoother animation */
-}
-
-.purchase-dropdown-menu.show {
-    display: block;
-}
-
-.dropdown-title {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.2em; /* Larger title */
-    font-weight: 700; /* Bold title */
-    color: var(--primary-color); /* Use primary color */
-    text-align: center;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 15px;
-}
-
-.purchase-options-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 20px 0;
-}
-
-.purchase-option {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 12px; /* More vertical padding */
-    border-radius: 8px; /* Slightly more rounded */
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
-    border: 2px solid transparent; /* Thicker border for selection */
-    background-color: #fdfdfd; /* Very light background */
-}
-
-.purchase-option:hover {
-    background-color: #f5f9fc;
-    transform: translateY(-2px); /* Slightly more lift */
-    border-color: #d0e8ff; /* Light blue border on hover */
-}
-
-.purchase-option.selected {
-    background-color: #e7f3ff;
-    border-color: var(--secondary-color); /* Use secondary color for selected border */
-    font-weight: bold;
-    transform: translateY(0); /* Reset transform on select */
-}
-.purchase-option.selected:hover {
-    background-color: #dbefff; /* Slightly darker blue on hover when selected */
-}
-
-.purchase-option .price {
-    color: var(--secondary-color); /* Use secondary color for price */
-    font-weight: bold;
-    white-space: nowrap;
-    margin-right: 15px;
-    font-size: 1.05em;
-}
-
-.promo-section {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    align-items: center;
-}
-
-.promo-section input[type="text"] {
-    flex-grow: 1;
-    padding: 10px 12px; /* More padding */
-    border: 1px solid var(--grey-color-light);
-    border-radius: 6px;
-    font-size: 1em;
-}
-.promo-section input[type="text"]:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.2);
-    outline: none;
-}
-
-.promo-section button {
-    padding: 10px 15px; /* Match input padding */
-    flex-shrink: 0;
-    background-color: var(--grey-color-dark); /* Use dark grey */
+.app-store-icons .app-icon-link:hover,
+.social-media-icons .social-icon-link:hover {
+    background-color: var(--footer-icon-bg-hover);
     color: var(--white-color);
-    border-color: var(--grey-color-dark);
-    border-radius: 6px;
-}
-.promo-section button:hover {
-    background-color: #5a6268;
-    border-color: #545b62;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-.total-section {
+.footer-links-row {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
-    padding: 15px 5px;
-    margin-bottom: 20px;
-    border-top: 1px solid #f0f0f0;
-    border-bottom: 1px solid #f0f0f0;
-    font-size: 1.15em; /* Slightly larger total */
-}
-.total-section span {
-    color: var(--grey-color-dark);
-}
-#total-price-display {
-    color: var(--success-color); /* Green total */
-    font-weight: 700; /* Bolder total */
+    gap: 15px 30px; /* مسافة بين الروابط إذا التفّت (عمودي أفقي) */
+    font-size: 0.9em; /* خط أصغر قليلاً للروابط النصية */
+    font-weight: 400; /* وزن خط عادي (أقل بروزاً من الأيقونات) */
 }
 
-#pay-now-btn {
-    width: 100%;
-    padding: 14px; /* Larger padding */
-    font-size: 1.15em; /* Larger font */
-    font-weight: bold;
-    background-color: var(--success-color); /* Green pay button */
+.footer-links-row .footer-text-link,
+.footer-links-row .developer-credit-modern {
+    color: var(--footer-text-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-links-row .footer-text-link:hover,
+.footer-links-row .developer-credit-modern a:hover {
+    text-decoration: underline;
     color: var(--white-color);
-    border: none;
-    border-radius: 8px;
 }
-#pay-now-btn:hover {
-    background-color: #218838;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+
+.footer-links-row .developer-credit-modern a {
+    color: var(--accent-color);
+    font-weight: 500;
+    text-decoration: none;
 }
-#pay-now-btn:disabled {
-    background-color: var(--grey-color-light);
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
+/* إزالة الأنماط القديمة لفقرة المطور */
+p.developer-credit {
+    font-size: inherit !important; /* التأكد من إلغاء الحجم القديم */
+    color: inherit !important;
+    text-align: inherit !important;
+    border-bottom: none !important;
+}
+/* التأكد من إزالة الخط السفلي من رابط المطور القديم إذا كان كلاس مستخدماً */
+.developer-credit a {
+    border-bottom: none !important;
+    font-weight: 500 !important; /* الحفاظ على وزن الخط إذا كان الكلاس القديم مستخدماً */
+    color: var(--accent-color) !important; /* الحفاظ على اللون إذا كان الكلاس القديم مستخدماً */
 }
 
 
-/* Animation for dropdown */
-@keyframes fadeInScaleUp {
-    from {
-        opacity: 0;
-        transform: translateY(-10px) scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+.footer-copyright-row {
+    font-size: 0.85em; /* خط أصغر قليلاً لحقوق النشر */
+    opacity: 0.8; /* جعل نص حقوق النشر أقل بروزاً قليلاً */
+    font-weight: 400; /* وزن خط عادي */
+    margin-top: 5px; /* تقليل المسافة فوق حقوق النشر قليلاً */
 }
+
+.footer-copyright-row p {
+    margin-bottom: 0;
+}
+.footer-copyright-row sup { /* للتأكد من أن علامة ® تظهر بشكل جيد */
+    font-size: 0.75em;
+    vertical-align: super;
+}
+
+
+/* إزالة الأنماط القديمة للأعمدة إذا لم تعد مستخدمة */
+.footer-main-container {
+    display: none !important; /* إخفاء الحاوية القديمة تماماً */
+}
+
 
 /* --- تجاوبية --- */
-@media (max-width: 992px) { /* Adjust breakpoint for header changes */
-    header .container {
-        /* Allow elements to stack if needed, but prioritize space */
-        justify-content: space-between;
-    }
-    nav {
-        order: 3; /* Move nav below logo and user actions on smaller screens */
-        width: 100%; /* Take full width */
-        margin-top: 10px;
-        justify-content: center; /* Center nav links */
-    }
-    nav ul {
-        /* Spacing already handled by li margin */
-        padding-bottom: 5px; /* Add padding if needed */
-    }
-    .user-actions {
-        order: 2; /* Keep user actions to the right */
-        min-width: auto; /* Allow shrinking */
-        /* Gap already added */
-    }
-
-    /* تجاوبية صفحة الحساب الجديدة */
-    .account-page-container {
-        flex-direction: column;
-    }
-    .account-sidebar {
-        flex: 0 0 auto; /* يعود لحجمه الطبيعي */
-        width: 100%;
-        border-left: none;
-        border-bottom: 1px solid var(--grey-color-light);
-        padding: 25px;
-    }
-    .btn-logout-sidebar {
-        margin-top: 20px;
-        max-width: 250px; /* لجعله يبدو أفضل عندما يكون بعرض كامل */
-    }
-    .account-content {
-        padding: 25px;
-    }
-    .account-title-main {
-        font-size: 1.8em;
-        text-align: center; /* توسيط العنوان الرئيسي في الشاشات الأصغر */
-    }
-    .tab-nav {
-        justify-content: center; /* توسيط ألسنة التبويب */
-    }
+@media (max-width: 992px) {
+    header .container { justify-content: space-between; }
+    nav { order: 3; width: 100%; margin-top: 10px; justify-content: center; }
+    nav ul { padding-bottom: 5px; }
+    .user-actions { order: 2; min-width: auto; }
+    .account-page-container { flex-direction: column; }
+    .account-sidebar { flex: 0 0 auto; width: 100%; border-left: none; border-bottom: 1px solid var(--grey-color-light); padding: 25px; }
+    .btn-logout-sidebar { margin-top: 20px; max-width: 250px; }
+    .account-content { padding: 25px; }
+    .account-title-main { font-size: 1.8em; text-align: center; }
+    .tab-nav { justify-content: center; }
 }
 
 @media (max-width: 768px) {
-    header .container {
-        /* Already flex-wrap: wrap */
-    }
-    .user-actions {
-        flex-wrap: wrap; /* Allow user actions to wrap now */
-        justify-content: center; /* Center when wrapped */
-        width: 100%; /* Take full width when wrapped */
-        margin-top: 10px;
-    }
+    .user-actions { flex-wrap: wrap; justify-content: center; width: 100%; margin-top: 10px; }
     .user-actions .btn-register { padding: 8px 20px; font-size: 0.9em; }
-
     .hero { padding: 60px 0; }
     .hero .game-logo-main { font-size: 3.5em; }
     .hero .slogan { font-size: 1.1em; }
     .main-actions .btn { width: 80%; margin: 10px auto; display: block; min-width: auto; }
-    section { scroll-margin-top: 80px; /* Adjust if header height changes */ }
+    section { scroll-margin-top: 80px; }
     .content-section h2 { font-size: 2em; }
-
-    /* تجاوبية قائمة الشراء */
-    .purchase-dropdown-menu {
-        min-width: 280px; /* Adjust width */
-        padding: 15px 20px;
-        left: 50%; /* Center dropdown */
-        transform: translateX(-50%); /* Fine-tune centering */
-        top: calc(100% + 5px);
-    }
-    /* Ensure trigger button is visible */
-    .games-counter-container {
-        margin-left: 0; /* Reset margin for centering */
-    }
+    .purchase-dropdown-menu { min-width: 280px; padding: 15px 20px; left: 50%; transform: translateX(-50%); top: calc(100% + 5px); }
+    .games-counter-container { margin-left: 0; }
 
     /* تجاوبية الفوتر */
-    .footer-main-container {
-        flex-direction: column; /* Stack columns */
-        align-items: center; /* Center items when stacked */
+    footer {
+        padding: 40px 20px 30px 20px;
+    }
+    .footer-container-modern {
         gap: 25px;
     }
-    .footer-column {
-        width: 100%; /* Make columns take full width */
-        align-items: center; /* Center content within each column */
+    .footer-icons-row {
+        gap: 20px 25px;
     }
-    .footer-content-left,
-    .footer-content-right {
-        align-items: center; /* Override specific alignment for stacked view */
+    .app-store-icons .app-icon-link i,
+    .social-media-icons .social-icon-link i {
+        font-size: 1.6em;
     }
-    .developer-credit,
-    .copyright-text {
-        text-align: center; /* Center text in stacked view */
+    .app-store-icons .app-icon-link,
+    .social-media-icons .social-icon-link {
+        width: 42px;
+        height: 42px;
     }
-
-    /* تجاوبية صفحة الحساب الجديدة */
-    .form-row {
-        flex-direction: column;
-        gap: 0px; /* إزالة المسافة لأن .form-group-logged سيتولى المسافة السفلية */
+    .footer-links-row {
+        font-size: 0.85em;
+        gap: 10px 20px;
     }
-    .form-group-logged {
-        margin-bottom: 20px; /* مسافة بين الحقول المكدسة */
-    }
-    .form-group-logged:last-child {
-        margin-bottom: 0; /* إزالة الهامش من آخر عنصر في النموذج */
-    }
-    .btn-save-changes-logged {
-        width: 100%; /* جعل الزر يأخذ العرض الكامل */
-    }
-    .btn-delete-account-logged {
-        float: none; /* إزالة الطفو */
-        display: block; /* جعله بلوك ليتمركز */
-        margin: 25px auto 0 auto; /* توسيط الزر */
-        width: fit-content; /* ليأخذ عرض المحتوى فقط */
-    }
-    .tab-link {
-        padding: 10px 15px;
-        font-size: 1em;
+    .footer-copyright-row {
+        font-size: 0.8em;
     }
 
+    .form-row { flex-direction: column; gap: 0px; }
+    .form-group-logged { margin-bottom: 20px; }
+    .form-group-logged:last-child { margin-bottom: 0; }
+    .btn-save-changes-logged { width: 100%; }
+    .btn-delete-account-logged { float: none; display: block; margin: 25px auto 0 auto; width: fit-content; }
+    .tab-link { padding: 10px 15px; font-size: 1em; }
 }
 
 @media (max-width: 480px) {
-    nav ul li { margin: 5px 8px; } /* Reduce nav spacing further */
-    .games-trigger-btn span:first-child {
-        display: none; /* Hide "عدد الألعاب المتبقية" text on very small screens */
-    }
-    .games-trigger-btn {
-        padding: 8px 12px; /* Adjust padding */
-    }
-    .purchase-dropdown-menu {
-        min-width: 90vw; /* Make dropdown wider on mobile */
-        left: 5%;
-        transform: translateX(0);
-    }
+    nav ul li { margin: 5px 8px; }
+    .games-trigger-btn span:first-child { display: none; }
+    .games-trigger-btn { padding: 8px 12px; }
+    .purchase-dropdown-menu { min-width: 90vw; left: 5%; transform: translateX(0); }
 
     /* تجاوبية الفوتر لشاشات أصغر */
+    .app-store-icons .app-icon-link,
+    .social-media-icons .social-icon-link {
+        width: 40px;
+        height: 40px;
+    }
     .app-store-icons .app-icon-link i,
     .social-media-icons .social-icon-link i {
-        font-size: 1.6em; /* Slightly smaller icons on very small screens */
+        font-size: 1.5em;
     }
-    .app-store-icons,
-    .social-media-icons {
+    .social-media-icons, .app-store-icons {
         gap: 15px;
     }
+    /* .developer-credit, .copyright-text -  تم استبدالها بـ .footer-links-row و .footer-copyright-row */
+    .footer-links-row, .footer-copyright-row { /* تعديل حجم الخط إذا لزم الأمر */
+        font-size: 0.82em;
+    }
 
-    /* تجاوبية صفحة الحساب الجديدة */
-    .account-sidebar {
-        padding: 20px 15px;
-    }
-    .profile-picture-wrapper-logged {
-        width: 100px;
-        height: 100px;
-    }
+    .account-sidebar { padding: 20px 15px; }
+    .profile-picture-wrapper-logged { width: 100px; height: 100px; }
     #profile-summary-name { font-size: 1.2em; }
     #profile-summary-email { font-size: 0.9em; }
-
-    .account-content {
-        padding: 20px 15px;
-    }
+    .account-content { padding: 20px 15px; }
     .account-title-main { font-size: 1.6em; }
-
-    .country-code-select-logged {
-        flex-basis: 120px !important; /* تأكيد العرض لمفتاح الدولة */
-        font-size: 0.9em;
-    }
-    .form-group-logged input, .form-group-logged select {
-        font-size: 0.95em;
-        padding: 10px 12px;
-    }
-    .tab-link {
-        font-size: 0.9em; /* تصغير خط الألسنة قليلاً */
-        padding: 10px 10px;
-    }
+    .country-code-select-logged { flex-basis: 120px !important; font-size: 0.9em; }
+    .form-group-logged input, .form-group-logged select { font-size: 0.95em; padding: 10px 12px; }
+    .tab-link { font-size: 0.9em; padding: 10px 10px; }
 }
