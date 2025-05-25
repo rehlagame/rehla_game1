@@ -1,7 +1,7 @@
 /* --- START OF FILE assets/css/game.css --- */
 
 :root {
-    /* ... (متغيرات الألوان كما هي) ... */
+    /* تعريف متغيرات الألوان لتسهيل التعديل */
     --primary-color: #17a2b8;
     --secondary-color: #6c757d;
     --accent-color: #ffc107;
@@ -18,8 +18,10 @@
     --team1-color: #0d6efd;
     --team2-color: #fd7e14;
 
+    /* عرض الشريط الجانبي الافتراضي للشاشات الكبيرة */
     --sidebar-width-default: 455px;
-    --sidebar-width-landscape-mobile: 230px;
+    /* عرض الشريط الجانبي المصغر للوضع الأفقي على الهواتف */
+    --sidebar-width-landscape-mobile: 220px; /* قيمة مقترحة، يمكنك تعديلها */
 }
 
 /* === أنماط خاصة بتطبيق WebView وملء الشاشة للعبة === */
@@ -27,9 +29,9 @@ body.game-active-page {
     margin: 0;
     padding: 0;
     width: 100vw;
-    height: 100vh; /* الارتفاع الكامل للشاشة */
+    height: 100vh;
     overflow: hidden; /* منع أي تمرير على مستوى الـ body */
-    background-color: var(--bg-color-light);
+    background-color: var(--bg-color-light); /* أو لون خلفية اللعبة الخاص */
     font-family: var(--body-font);
     color: var(--text-color);
     direction: rtl;
@@ -38,14 +40,14 @@ body.game-active-page {
 }
 
 body.game-active-page main.game-content {
-    flex-grow: 1; /* لجعل main يملأ المساحة المتاحة في body */
+    flex-grow: 1;
     width: 100%;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;  /* **السماح بالتمرير العمودي لـ main إذا تجاوز المحتوى الارتفاع** */
-    overflow-x: hidden;
+    overflow: hidden; /*  مهم لمنع التمرير العام، التمرير يكون داخل الأعمدة */
     padding: 0;
     margin: 0;
+    /* التعامل مع الحواف الآمنة لشاشات مثل iPhone X */
     padding-top: env(safe-area-inset-top, 0px);
     padding-bottom: env(safe-area-inset-bottom, 0px);
     padding-left: env(safe-area-inset-left, 0px);
@@ -54,41 +56,40 @@ body.game-active-page main.game-content {
 }
 
 body.game-active-page #game-play-area {
-    /* flex-grow: 1;  ليس ضروريًا إذا كان main.game-content يسمح بالتمرير */
-    width: 100%; /* التأكد من أخذ العرض الكامل */
-    min-height: 0; /* مهم لـ flex/grid children لمنع التمدد غير المرغوب */
+    flex-grow: 1;
+    width: 100%;
+    min-height: 0; /* مهم لأطفال flex/grid */
     margin-top: 0;
     display: grid;
     grid-template-columns: 1fr var(--sidebar-width-default);
-    gap: 15px;
-    align-items: stretch; /* أو start إذا كنت لا تريد أن يمتد ارتفاع الأعمدة */
+    gap: 10px;
+    align-items: stretch; /* لتمتد الأعمدة لملء الارتفاع */
     padding: 10px;
     box-sizing: border-box;
-    /* overflow: hidden;  إزالة هذا من هنا، main.game-content سيتولى التمرير العام */
+    overflow: hidden; /* منع game-play-area من التمرير بنفسها */
 }
 
 body.game-active-page #question-interaction-area,
 body.game-active-page #game-sidebar {
-    overflow-y: auto; /* السماح بالتمرير الداخلي لهذه الأعمدة إذا كان محتواها أطول */
-    padding: 15px;
+    overflow-y: auto; /* السماح بالتمرير العمودي الداخلي لهذه العناصر إذا كان محتواها أطول */
+    padding: 12px;    /* حشو داخلي موحد للعناصر */
     border-radius: 8px;
     background-color: var(--white-color);
     box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    min-height: 200px; /* ارتفاع أدنى بسيط لضمان ظهورها حتى لو فارغة مؤقتًا */
 }
 
 body.game-active-page #game-sidebar {
     background-color: #fdfdfd;
-    box-shadow: -2px 0 5px rgba(0,0,0,0.05);
-    position: sticky; /* جعل الشريط الجانبي ثابتًا عند التمرير العمودي داخل #game-play-area */
-    top: 10px;       /* المسافة من الأعلى عند التثبيت */
-    align-self: start; /* لضمان أن الـ sticky يعمل بشكل صحيح داخل grid */
-    max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 20px); /* تحديد أقصى ارتفاع للشريط الجانبي ليتناسب مع الشاشة مع مراعاة الحواف الآمنة والحشو */
-
+    box-shadow: -2px 0 5px rgba(0,0,0,0.05); /* ظل في RTL سيكون على اليمين */
+    position: sticky; /* ليبقى الشريط الجانبي ظاهرًا عند تمرير منطقة الأسئلة (إذا كانت أطول) */
+    top: 10px; /* مسافة من الأعلى عند التثبيت */
+    align-self: start; /* مهم لعمل sticky داخل grid */
+    /* تحديد أقصى ارتفاع للشريط الجانبي لمنعه من تجاوز ارتفاع الشاشة المرئي */
+    max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 20px - 20px); /* (viewport height - safe_areas - game_play_area_padding - sticky_top_offset) */
 }
 
+
 /* --- إعدادات اللعبة (Setup Section) --- */
-/* ... (لا تغييرات هنا، كما هو) ... */
 #game-setup-section { padding: 40px 20px; text-align: center; }
 #game-setup-section h1 { font-size: 2.2em; margin-bottom: 15px; color: var(--primary-color); }
 #game-setup-section .intro-text { font-size: 1em; color: var(--grey-color-dark); max-width: 700px; margin: 0 auto 30px auto; line-height: 1.7; }
@@ -109,16 +110,9 @@ body.game-active-page #game-sidebar {
 
 /* --- العمود الثاني (يمين): الشريط الجانبي (تعديلات على محتواه) --- */
 #game-sidebar {
-    /* display: flex; flex-direction: column; gap: 10px; <-- تم تعريفها أعلاه */
+    display: flex; flex-direction: column; gap: 10px;
 }
-
-#current-turn-info {
-    text-align: center; font-size: 1.1em; font-weight: 700; padding: 10px;
-    background-color: var(--white-color); color: var(--black-color);
-    border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.06);
-    border: 1px solid var(--grey-color-medium); flex-shrink: 0; position: relative;
-}
-/* ... (بقية أنماط الشريط الجانبي كما هي أو مع تعديلاتك) ... */
+#current-turn-info { text-align: center; font-size: 1.1em; font-weight: 700; padding: 10px; background-color: var(--white-color); color: var(--black-color); border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.06); border: 1px solid var(--grey-color-medium); flex-shrink: 0; position: relative; }
 .team-name-highlight { color: var(--primary-color); }
 .teams-dashboard { display: flex; flex-direction: column; gap: 10px; align-items: stretch; flex-shrink: 0;}
 .team-info-card { background-color: var(--white-color); border: 1px solid var(--grey-color-medium); padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); display: flex; flex-direction: column;}
@@ -126,10 +120,8 @@ body.game-active-page #game-sidebar {
 .team-info-card .current-station { font-size: 0.75em; margin-bottom: 5px; padding-top: 5px; color: var(--grey-color-dark); text-align: center; border-top: 1px solid var(--grey-color-light); }
 .team-info-card .current-station span { font-size: 0.95em; margin-top: 2px; display: block; font-weight: 700; color: var(--black-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .team-info-card.active-team { border-color: var(--primary-color); background-color: #e6f7ff; box-shadow: 0 4px 12px rgba(23, 162, 184, 0.1); }
-#team1-info.active-team { border-color: var(--team1-color); box-shadow: 0 4px 12px rgba(13, 110, 253, 0.1); }
-#team1-info.active-team h2 { color: var(--team1-color); }
-#team2-info.active-team { border-color: var(--team2-color); box-shadow: 0 4px 12px rgba(253, 126, 20, 0.1); }
-#team2-info.active-team h2 { color: var(--team2-color); }
+#team1-info.active-team { border-color: var(--team1-color); box-shadow: 0 4px 12px rgba(13, 110, 253, 0.1); } #team1-info.active-team h2 { color: var(--team1-color); }
+#team2-info.active-team { border-color: var(--team2-color); box-shadow: 0 4px 12px rgba(253, 126, 20, 0.1); } #team2-info.active-team h2 { color: var(--team2-color); }
 .path-display { margin-top: 6px; flex-grow: 1; }
 .path-display h4 { margin-bottom: 5px; font-size: 0.7em; color: var(--secondary-color); text-align: center; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
 .path-display ol { list-style: none; padding-right: 0; margin: 0; counter-reset: path-counter; }
@@ -140,15 +132,12 @@ body.game-active-page #game-sidebar {
 .path-display li.current-path-station { background-color: var(--accent-color); color: var(--black-color); font-weight: 700; border-color: #e0a800; box-shadow: 0 1px 3px rgba(0,0,0,0.07); opacity: 1; }
 .path-display li.current-path-station::before { background-color: var(--primary-color); color: white; }
 
-
 /* --- العمود الأول (يسار): منطقة السؤال والتفاعل --- */
 #question-timer { position: absolute; top: 10px; left: 10px; background-color: var(--black-color); color: var(--white-color); padding: 5px 10px; border-radius: 10px; font-size: 0.9em; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: 0 1px 3px rgba(0,0,0,0.2); z-index: 10; min-width: 45px; text-align: center; transition: background-color 0.3s ease; }
 #question-interaction-area h3 { margin-top: 0; margin-bottom: 6px; font-size: 1.4em; color: var(--primary-color); text-align: center; padding-top: 5px; }
 #question-details { margin-bottom: 10px; font-size: 0.9em; text-align: center; color: var(--grey-color-dark); }
 #question-difficulty { padding: 3px 8px; font-size: 0.8em; font-weight: bold; border-radius: 5px; color: white; display: inline-block; vertical-align: middle; }
-#question-difficulty.easy { background-color: var(--success-color); }
-#question-difficulty.medium { background-color: var(--warning-color); color: var(--black-color); }
-#question-difficulty.hard { background-color: var(--danger-color); }
+#question-difficulty.easy { background-color: var(--success-color); } #question-difficulty.medium { background-color: var(--warning-color); color: var(--black-color); } #question-difficulty.hard { background-color: var(--danger-color); }
 #question-points { margin-right: 3px; font-weight: bold; vertical-align: middle; }
 #question-image-container { margin-top: 6px; margin-bottom: 12px; text-align: center; }
 #question-image { max-height: 150px; display: block; max-width: 100%; margin: 0 auto; border-radius: 6px; border: 1px solid var(--grey-color-medium); background-color: var(--white-color); object-fit: contain; object-position: center; box-shadow: 0 2px 5px rgba(0,0,0,0.07); }
@@ -158,7 +147,7 @@ body.game-active-page #game-sidebar {
 .option-btn { padding: 10px 15px; font-size: 1em; font-weight: 600; background-color: var(--grey-color-light); border: 1px solid var(--grey-color-medium); border-radius: 6px; cursor: pointer; transition: all 0.2s ease; text-align: center; font-family: var(--body-font); }
 .option-btn:hover:not(:disabled) { background-color: var(--grey-color-medium); border-color: var(--secondary-color); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
 .option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; background-color: var(--grey-color-light); border-color: var(--grey-color-medium);}
-#reveal-answer-btn { width: 75%; padding: 10px 15px; font-size: 1.05em; display: block; margin: 0 auto; background-color: var(--accent-color); color: var(--black-color); border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.3s ease, transform 0.1s ease; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+#reveal-answer-btn { width: 75%; padding: 10px 15px; font-size: 1.05em; display: block; margin: 10px auto 0 auto; /* مسافة علوية بسيطة */ background-color: var(--accent-color); color: var(--black-color); border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.3s ease, transform 0.1s ease; font-weight: 700; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 #reveal-answer-btn:hover:not(:disabled) { background-color: #e0a800; transform: translateY(-1px); }
 #reveal-answer-btn:active:not(:disabled) { transform: translateY(1px); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
 #reveal-answer-btn:disabled { background-color: #adb5bd; color: var(--white-color); cursor: not-allowed; box-shadow: none; transform: none; }
@@ -172,12 +161,9 @@ body.game-active-page #game-sidebar {
 .btn-assign-points { padding: 8px 18px; font-size: 0.95em; min-width: 120px; border: none; border-radius: 6px; cursor: pointer; transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease; font-weight: 700; box-shadow: 0 2px 4px rgba(0,0,0,0.08); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .btn-assign-points:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
 .btn-assign-points:active { transform: translateY(0px); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.btn-assign-points.team1-btn { background-color: var(--team1-color); color: white; }
-.btn-assign-points.team1-btn:hover { background-color: #0b5ed7; }
-.btn-assign-points.team2-btn { background-color: var(--team2-color); color: white; }
-.btn-assign-points.team2-btn:hover { background-color: #d96a05; }
-.btn-assign-points.none-btn { background-color: var(--secondary-color); color: white; }
-.btn-assign-points.none-btn:hover { background-color: #5a6268; }
+.btn-assign-points.team1-btn { background-color: var(--team1-color); color: white; } .btn-assign-points.team1-btn:hover { background-color: #0b5ed7; }
+.btn-assign-points.team2-btn { background-color: var(--team2-color); color: white; } .btn-assign-points.team2-btn:hover { background-color: #d96a05; }
+.btn-assign-points.none-btn { background-color: var(--secondary-color); color: white; } .btn-assign-points.none-btn:hover { background-color: #5a6268; }
 #previous-correct-answer-display { margin-top: 12px; padding: 10px 15px; background-color: var(--grey-color-light); border: 1px dashed var(--secondary-color); border-radius: 6px; text-align: center; }
 #previous-correct-answer-display h4 { margin-top: 0; margin-bottom: 6px; font-size: 0.85em; color: var(--secondary-color); font-weight: 600; }
 #previous-correct-answer-display p { font-size: 1em; margin-bottom: 0; font-weight: bold; color: var(--grey-color-dark); }
@@ -188,10 +174,8 @@ body.game-active-page #game-sidebar {
 .question-navigation-btns { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
 .question-navigation-btns .btn { padding: 7px 15px; font-size: 0.85em; cursor: pointer; border-radius: 6px; border: none; transition: background-color 0.3s, opacity 0.3s; }
 .question-navigation-btns .btn i { margin-left: 4px; margin-right: 4px; }
-#view-previous-btn { background-color: var(--secondary-color); color: white; }
-#view-previous-btn:hover { background-color: #5a6268; }
-#return-to-current-btn { background-color: var(--primary-color); color: white; }
-#return-to-current-btn:hover { background-color: #138496; }
+#view-previous-btn { background-color: var(--secondary-color); color: white; } #view-previous-btn:hover { background-color: #5a6268; }
+#return-to-current-btn { background-color: var(--primary-color); color: white; } #return-to-current-btn:hover { background-color: #138496; }
 #game-over-section { padding: 20px 25px; display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; z-index: 100; text-align: center; background-color: var(--white-color); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid var(--grey-color-medium); }
 #game-over-section.visible { display: block; }
 #game-over-section h2 { font-size: 1.5em; color: var(--primary-color); margin-bottom: 20px; }
@@ -205,92 +189,103 @@ body.game-active-page #game-sidebar {
 .score-value-container { padding: 3px 5px; min-width: 70px; display: inline-flex; align-items: center; justify-content: center; position: relative; background-color: var(--grey-color-light); border-radius: 18px; transition: background-color 0.3s ease, box-shadow 0.3s ease; vertical-align: middle; box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); }
 .score-value-container #team1-score, .score-value-container #team2-score { font-size: 1em; margin: 0 8px; min-width: 20px; display: inline-block; font-weight: 700; color: var(--black-color); text-align: center; z-index: 2; position: relative;}
 .btn-adjust-score { width: 24px; height: 24px; font-size: 0.8em; position: absolute; top: 50%; transform: translateY(-50%) scale(0.8); display: inline-flex; align-items: center; justify-content: center; padding: 0; border-radius: 50%; border: none; background-color: rgba(0,0,0,0.5); color: var(--white-color); cursor: pointer; transition: all 0.25s cubic-bezier(0.4,0,0.2,1); opacity: 0; z-index: 3; box-shadow: 0 2px 5px rgba(0,0,0,0.15);}
-.btn-adjust-score.btn-decrement { right: 5px; }
-.btn-adjust-score.btn-increment { left: 5px; }
+.btn-adjust-score.btn-decrement { right: 5px; } .btn-adjust-score.btn-increment { left: 5px; }
 .score-value-container:hover { background-color: var(--grey-color-medium); box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); }
 .score-value-container:hover .btn-adjust-score { opacity: 1; transform: translateY(-50%) scale(1); }
 .btn-adjust-score:hover { background-color: rgba(0,0,0,0.7); transform: translateY(-50%) scale(1.08); box-shadow: 0 3px 7px rgba(0,0,0,0.2); }
-.btn-adjust-score.btn-increment:hover { background-color: var(--success-color); }
-.btn-adjust-score.btn-decrement:hover { background-color: var(--danger-color); }
+.btn-adjust-score.btn-increment:hover { background-color: var(--success-color); } .btn-adjust-score.btn-decrement:hover { background-color: var(--danger-color); }
 .btn-adjust-score:active { transform: translateY(-50%) scale(0.95); transition-duration: 0.1s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
 
 /* === Media Queries للتجاوبية === */
 
-@media (max-width: 991px) and (orientation: portrait) {
-    body.game-active-page #game-play-area { display: block; padding: 10px; }
-    #game-sidebar { position: static; height: auto; overflow-y: visible; margin-top: 20px; width: 100%; padding: 15px; box-shadow: none; }
-    .teams-dashboard { flex-direction: row; flex-wrap: wrap; gap: 10px; }
-    .team-info-card { flex-basis: calc(50% - 5px); min-width: 180px; }
-    #question-interaction-area { min-height: auto; padding: 15px; margin-bottom: 0; }
-    .team-setup { flex-basis: 100%; } /* Setup section */
-    #game-setup-form { padding: 20px; } /* Setup section */
-    .btn-start-game { width: 80%; margin-left:auto; margin-right:auto; } /* Setup section */
+/* الوضع الرأسي للهواتف (والشاشات المشابهة) */
+@media (max-width: 767px) and (orientation: portrait) {
+    body.game-active-page #game-play-area {
+        display: block; /* تكديس الأعمدة */
+        padding: 10px;
+        overflow-y: auto; /* السماح بالتمرير لمنطقة اللعب كلها إذا لزم الأمر */
+    }
+    #game-sidebar {
+        position: static; /* إزالة التثبيت */
+        height: auto;
+        overflow-y: visible;
+        margin-top: 15px;
+        width: 100%;
+        padding: 10px;
+        box-shadow: none;
+    }
+    .teams-dashboard {
+        flex-direction: row; /* بطاقات الفرق جنبًا إلى جنب */
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .team-info-card {
+        flex-basis: calc(50% - 4px); /* كل بطاقة تأخذ نصف المساحة تقريبًا */
+        min-width: 150px;
+    }
+    #question-interaction-area {
+        min-height: auto;
+        padding: 10px;
+        margin-bottom: 0;
+    }
+    /* تصغير الخطوط والعناصر */
+    #current-turn-info { font-size: 1em; padding: 8px; padding-left: 30px; }
+    .team-info-card h2 { font-size: 0.9em; }
+    #question-interaction-area h3 { font-size: 1.2em; }
+    #question-text { font-size: 1.1em; }
+    .option-btn { font-size: 0.9em; padding: 8px 10px; }
+    #reveal-answer-btn { font-size: 0.95em; padding: 8px 12px; }
+    #question-image { max-height: 120px; }
 }
 
-@media (max-width: 991px) and (orientation: landscape) {
-    body.game-active-page main.game-content { padding: 5px; }
+/* الوضع الأفقي للهواتف (والشاشات المشابهة) */
+@media (max-height: 500px) and (orientation: landscape), /* يستهدف الارتفاعات الصغيرة في الوضع الأفقي */
+       (max-width: 991px) and (orientation: landscape) { /* قاعدة عامة للوضع الأفقي للشاشات الأصغر */
+    body.game-active-page main.game-content {
+        padding: 5px; /* حشو أصغر حول اللعبة كلها */
+    }
     body.game-active-page #game-play-area {
         grid-template-columns: 1fr var(--sidebar-width-landscape-mobile);
-        gap: 10px;
+        gap: 8px;
         padding: 0;
+        align-items: stretch; /* التأكد أن الأعمدة تمتد */
     }
     #game-sidebar {
         margin-top: 0;
         position: sticky; top: 5px;
-        height: calc(100% - 10px); /* Should be relative to #game-play-area if #game-play-area itself scrolls */
-        /* Or if main.game-content scrolls, then height can be relative to viewport minus paddings */
-        max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 10px - 10px); /* viewport height - main content padding - sidebar top */
+        /* max-height يتم التحكم به في القاعدة العامة لـ #game-sidebar */
         padding: 8px;
     }
-    #current-turn-info { font-size: 0.9em; padding: 6px; padding-left: 30px; }
-    .team-info-card { padding: 8px; }
-    .team-info-card h2 { font-size: 0.9em; margin-bottom: 4px; }
-    .team-info-card .current-station { font-size: 0.7em; margin-bottom: 4px; padding-top: 4px; }
-    .team-info-card .current-station span { font-size: 0.8em; }
-    .path-display h4 { font-size: 0.65em; margin-bottom: 4px; }
-    .path-display li { font-size: 0.7em; padding: 4px 6px; margin-bottom: 3px; }
-    .path-display li::before { min-width: 14px; height: 14px; line-height: 14px; font-size: 0.6em; margin-left: 4px; }
-    .team-info-card .score > span:first-child { font-size: 0.7em; }
-    .score-value-container { padding: 2px 4px; min-width: 60px; }
-    .score-value-container span[id*="-score"] { font-size: 0.9em; margin: 0 6px; }
-    .btn-adjust-score { width: 20px; height: 20px; font-size: 0.7em; }
-    #question-interaction-area { padding: 10px; }
-    #question-timer { top: 8px; left: 8px; font-size: 0.8em; padding: 4px 8px; min-width: 40px; }
-    #question-interaction-area h3 { font-size: 1.1em; margin-bottom: 5px; }
-    #question-details { font-size: 0.8em; margin-bottom: 8px; }
-    #question-difficulty { padding: 2px 6px; font-size: 0.75em; }
-    #question-image-container { margin-top: 5px; margin-bottom: 10px; }
-    #question-image { max-height: 80px; } /* تقليل ارتفاع الصورة أكثر في الوضع الأفقي للهاتف */
-    #question-text { font-size: 0.95em; margin-bottom: 8px; line-height: 1.3; } /* تقليل حجم الخط والمسافة */
-    #answer-options { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 5px; margin-bottom: 8px; } /* تصغير الخيارات */
-    .option-btn { font-size: 0.8em; padding: 6px 8px;}
-    #reveal-answer-btn { width: 90%; padding: 7px 10px; font-size: 0.85em;}
-    #answer-reveal-section { padding: 8px 12px; margin-top: 8px; }
+    /* تصغير الخطوط والعناصر أكثر للوضع الأفقي على الهاتف */
+    #current-turn-info { font-size: 0.85em; padding: 5px; padding-left: 25px; }
+    .team-info-card { padding: 6px; }
+    .team-info-card h2 { font-size: 0.8em; margin-bottom: 3px; }
+    .team-info-card .current-station { font-size: 0.65em; margin-bottom: 3px; padding-top: 3px; }
+    .team-info-card .current-station span { font-size: 0.75em; }
+    .path-display h4 { font-size: 0.6em; margin-bottom: 3px; }
+    .path-display li { font-size: 0.65em; padding: 3px 5px; margin-bottom: 2px; }
+    .path-display li::before { min-width: 12px; height: 12px; line-height: 12px; font-size: 0.55em; margin-left: 3px; }
+    .team-info-card .score > span:first-child { font-size: 0.65em; }
+    .score-value-container { padding: 1px 3px; min-width: 50px; }
+    .score-value-container span[id*="-score"] { font-size: 0.85em; margin: 0 4px; }
+    .btn-adjust-score { width: 18px; height: 18px; font-size: 0.6em; }
+
+    #question-interaction-area { padding: 8px; }
+    #question-timer { top: 5px; left: 5px; font-size: 0.75em; padding: 3px 6px; min-width: 35px; }
+    #question-interaction-area h3 { font-size: 1em; margin-bottom: 4px; }
+    #question-details { font-size: 0.75em; margin-bottom: 6px; }
+    #question-difficulty { padding: 2px 5px; font-size: 0.7em; }
+    #question-image-container { margin-top: 4px; margin-bottom: 8px; }
+    #question-image { max-height: 70px; }
+    #question-text { font-size: 0.85em; margin-bottom: 8px; line-height: 1.25; }
+    #answer-options { grid-template-columns: 1fr 1fr; /* عمودان للخيارات */ gap: 4px; margin-bottom: 8px; }
+    .option-btn { font-size: 0.75em; padding: 5px 7px;}
+    #reveal-answer-btn { width: 90%; padding: 6px 10px; font-size: 0.8em;}
+    #answer-reveal-section { padding: 6px 10px; margin-top: 8px; }
     .correct-answer-display { font-size: 0.9em; margin-bottom: 8px; padding: 4px; }
-    .assign-points-prompt { font-size: 0.85em; margin-bottom: 6px; }
-    .btn-assign-points { padding: 5px 10px; font-size: 0.8em; min-width: 90px; }
-}
-
-@media (max-width: 575px) and (orientation: portrait) {
-    body.game-active-page #game-play-area { padding: 5px; }
-    #game-setup-section h1 { font-size: 1.8em; } /* Setup */
-    #game-setup-form { padding: 15px; } /* Setup */
-    .team-setup { padding: 10px; min-width: unset; } /* Setup */
-    .input-group input[type="text"] { font-size: 0.9em; padding: 8px 10px; } /* Setup */
-    .btn-start-game { font-size: 1em; padding: 8px 25px; width: 90%; } /* Setup */
-
-    #current-turn-info { font-size: 0.9em; padding: 8px; padding-left: 35px; }
-    .team-info-card { padding: 8px; } .team-info-card h2 { font-size: 0.9em; }
-    .path-display li { font-size: 0.65em; } .path-display li::before { min-width: 14px; height: 14px; line-height: 14px; font-size: 0.6em; }
-    #question-interaction-area { padding: 8px; } #question-interaction-area h3 { font-size: 1.1em; }
-    #question-text { font-size: 1em; }
-    #answer-options { grid-template-columns: 1fr; }
-    .option-btn { font-size: 0.9em; padding: 8px 10px; }
-    #reveal-answer-btn { width: 95%; font-size: 0.95em; padding: 8px 12px; }
-    .btn-assign-points { width: 90%; font-size: 0.9em; padding: 8px 12px; }
-    .question-navigation-btns .btn { width: 90%; font-size: 0.8em; padding: 7px 12px;}
-    #question-image { max-height: 100px; }
+    .assign-points-prompt { font-size: 0.8em; margin-bottom: 6px; }
+    .btn-assign-points { padding: 4px 8px; font-size: 0.75em; min-width: 80px; }
 }
 
 #text-answer-input { display: none !important; }
