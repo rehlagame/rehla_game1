@@ -15,11 +15,11 @@
     --success-color: #28a745;
     --apple-btn-bg: #000000;
     --apple-btn-text: #ffffff;
-    --footer-bg-color: #2c3e50; /* لون أزرق مسود / رمادي غامق أنيق للفوتر */
-    --footer-text-color: #bdc3c7; /* لون نص فاتح يتناسب مع الخلفية الداكنة للفوتر */
-    --footer-icon-bg-hover: var(--primary-color); /* لون خلفية الأيقونة عند المرور */
-    --footer-icon-color: #ecf0f1; /* لون الأيقونات الأساسي في الفوتر */
-    --profile-red-accent: #E74C3C; /* لون أحمر مميز لصفحة الحساب */
+    --footer-bg-color: #2c3e50;
+    --footer-text-color: #bdc3c7;
+    --footer-icon-bg-hover: var(--primary-color);
+    --footer-icon-color: #ecf0f1;
+    --profile-red-accent: #E74C3C;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,40 +34,37 @@ h1, h2 { color: var(--primary-color); margin-bottom: 15px; }
 /* --- الهيدر --- */
 header {
     background-color: var(--white-color);
-    padding: 15px 0;
+    padding: 12px 0; /* تقليل الحشو قليلاً لارتفاع أقل للهيدر */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    position: fixed; /* مهم لسلوك الاختفاء/الظهور */
+    position: fixed; /* هذا يجعله ثابتاً */
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
-    transition: top 0.3s ease-in-out, background-color 0.4s ease, box-shadow 0.4s ease; /* إضافة transition لـ top */
+    /* تمت إزالة transition لـ top. يمكن إبقاء transitions أخرى إذا أردت استخدام .scrolled */
+    transition: background-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-/* كلاس جديد لإخفاء الهيدر */
-header.header-hidden {
-    top: -150px; /* قيمة أكبر من ارتفاع الهيدر لضمان اختفائه بالكامل. قد تحتاج لتعديل هذه القيمة. */
-    /* إذا كان ارتفاع الهيدر يتغير ديناميكيًا، تأكد أن هذه القيمة كافية دائمًا. */
-}
+/* تم حذف header.header-hidden لأنه لن يتم إخفاء الهيدر بعد الآن */
 
-/* القاعدة header.scrolled يمكن أن تبقى أو تعدل حسب الرغبة */
-/* يتم التحكم بها الآن من خلال JavaScript في دالة hasScrolled */
+/* (اختياري) إذا كنت لا تزال تريد تغيير طفيف في الهيدر عند التمرير (مثلاً زيادة الظل) */
+/* هذا الكلاس سيتم إضافته بواسطة JavaScript إذا قام المستخدم بالتمرير للأسفل قليلاً */
 header.scrolled {
-    background-color: rgba(255, 255, 255, 0.98);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* background-color: rgba(255, 255, 255, 0.95); */ /* مثال: تغيير طفيف في الشفافية إذا أردت */
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1); /* مثال: ظل أوضح قليلاً */
 }
 
 header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
 .logo { flex-shrink: 0; }
-.logo h1 { margin: 0; font-size: 2em; font-weight: 700; }
+.logo h1 { margin: 0; font-size: 1.8em; /* تصغير حجم اللوجو قليلاً */ font-weight: 700; }
 .logo h1 a { color: var(--primary-color); }
 .logo h1 a:hover { color: var(--secondary-color); }
 nav { flex-grow: 1; display: flex; justify-content: center; margin: 0 15px; }
 nav ul { display: flex; flex-wrap: wrap; justify-content: center; }
-nav ul li { margin: 5px 15px; }
-nav ul li a { color: var(--text-color); font-weight: bold; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; white-space: nowrap; }
+nav ul li { margin: 5px 12px; /* تقليل المسافة بين عناصر القائمة */ }
+nav ul li a { color: var(--text-color); font-weight: bold; padding-bottom: 4px; /* تقليل الحشو السفلي للخط */ border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; white-space: nowrap; font-size: 0.95em; /* تصغير خط القائمة قليلاً */ }
 nav ul li a:hover, nav ul li a.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
-.user-actions { display: flex; align-items: center; flex-wrap: nowrap; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+.user-actions { display: flex; align-items: center; flex-wrap: nowrap; justify-content: flex-end; gap: 8px; /* تقليل الفجوة */ flex-shrink: 0; }
 
 /* --- الأزرار --- */
 .btn { padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-align: center; border: none; font-size: 1em; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
@@ -75,16 +72,16 @@ nav ul li a:hover, nav ul li a.active { color: var(--primary-color); border-bott
     background-color: var(--white-color);
     color: var(--primary-color);
     border: 1px solid var(--primary-color);
-    padding: 8px 20px;
+    padding: 7px 18px; /* تصغير الحشو */
     border-radius: 20px;
-    font-size: 0.9em;
+    font-size: 0.85em; /* تصغير الخط */
 }
 .btn-register:hover {
     background-color: var(--bg-color-alt);
     color: var(--secondary-color);
     border-color: var(--secondary-color);
 }
-.btn-icon { background-color: var(--accent-color); color: var(--text-color); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5em; font-weight: bold; line-height: 1; margin-left: 10px; }
+.btn-icon { background-color: var(--accent-color); color: var(--text-color); width: 36px; /* تصغير الأيقونة */ height: 36px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.3em; font-weight: bold; line-height: 1; margin-left: 8px; }
 .btn-icon:hover { background-color: #ffca2c; transform: scale(1.1); }
 
 /* --- الهيرو --- */
@@ -98,17 +95,19 @@ nav ul li a:hover, nav ul li a.active { color: var(--primary-color); border-bott
 .main-actions .btn-secondary:hover { background-color: var(--white-color); color: var(--primary-color); }
 
 /* --- أقسام المحتوى --- */
-section { scroll-margin-top: 80px; } /* قد تحتاج لتعديل هذه إذا كان الهيدر يختفي/يظهر */
+/* scroll-margin-top يضمن أن الروابط الداخلية تتخطى الهيدر الثابت */
+section { scroll-margin-top: 70px; /* يجب أن تكون هذه القيمة أكبر أو تساوي ارتفاع الهيدر */ }
 .content-section { padding: 60px 0; text-align: center; }
 .content-section h2 { font-size: 2.5em; margin-bottom: 30px; color: var(--primary-color); }
 .content-section p { font-size: 1.1em; max-width: 800px; margin: 0 auto 20px auto; color: var(--grey-color-dark); }
 .content-section.alt-bg { background-color: var(--bg-color-alt); }
 
 /* --- عناصر الهيدر الديناميكية --- */
-.user-greeting { font-weight: bold; color: var(--text-color); white-space: nowrap; }
-.btn-logout { background-color: var(--secondary-color); color: var(--white-color); padding: 8px 18px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 0.9em; line-height: normal; }
+.user-greeting { font-weight: bold; color: var(--text-color); white-space: nowrap; font-size: 0.9em; /* تصغير خط الترحيب */ }
+.btn-logout { background-color: var(--secondary-color); color: var(--white-color); padding: 7px 16px; /* تصغير الحشو */ border-radius: 20px; border: none; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 0.85em; /* تصغير الخط */ line-height: normal; }
 .btn-logout:hover { background-color: var(--primary-color); }
-.user-actions a.btn-logout { padding: 8px 18px; text-decoration: none; }
+.user-actions a.btn-logout { padding: 7px 16px; text-decoration: none; }
+
 
 /* --- أنماط صفحة الحساب الجديدة (Logged.html - تصميم "حسابي") --- */
 main.account-main-content.new-account-layout { padding: 50px 0; background-color: var(--bg-color-alt); min-height: calc(100vh - 200px); }
@@ -155,11 +154,11 @@ main.account-main-content.new-account-layout { padding: 50px 0; background-color
 .btn-delete-account-logged:hover { background-color: var(--danger-color); color: var(--white-color); }
 
 /* --- أنماط قائمة شراء الألعاب --- */
-.games-counter-container { position: relative; display: inline-block; }
-.games-trigger-btn { background-color: #ff8c00; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; transition: background-color 0.3s ease; line-height: normal; }
+.games-counter-container { position: relative; display: inline-block; margin-left: 5px; /* إضافة مسافة طفيفة إذا لزم الأمر */}
+.games-trigger-btn { background-color: #ff8c00; color: white; padding: 7px 14px; /* تصغير الحشو */ border-radius: 20px; font-size: 0.85em; /* تصغير الخط */ cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; /* تصغير الفجوة */ transition: background-color 0.3s ease; line-height: normal; }
 .games-trigger-btn:hover { background-color: #e07b00; }
 .games-trigger-btn #remaining-games-count { font-weight: bold; }
-.games-trigger-btn .plus-icon { background-color: rgba(255, 255, 255, 0.2); border-radius: 50%; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center; font-weight: bold; line-height: 1; }
+.games-trigger-btn .plus-icon { background-color: rgba(255, 255, 255, 0.2); border-radius: 50%; width: 14px; height: 14px; display: inline-flex; justify-content: center; align-items: center; font-weight: bold; line-height: 1; font-size: 0.9em; }
 .purchase-dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 0; background-color: white; border-radius: 10px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18); padding: 20px 25px; min-width: 320px; z-index: 1001; border: 1px solid #e0e0e0; text-align: right; animation: fadeInScaleUp 0.35s cubic-bezier(0.165, 0.84, 0.44, 1); }
 .purchase-dropdown-menu.show { display: block; }
 .dropdown-title { margin-top: 0; margin-bottom: 20px; font-size: 1.2em; font-weight: 700; color: var(--primary-color); text-align: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; }
@@ -184,52 +183,52 @@ main.account-main-content.new-account-layout { padding: 50px 0; background-color
 
 /* --- الفوتر (تصميم حديث مستوحى من harperwilde.com) --- */
 footer {
-    background-color: var(--footer-bg-color); /* #2c3e50 - لون داكن */
-    color: var(--footer-text-color);         /* #bdc3c7 - لون نص فاتح */
-    padding: 50px 20px 40px 20px; /* حشو علوي وسفلي أكبر */
-    margin-top: 60px; /* مسافة أكبر فوق الفوتر */
-    font-size: 1em; /* حجم خط أساسي للفوتر */
-    border-top: 3px solid var(--primary-color); /* الحفاظ على الخط العلوي الحالي */
-    text-align: center; /* محاذاة كل محتوى الفوتر للوسط */
-    font-family: 'Cairo', sans-serif; /* التأكيد على استخدام خط كايرو */
+    background-color: var(--footer-bg-color);
+    color: var(--footer-text-color);
+    padding: 50px 20px 40px 20px;
+    margin-top: 60px;
+    font-size: 1em;
+    border-top: 3px solid var(--primary-color);
+    text-align: center;
+    font-family: 'Cairo', sans-serif;
 }
 
 .footer-container-modern {
     display: flex;
-    flex-direction: column; /* ترتيب الصفوف فوق بعضها (أيقونات، روابط، حقوق) */
-    align-items: center;    /* محاذاة كل الصفوف للوسط */
-    gap: 30px;              /* زيادة المسافة بين كل صف */
-    max-width: 800px;       /* تحديد عرض أقصى لمحتوى الفوتر لتركيز أفضل */
-    margin: 0 auto;         /* توسيط الحاوية نفسها إذا كانت الصفحة أعرض */
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .footer-icons-row {
     display: flex;
-    flex-wrap: wrap;        /* السماح بالالتفاف في الشاشات الصغيرة */
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 25px 35px; /* مسافات مرنة (عمودي أفقي) بين مجموعات الأيقونات */
+    gap: 25px 35px;
 }
 
 .social-media-icons,
 .app-store-icons {
     display: flex;
-    gap: 20px; /* تعديل المسافة بين الأيقونات الفردية قليلاً */
+    gap: 20px;
 }
 
 .app-store-icons .app-icon-link i,
 .social-media-icons .social-icon-link i {
-    font-size: 1.7em; /* حجم الأيقونة نفسها، يمكن تعديله حسب الرغبة */
+    font-size: 1.7em;
 }
 .app-store-icons .app-icon-link,
 .social-media-icons .social-icon-link {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 45px;  /* تعديل حجم خلفية الأيقونة قليلاً */
+    width: 45px;
     height: 45px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.08); /* خلفية شفافة قليلاً أغمق قليلاً */
+    background-color: rgba(255, 255, 255, 0.08);
     color: var(--footer-icon-color);
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     text-decoration: none;
@@ -247,9 +246,9 @@ footer {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 15px 30px; /* مسافة بين الروابط إذا التفّت (عمودي أفقي) */
-    font-size: 0.9em; /* خط أصغر قليلاً للروابط النصية */
-    font-weight: 400; /* وزن خط عادي (أقل بروزاً من الأيقونات) */
+    gap: 15px 30px;
+    font-size: 0.9em;
+    font-weight: 400;
 }
 
 .footer-links-row .footer-text-link,
@@ -270,40 +269,36 @@ footer {
     font-weight: 500;
     text-decoration: none;
 }
-/* إزالة الأنماط القديمة لفقرة المطور */
 p.developer-credit {
-    font-size: inherit !important; /* التأكد من إلغاء الحجم القديم */
+    font-size: inherit !important;
     color: inherit !important;
     text-align: inherit !important;
     border-bottom: none !important;
 }
-/* التأكد من إزالة الخط السفلي من رابط المطور القديم إذا كان كلاس مستخدماً */
 .developer-credit a {
     border-bottom: none !important;
-    font-weight: 500 !important; /* الحفاظ على وزن الخط إذا كان الكلاس القديم مستخدماً */
-    color: var(--accent-color) !important; /* الحفاظ على اللون إذا كان الكلاس القديم مستخدماً */
+    font-weight: 500 !important;
+    color: var(--accent-color) !important;
 }
 
 
 .footer-copyright-row {
-    font-size: 0.85em; /* خط أصغر قليلاً لحقوق النشر */
-    opacity: 0.8; /* جعل نص حقوق النشر أقل بروزاً قليلاً */
-    font-weight: 400; /* وزن خط عادي */
-    margin-top: 5px; /* تقليل المسافة فوق حقوق النشر قليلاً */
+    font-size: 0.85em;
+    opacity: 0.8;
+    font-weight: 400;
+    margin-top: 5px;
 }
 
 .footer-copyright-row p {
     margin-bottom: 0;
 }
-.footer-copyright-row sup { /* للتأكد من أن علامة ® تظهر بشكل جيد */
+.footer-copyright-row sup {
     font-size: 0.75em;
     vertical-align: super;
 }
 
-
-/* إزالة الأنماط القديمة للأعمدة إذا لم تعد مستخدمة */
 .footer-main-container {
-    display: none !important; /* إخفاء الحاوية القديمة تماماً */
+    display: none !important;
 }
 
 
@@ -322,43 +317,85 @@ p.developer-credit {
 }
 
 @media (max-width: 768px) {
-    .user-actions { flex-wrap: wrap; justify-content: center; width: 100%; margin-top: 10px; }
-    .user-actions .btn-register { padding: 8px 20px; font-size: 0.9em; }
+    header {
+        padding: 10px 0; /* تقليل حشو الهيدر أكثر للشاشات الأصغر */
+    }
+    header .container {
+        /* Allow items to wrap if they become too crowded */
+        flex-wrap: wrap;
+        justify-content: space-between; /* Keep logo left, actions right if possible */
+    }
+    .logo h1 {
+        font-size: 1.6em; /* تصغير اللوجو أكثر */
+    }
+    nav {
+        order: 3; /* Nav below logo and user-actions if they wrap */
+        width: 100%;
+        margin-top: 8px; /* مسافة أقل فوق القائمة */
+        justify-content: center; /* توسيط القائمة */
+    }
+    nav ul {
+        flex-direction: row; /* تأكد أن القائمة أفقية */
+        justify-content: center; /* توسيط عناصر القائمة */
+        gap: 5px 10px; /* مسافات بين عناصر القائمة */
+    }
+    nav ul li {
+        margin: 0; /* إزالة الهوامش الفردية، الاعتماد على gap */
+    }
+    nav ul li a {
+        font-size: 0.85em; /* تصغير خط القائمة أكثر */
+        padding: 5px 8px; /* تعديل حشو الروابط */
+    }
+
+    .user-actions {
+        order: 2; /* User actions to the right of logo (or below if wraps) */
+        flex-basis: auto; /* Allow it to shrink if needed */
+        margin-left: auto; /* Push to the right if space allows */
+        gap: 6px;
+        margin-top: 0; /* Reset margin-top if header items are on one line */
+    }
+     /* If user-actions wrap to a new line */
+    header .container > .user-actions:nth-child(3) { /* More specific selector if it's the 3rd child due to wrapping */
+        width: 100%;
+        justify-content: center;
+        margin-top: 8px;
+    }
+
+    .user-actions .btn-register,
+    .user-actions .btn-logout,
+    .user-actions a.btn-logout {
+        padding: 5px 12px;
+        font-size: 0.8em;
+    }
+    .user-greeting {
+        font-size: 0.85em;
+    }
+    .games-trigger-btn {
+        padding: 5px 10px;
+        font-size: 0.8em;
+    }
+    .games-trigger-btn .plus-icon {
+        width: 12px; height: 12px; font-size: 0.8em;
+    }
+
     .hero { padding: 60px 0; }
     .hero .game-logo-main { font-size: 3.5em; }
     .hero .slogan { font-size: 1.1em; }
     .main-actions .btn { width: 80%; margin: 10px auto; display: block; min-width: auto; }
-    section { scroll-margin-top: 80px; }
+    section { scroll-margin-top: 60px; /* تعديل ليتناسب مع ارتفاع الهيدر الجديد المحتمل */ }
     .content-section h2 { font-size: 2em; }
     .purchase-dropdown-menu { min-width: 280px; padding: 15px 20px; left: 50%; transform: translateX(-50%); top: calc(100% + 5px); }
-    .games-counter-container { margin-left: 0; }
+    /* .games-counter-container { margin-left: 0; } <-- لا حاجة له إذا كانت العناصر في user-actions تستخدم gap */
 
-    /* تجاوبية الفوتر */
-    footer {
-        padding: 40px 20px 30px 20px;
-    }
-    .footer-container-modern {
-        gap: 25px;
-    }
-    .footer-icons-row {
-        gap: 20px 25px;
-    }
+    footer { padding: 40px 20px 30px 20px; }
+    .footer-container-modern { gap: 25px; }
+    .footer-icons-row { gap: 20px 25px; }
     .app-store-icons .app-icon-link i,
-    .social-media-icons .social-icon-link i {
-        font-size: 1.6em;
-    }
+    .social-media-icons .social-icon-link i { font-size: 1.6em; }
     .app-store-icons .app-icon-link,
-    .social-media-icons .social-icon-link {
-        width: 42px;
-        height: 42px;
-    }
-    .footer-links-row {
-        font-size: 0.85em;
-        gap: 10px 20px;
-    }
-    .footer-copyright-row {
-        font-size: 0.8em;
-    }
+    .social-media-icons .social-icon-link { width: 42px; height: 42px; }
+    .footer-links-row { font-size: 0.85em; gap: 10px 20px; }
+    .footer-copyright-row { font-size: 0.8em; }
 
     .form-row { flex-direction: column; gap: 0px; }
     .form-group-logged { margin-bottom: 20px; }
@@ -369,28 +406,42 @@ p.developer-credit {
 }
 
 @media (max-width: 480px) {
-    nav ul li { margin: 5px 8px; }
-    .games-trigger-btn span:first-child { display: none; }
-    .games-trigger-btn { padding: 8px 12px; }
+    header {
+        padding: 8px 0; /* تقليل الحشو أكثر */
+    }
+    .logo h1 {
+        font-size: 1.4em; /* أصغر حجم للوجو */
+    }
+    nav ul li a {
+        font-size: 0.8em; /* أصغر خط للقائمة */
+        padding: 4px 6px;
+    }
+    .user-actions .btn-register,
+    .user-actions .btn-logout,
+    .user-actions a.btn-logout {
+        padding: 4px 10px;
+        font-size: 0.75em;
+    }
+     .user-greeting {
+        font-size: 0.8em;
+    }
+    .games-trigger-btn {
+        padding: 4px 8px;
+        font-size: 0.75em;
+    }
+    .games-trigger-btn span:first-child { display: none; /* إخفاء نص "عدد الألعاب" بالكامل */ }
+    .games-trigger-btn .plus-icon {
+        width: 14px; height: 14px; /* جعل الأيقونة أكبر قليلاً نسبةً للزر */
+    }
+
     .purchase-dropdown-menu { min-width: 90vw; left: 5%; transform: translateX(0); }
 
-    /* تجاوبية الفوتر لشاشات أصغر */
     .app-store-icons .app-icon-link,
-    .social-media-icons .social-icon-link {
-        width: 40px;
-        height: 40px;
-    }
+    .social-media-icons .social-icon-link { width: 40px; height: 40px; }
     .app-store-icons .app-icon-link i,
-    .social-media-icons .social-icon-link i {
-        font-size: 1.5em;
-    }
-    .social-media-icons, .app-store-icons {
-        gap: 15px;
-    }
-    /* .developer-credit, .copyright-text -  تم استبدالها بـ .footer-links-row و .footer-copyright-row */
-    .footer-links-row, .footer-copyright-row { /* تعديل حجم الخط إذا لزم الأمر */
-        font-size: 0.82em;
-    }
+    .social-media-icons .social-icon-link i { font-size: 1.5em; }
+    .social-media-icons, .app-store-icons { gap: 15px; }
+    .footer-links-row, .footer-copyright-row { font-size: 0.82em; }
 
     .account-sidebar { padding: 20px 15px; }
     .profile-picture-wrapper-logged { width: 100px; height: 100px; }
