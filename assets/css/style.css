@@ -1,7 +1,6 @@
+/* --- style.css --- */
 
-    /* --- style.css --- */
-
-    /* --- الإعدادات العامة والخط --- */
+/* --- الإعدادات العامة والخط --- */
 :root {
     --primary-color: #17a2b8;
     --secondary-color: #138496;
@@ -22,23 +21,9 @@
     --footer-icon-color: #ecf0f1; /* لون الأيقونات الأساسي في الفوتر */
     --profile-red-accent: #E74C3C; /* لون أحمر مميز لصفحة الحساب */
 }
-
 /* —————————————————————————————————————————————————————— */
 /* تحسين الاستجابة لملء عرض الشاشة ومنع ظهور شريط التمرير الأفقي */
-html {
-    width: 100%;
-    overflow-x: hidden;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-/* html { } -- Original empty rule, now covered by the rule above */
-body {
-    font-family: 'Cairo', sans-serif;
-    direction: rtl;
-    background-color: var(--bg-color-light);
-    color: var(--text-color);
-    line-height: 1.6;
-    /* Added from new rules: */
+html, body {
     width: 100%;
     overflow-x: hidden;
 }
@@ -49,16 +34,47 @@ body {
     max-width: 100%;
     padding: 0 1rem; /* مسافة جانبية 16px تقريباً */
 }
-a { text-decoration: none; color: var(--secondary-color); transition: color 0.3s ease; }
-a:hover { color: var(--primary-color); }
-ul { list-style: none; }
-h1, h2 { color: var(--primary-color); margin-bottom: 15px; }
+
+/* —————————————————————————————————————————————————————— */
+/* تعديل قسم الهيرو ليملأ كامل ارتفاع الشاشة، بدون نقص عند التدوير */
+.hero {
+    padding: 0;             /* إزالة الحشو الكبير */
+    min-height: 100vh;      /* ارتفاع يساوي ارتفاع الشاشة */
+    box-sizing: border-box; /* احتساب الحشو داخل الحجم */
+}
+
+/* إذا أردت مسافة عليا/سفلى للنصوص ضمن الهيرو */
+.hero .container {
+    padding: 2rem 0;
+}
 
 /* —————————————————————————————————————————————————————— */
 /* تأكد أن جميع الصور والعناصر الخلفية تمتد بعرض 100% */
 img, .hero, section, footer {
     width: 100%;
 }
+
+/* —————————————————————————————————————————————————————— */
+/* عند تدوير الجهاز للعرض (Landscape) */
+@media screen and (orientation: landscape) {
+    /* قلل الحشو داخل الأقسام لتفادي التقطيع */
+    .content-section, .content-section.alt-bg {
+        padding: 40px 1rem;
+    }
+    /* الهيرو لا يحتاج ارتفاع أكبر */
+    .hero {
+        min-height: 100vh;
+    }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { }
+body { font-family: 'Cairo', sans-serif; direction: rtl; background-color: var(--bg-color-light); color: var(--text-color); line-height: 1.6; }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+a { text-decoration: none; color: var(--secondary-color); transition: color 0.3s ease; }
+a:hover { color: var(--primary-color); }
+ul { list-style: none; }
+h1, h2 { color: var(--primary-color); margin-bottom: 15px; }
 
 /* --- الهيدر --- */
 header {
@@ -103,28 +119,7 @@ nav ul li a:hover, nav ul li a.active { color: var(--primary-color); border-bott
 .btn-icon:hover { background-color: #ffca2c; transform: scale(1.1); }
 
 /* --- الهيرو --- */
-/* —————————————————————————————————————————————————————— */
-/* تعديل قسم الهيرو ليملأ كامل ارتفاع الشاشة، بدون نقص عند التدوير */
-.hero {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #a8dadc 100%);
-    color: var(--white-color);
-    text-align: center;
-    /* padding: 100px 0; MODIFIED TO: */
-    padding: 0;
-    /* min-height: calc(100vh - 75px); MODIFIED TO: */
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    /* ADDED: */
-    box-sizing: border-box;
-}
-
-/* إذا أردت مسافة عليا/سفلى للنصوص ضمن الهيرو */
-.hero .container {
-    padding: 2rem 0; /* Combined with global .container padding: 0 1rem -> effective padding: 2rem 1rem */
-}
+.hero { background: linear-gradient(135deg, var(--primary-color) 0%, #a8dadc 100%); color: var(--white-color); text-align: center; padding: 100px 0; min-height: calc(100vh - 75px); display: flex; flex-direction: column; justify-content: center; align-items: center; }
 .hero .game-logo-main { font-size: clamp(4em, 10vw, 7em); font-weight: 700; margin-bottom: 20px; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); color: var(--white-color); }
 .hero .slogan { font-size: clamp(1.2em, 3vw, 1.8em); margin-bottom: 40px; max-width: 700px; line-height: 1.8; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15); }
 .main-actions .btn { margin: 10px; min-width: 180px; }
@@ -360,14 +355,7 @@ p.developer-credit {
 @media (max-width: 768px) {
     .user-actions { flex-wrap: wrap; justify-content: center; width: 100%; margin-top: 10px; }
     .user-actions .btn-register { padding: 8px 20px; font-size: 0.9em; }
-    .hero { padding: 60px 0; } /* This will be overridden by the main .hero padding: 0 and by landscape media query for .hero .container */
-    /* However, this general .hero padding for smaller screens might be desired if not in landscape. */
-    /* The new base .hero { padding: 0; } takes precedence over this if specific enough. */
-    /* The new .hero .container { padding: 2rem 0; } will handle inner padding. */
-    /* Let's verify if this padding: 60px 0 on .hero should be kept for <768px mobile portrait. */
-    /* Given the new .hero { padding: 0; box-sizing: border-box; } and .hero .container { padding: 2rem 0; } */
-    /* This rule here `@media (max-width: 768px) { .hero { padding: 60px 0; } }` would actually override the `padding:0` from the base .hero. */
-    /* This is likely fine as it targets smaller screens where more padding might be intended. */
+    .hero { padding: 60px 0; }
     .hero .game-logo-main { font-size: 3.5em; }
     .hero .slogan { font-size: 1.1em; }
     .main-actions .btn { width: 80%; margin: 10px auto; display: block; min-width: auto; }
@@ -444,23 +432,4 @@ p.developer-credit {
     .country-code-select-logged { flex-basis: 120px !important; font-size: 0.9em; }
     .form-group-logged input, .form-group-logged select { font-size: 0.95em; padding: 10px 12px; }
     .tab-link { font-size: 0.9em; padding: 10px 10px; }
-}
-
-/* —————————————————————————————————————————————————————— */
-/* عند تدوير الجهاز للعرض (Landscape) */
-@media screen and (orientation: landscape) {
-    /* قلل الحشو داخل الأقسام لتفادي التقطيع */
-    .content-section, .content-section.alt-bg {
-        padding: 40px 1rem;
-    }
-    /* الهيرو لا يحتاج ارتفاع أكبر */
-    .hero {
-        min-height: 100vh; /* Reinforces the main style, no conflict */
-        /* padding: 0; /* This is already the base style */
-    }
-    /* .hero .container specific padding for landscape could be added here if needed,
-       but current .hero .container { padding: 2rem 0; } might be fine.
-       The global .container padding: 0 1rem; will provide side padding.
-       So effective padding of .hero .container is 2rem (top/bottom) and 1rem (left/right).
-    */
 }
