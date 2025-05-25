@@ -1,3 +1,4 @@
+/* --- START OF FILE assets/css/game.css (مُعدل بناءً على الكود الأصلي مع التركيز على WebView Landscape) --- */
 
 :root {
     /* تعريف متغيرات الألوان لتسهيل التعديل */
@@ -147,11 +148,11 @@ footer .container {
 .path-display li.completed-path-station { background-color: #e9ecef; color: var(--grey-color-dark); opacity: 0.75; border-color: #ced4da; } .path-display li.completed-path-station::before { background-color: var(--success-color); }
 .path-display li.current-path-station { background-color: var(--accent-color); color: var(--black-color); font-weight: 700; border-color: #e0a800; box-shadow: 0 2px 4px rgba(0,0,0,0.08); opacity: 1; } .path-display li.current-path-station::before { background-color: var(--primary-color); color: white; }
 
-/* --- العمود الأول (يسار): منطقة السؤال والتفاعل (الأنماط المعدلة لتحسين مكان الوقت والزر) --- */
+/* --- العمود الأول (يسار): منطقة السؤال والتفاعل (الأنماط المعدلة للحفاظ على مكان الوقت وإعادة الزر لمكانه الأصلي) --- */
 #question-timer {
     position: absolute;
-    top: 12px; /* تعديل الموقع العلوي ليكون متناسقًا داخل المربع */
-    left: 12px; /* تعديل الموقع الأيسر */
+    top: 12px; /* الموقع العلوي ليكون متناسقًا داخل المربع */
+    left: 12px; /* الموقع الأيسر */
     background-color: var(--black-color);
     color: var(--white-color);
     padding: 6px 12px;
@@ -167,7 +168,7 @@ footer .container {
 }
 
 #question-interaction-area h3 {
-    margin-top: 40px; /* إضافة هامش علوي لتجنب التداخل مع الوقت والزر */
+    margin-top: 40px; /* هامش علوي لتجنب التداخل مع الوقت */
     margin-bottom: 8px;
     color: var(--primary-color);
     font-size: 1.5em;
@@ -274,12 +275,11 @@ footer .container {
 }
 
 #reveal-answer-btn {
-    position: absolute;
-    top: 12px; /* نفس الموقع العلوي للوقت للتناسق */
-    right: 12px; /* وضعه أعلى يمين */
-    width: auto; /* تصغير العرض */
-    padding: 8px 16px; /* تصغير الحشو */
-    font-size: 1em; /* تصغير حجم الخط */
+    display: block;
+    width: 70%; /* العودة إلى العرض الأصلي */
+    margin: 10px auto 0 auto; /* العودة إلى الموقع الأصلي متمركزًا */
+    padding: 12px 18px; /* العودة إلى الحشو الأصلي */
+    font-size: 1.15em; /* العودة إلى حجم الخط الأصلي */
     background-color: var(--accent-color);
     color: var(--black-color);
     border: none;
@@ -691,7 +691,7 @@ footer .container {
     #question-text { font-size: 1em; margin-bottom: 6px; line-height: 1.2; }
     #answer-options { grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 6px; }
     .option-btn { font-size: 0.85em; padding: 6px 8px; }
-    #reveal-answer-btn { top: 8px; right: 8px; padding: 5px 10px; font-size: 0.9em; }
+    #reveal-answer-btn { width: 90%; padding: 5px 8px; font-size: 0.95em; }
     #answer-reveal-section { padding: 5px 8px; margin-top: 6px; }
     .correct-answer-display { font-size: 0.85em; margin-bottom: 6px; padding: 3px; }
     .assign-points-prompt { font-size: 0.75em; margin-bottom: 5px; }
