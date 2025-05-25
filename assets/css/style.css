@@ -4,19 +4,19 @@
 :root {
     --primary-color: #17a2b8;
     --secondary-color: #138496;
-    --accent-color: #ffc107; /* لون مميز وجذاب */
+    --accent-color: #ffc107;
     --bg-color-light: #f8f9fa;
     --bg-color-alt: #e9ecef;
     --text-color: #343a40;
-    --text-color-light: #495057; /* لون نص أفتح قليلاً للمحتوى الثانوي */
+    --text-color-light: #495057;
     --white-color: #ffffff;
     --grey-color-light: #dee2e6;
-    --grey-color-medium: #ced4da; /* درجة أغمق قليلاً من الرمادي الفاتح */
+    --grey-color-medium: #ced4da;
     --grey-color-dark: #6c757d;
     --danger-color: #dc3545;
     --success-color: #28a745;
-    --info-color: #0dcaf0; /* لون سماوي إضافي للمعلومات */
-    --purchase-highlight-bg: #e7f5ff; /* خلفية مميزة للعنصر المختار في قائمة الشراء */
+    --info-color: #0dcaf0;
+    --purchase-highlight-bg: #e7f5ff;
     --purchase-highlight-border: var(--primary-color);
 
     --footer-bg-color: #2c3e50;
@@ -25,85 +25,83 @@
     --footer-icon-color: #ecf0f1;
     --profile-red-accent: #E74C3C;
 
-    --header-height-desktop: 65px; /* ارتفاع تقريبي للهيدر على سطح المكتب */
-    --header-height-mobile: 55px;  /* ارتفاع تقريبي للهيدر على الهواتف */
+    --header-height-desktop: 60px; /* تم تقليل ارتفاع الهيدر قليلاً */
+    --header-height-mobile: 50px;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html {
-    scroll-behavior: smooth;
-    overflow-x: hidden;
-}
+html { scroll-behavior: smooth; overflow-x: hidden; }
 body {
     font-family: 'Cairo', sans-serif;
     direction: rtl;
     background-color: var(--bg-color-light);
     color: var(--text-color);
-    line-height: 1.7; /* زيادة طفيفة لتباعد الأسطر لراحة القراءة */
+    line-height: 1.65; /* تعديل طفيف */
     width: 100%;
     overflow-x: hidden;
-    font-size: 16px; /* حجم خط أساسي للجسم */
+    font-size: 15px; /* تعديل حجم الخط الأساسي قليلاً */
 }
-.container {
-    max-width: 1140px; /* تعديل العرض الأقصى قليلاً */
-    margin: 0 auto;
-    padding: 0 15px;
-}
-a { text-decoration: none; color: var(--secondary-color); transition: color 0.25s ease-in-out; }
+.container { max-width: 1140px; margin: 0 auto; padding: 0 15px; }
+a { text-decoration: none; color: var(--secondary-color); transition: color 0.2s ease-in-out; } /* تسريع الانتقال قليلاً */
 a:hover { color: var(--primary-color); }
 ul { list-style: none; }
-h1, h2, h3, h4, h5, h6 { color: var(--primary-color); margin-bottom: 0.75em; font-weight: 700; } /* تعديل الهامش السفلي للعناوين */
-p { margin-bottom: 1em; color: var(--text-color-light); }
+h1, h2, h3, h4, h5, h6 { color: var(--primary-color); margin-bottom: 0.7em; font-weight: 700; line-height: 1.3; } /* تعديل ارتفاع الخط للعناوين */
+p { margin-bottom: 0.9em; color: var(--text-color-light); }
 
 /* --- الهيدر --- */
 header {
     background-color: var(--white-color);
-    padding: 0; /* إزالة الحشو من الهيدر نفسه، سيتم التحكم به عبر الحاوية الداخلية */
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); /* ظل أنعم */
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    border-bottom: 1px solid var(--grey-color-light); /* إضافة خط سفلي خفيف */
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06); /* ظل أنعم وأخف */
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    border-bottom: 1px solid #f0f0f0; /* خط سفلي خفيف جداً */
+    position: sticky; /*  <--- تعديل مهم: جعل الهيدر يلتصق بالأعلى عند التمرير */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000; /* للتأكد أنه فوق العناصر الأخرى */
 }
-header.scrolled {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
+/* بما أن الهيدر أصبح sticky، لم نعد بحاجة لكلاس .scrolled لهذا الغرض */
+/* header.scrolled { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); } */
+
 header .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: nowrap;
     gap: 10px;
-    height: var(--header-height-desktop); /* استخدام متغير لارتفاع الهيدر */
+    height: var(--header-height-desktop);
 }
 
-.logo { flex-shrink: 0; margin-left: 15px; /* مسافة لليمين (في RTL) من القائمة */ }
-.logo h1 { margin: 0; font-size: 1.9em; font-weight: 700; line-height: 1; } /* التأكد من عدم وجود ارتفاع إضافي */
-.logo h1 a { color: var(--primary-color); display: block; /* لجعل الهامش يعمل بشكل صحيح */ }
+.logo { flex-shrink: 0; margin-left: 10px; /* تقليل المسافة قليلاً */ }
+.logo h1 { margin: 0; font-size: 1.8em; /* تعديل طفيف */ font-weight: 700; line-height: 1; }
+.logo h1 a { color: var(--primary-color); display: block; }
 
 nav {
     flex-grow: 1;
     display: flex;
-    justify-content: center; /* توسيط القائمة */
-    margin: 0 auto; /* توسيط القائمة إذا كان هناك مساحة إضافية */
-    overflow: visible; /* السماح بظهور أي قوائم منسدلة فرعية مستقبلاً */
+    justify-content: center;
+    margin: 0 auto;
+    overflow: hidden; /* تغيير إلى hidden لمنع التجاوز إذا كانت الروابط كثيرة جداً */
 }
-nav ul { display: flex; flex-wrap: nowrap; justify-content: center; gap: 0 15px; /* زيادة المسافة بين عناصر القائمة قليلاً */ }
+nav ul { display: flex; flex-wrap: nowrap; justify-content: center; gap: 0 12px; /* تعديل المسافة */ }
 nav ul li { margin: 0; }
 nav ul li a {
-    color: var(--text-color);
-    font-weight: 600; /* وزن خط أثقل قليلاً */
-    padding: 8px 10px; /* تعديل الحشو ليتناسب مع ارتفاع الهيدر */
-    border-bottom: 3px solid transparent;
+    color: var(--text-color-light); /* لون أفتح قليلاً لعناصر القائمة غير النشطة */
+    font-weight: 600;
+    padding: 6px 9px; /* تعديل الحشو */
+    border-bottom: 2.5px solid transparent; /* إطار سفلي أسمك قليلاً للتمييز */
     transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
     white-space: nowrap;
-    font-size: 0.95em;
+    font-size: 0.9em;
     display: block;
-    border-radius: 4px 4px 0 0; /* استدارة طفيفة للحواف العلوية عند التمرير */
+    border-radius: 3px 3px 0 0;
 }
 nav ul li a:hover,
 nav ul li a.active {
     color: var(--primary-color);
     border-bottom-color: var(--primary-color);
-    background-color: rgba(23, 162, 184, 0.05); /* خلفية خفيفة عند التمرير أو النشاط */
+    /* background-color: rgba(23, 162, 184, 0.03); /* خلفية خفيفة جداً */
 }
 
 .user-actions {
@@ -111,131 +109,117 @@ nav ul li a.active {
     align-items: center;
     flex-wrap: nowrap;
     justify-content: flex-end;
-    gap: 8px; /* مسافة محسنة بين الأزرار */
+    gap: 8px;
     flex-shrink: 0;
-    margin-right: 15px; /* مسافة لليسار (في RTL) من القائمة */
+    margin-right: 10px; /* تقليل المسافة قليلاً */
 }
 
 /* --- الأزرار --- */
-.btn { padding: 9px 22px; border-radius: 22px; /* استدارة أكثر نعومة */ font-weight: 600; cursor: pointer; transition: all 0.25s ease-in-out; text-align: center; border: none; font-size: 0.85em; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; letter-spacing: 0.5px; /* تباعد خفيف بين الأحرف */ }
+.btn { padding: 8px 18px; /* تعديل طفيف */ border-radius: 20px; font-weight: 600; letter-spacing: 0.3px; /* تعديل طفيف */ }
 .btn-register {
     background-color: var(--white-color);
     color: var(--primary-color);
-    border: 1.5px solid var(--primary-color); /* إطار أسمك قليلاً */
-    padding: 7px 18px;
+    border: 1.5px solid var(--primary-color);
+    padding: 5px 14px; /* تعديل طفيف */
     font-size: 0.75em;
 }
-.btn-register:hover { background-color: var(--primary-color); color: var(--white-color); transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+.btn-register:hover { background-color: var(--primary-color); color: var(--white-color); transform: translateY(0); box-shadow: 0 1px 3px rgba(0,0,0,0.08); } /* تعديل تأثير Hover */
 
 /* --- الهيرو (Hero Section) --- */
-.hero { background: linear-gradient(135deg, var(--primary-color) 0%, #a8dadc 100%); color: var(--white-color); text-align: center; padding: 90px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.hero { padding: 80px 20px; /* تعديل طفيف */ }
+.hero .slogan {
+    color: var(--white-color); /*  <--- جعل لون الخط أبيض */
+    font-size: clamp(1em, 2.8vw, 1.5em); /* تعديل طفيف */
+    margin-bottom: 30px;
+    max-width: 620px; /* تعديل طفيف */
+    line-height: 1.7; /* تعديل طفيف */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2); /* تعديل الظل */
+}
+/* (بقية أنماط الهيرو كما هي) */
 .hero .game-logo-main { font-size: clamp(3.2em, 9vw, 5.5em); font-weight: 700; margin-bottom: 18px; text-shadow: 1px 1px 3px rgba(0,0,0,0.15); }
-.hero .slogan { font-size: clamp(1.05em, 2.8vw, 1.5em); margin-bottom: 30px; max-width: 600px; line-height: 1.65; }
-.main-actions .btn-play { /* تم الحفاظ على الشكل الأصلي كما هو مطلوب */
+.main-actions .btn { margin: 8px; }
+.main-actions .btn-play {
     background-color: var(--accent-color); color: var(--text-color); font-size: 1.2em; padding: 12px 35px; border: 2px solid var(--accent-color); border-radius: 25px; min-width: 180px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-.main-actions .btn-play:hover { background-color: #f5b000; /* أصفر أغمق قليلاً عند التمرير */ border-color: #f5b000; transform: translateY(-2px) scale(1.02); box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3); }
+.main-actions .btn-play:hover { background-color: #f5b000; border-color: #f5b000; transform: translateY(-2px) scale(1.02); box-shadow: 0 5px 15px rgba(255, 193, 7, 0.3); }
+
 
 /* --- أقسام المحتوى --- */
-.content-section { padding: 50px 0; text-align: center; }
-.content-section h2 { font-size: 2em; /* تصغير درجة */ margin-bottom: 20px; }
-.content-section p { font-size: 0.95em; /* تصغير درجة */ max-width: 700px; margin: 0 auto 15px auto; }
+.content-section { padding: 45px 0; /* تعديل طفيف */ }
+.content-section h2 { font-size: 1.9em; /* تصغير درجة */ margin-bottom: 18px; }
+.content-section p { font-size: 0.9em; /* تصغير درجة */ max-width: 680px; margin: 0 auto 14px auto; }
 
 /* --- عناصر الهيدر الديناميكية --- */
 .user-greeting { font-weight: 600; color: var(--text-color); white-space: nowrap; font-size: 0.8em; }
-.btn-logout { background-color: var(--secondary-color); color: var(--white-color); padding: 7px 15px; border-radius: 18px; font-size: 0.75em; }
-.btn-logout:hover { background-color: var(--primary-color); transform: translateY(-1px); }
-.user-actions a.btn-logout { /* لزر "حسابي" */ padding: 7px 15px; text-decoration: none; background-color: var(--primary-color); }
+.btn-logout { background-color: var(--secondary-color); color: var(--white-color); padding: 6px 12px; /* تعديل طفيف */ border-radius: 16px; font-size: 0.75em; }
+.btn-logout:hover { background-color: var(--primary-color); transform: translateY(0); /* إزالة التحريك الطفيف */ }
+.user-actions a.btn-logout { padding: 6px 12px; text-decoration: none; background-color: var(--primary-color); }
 .user-actions a.btn-logout:hover { background-color: var(--secondary-color); }
 
-/* --- أنماط قائمة شراء الألعاب --- */
+/* --- أنماط قائمة شراء الألعاب (تم إعادة تصميمها بشكل احترافي) --- */
 .games-counter-container { position: relative; display: inline-block; }
 .games-trigger-btn {
-    background-color: var(--accent-color); /* استخدام اللون المميز */
+    background-color: var(--accent-color);
     color: var(--text-color);
-    padding: 7px 14px;
-    border-radius: 18px;
+    padding: 6px 12px;
+    border-radius: 16px; /* استدارة أنعم */
     font-size: 0.75em;
-    font-weight: 700; /* خط أثقل */
+    font-weight: 700;
     cursor: pointer;
     border: none;
     display: inline-flex;
     align-items: center;
     gap: 5px;
     transition: all 0.2s ease-in-out;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
 }
-.games-trigger-btn:hover { background-color: #f5b000; transform: translateY(-1px); box-shadow: 0 3px 7px rgba(0,0,0,0.15); }
-.games-trigger-btn #remaining-games-count { font-weight: 700; }
-.games-trigger-btn .plus-icon { background-color: rgba(0,0,0, 0.1); border-radius: 50%; width: 14px; height: 14px; font-size: 0.85em; line-height: 14px; color: var(--text-color); }
+.games-trigger-btn:hover { background-color: #f5b000; transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.12); }
+.games-trigger-btn #remaining-games-count { font-weight: 700; margin-right: 2px; /* مسافة طفيفة */ }
+.games-trigger-btn .plus-icon { background-color: rgba(0,0,0, 0.12); border-radius: 50%; width: 13px; height: 13px; font-size: 0.8em; line-height: 13px; color: var(--text-color); }
 
 .purchase-dropdown-menu {
     display: none;
     position: absolute;
-    top: calc(100% + 10px); /* مسافة أفضل من الزر */
+    top: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
     background-color: var(--white-color);
-    border-radius: 10px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0,0,0,0.05); /* ظل أنعم وحدود خفيفة */
-    padding: 18px; /* حشو داخلي متوازن */
-    min-width: 300px; /* عرض أدنى مناسب */
-    max-width: calc(100vw - 30px); /* لا تتجاوز عرض الشاشة */
+    border-radius: 8px; /* استدارة أقل حدة */
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0,0,0,0.04); /* ظل أنعم وحدود أخف */
+    padding: 16px; /* حشو داخلي أنظف */
+    min-width: 290px; /* عرض مناسب */
+    max-width: calc(100vw - 20px);
     z-index: 1001;
     text-align: right;
-    animation: fadeInScaleUp 0.25s cubic-bezier(0.25, 0.1, 0.25, 1);
+    animation: fadeInScaleUp 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 .purchase-dropdown-menu.show { display: block; }
 .dropdown-title {
-    margin-top: 0;
-    margin-bottom: 18px;
-    font-size: 1.15em; /* خط أكبر قليلاً للعنوان */
-    font-weight: 700;
-    color: var(--primary-color);
-    text-align: center;
-    border-bottom: 1px solid var(--grey-color-light);
-    padding-bottom: 12px;
+    margin-top: 0; margin-bottom: 15px; font-size: 1.1em; font-weight: 600; color: var(--text-color); text-align: center; border-bottom: 1px solid #eaeaea; padding-bottom: 10px;
 }
-.purchase-options-list { list-style: none; padding: 0; margin: 0 0 18px 0; }
+.purchase-options-list { list-style: none; padding: 0; margin: 0 0 15px 0; }
 .purchase-option {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 10px; /* حشو أفضل للخيارات */
-    border-radius: 6px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
-    border: 1.5px solid var(--grey-color-light);
-    background-color: var(--white-color);
+    display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 5px; margin-bottom: 6px; cursor: pointer; transition: background-color 0.15s ease, border-color 0.15s ease; border: 1px solid var(--grey-color-light); background-color: var(--white-color);
 }
-.purchase-option:hover { background-color: #f9f9f9; border-color: var(--grey-color-medium); transform: scale(1.01); }
-.purchase-option.selected { background-color: var(--purchase-highlight-bg); border-color: var(--purchase-highlight-border); font-weight: 600; }
-.purchase-option.selected .price { color: var(--primary-color); }
-.purchase-option span:first-child { font-size: 0.9em; color: var(--text-color); }
-.purchase-option .price { color: var(--secondary-color); font-weight: 700; white-space: nowrap; margin-right: 12px; font-size: 0.95em; }
+.purchase-option:hover { background-color: #f7f9fc; border-color: var(--grey-color-medium); }
+.purchase-option.selected { background-color: var(--purchase-highlight-bg); border-color: var(--purchase-highlight-border); }
+.purchase-option.selected span:first-child { color: var(--primary-color); font-weight: 600; }
+.purchase-option.selected .price { color: var(--primary-color); font-weight: 700; }
+.purchase-option span:first-child { font-size: 0.85em; color: var(--text-color-light); }
+.purchase-option .price { color: var(--secondary-color); font-weight: 600; white-space: nowrap; margin-right: 10px; font-size: 0.9em; }
 
-.promo-section { display: flex; flex-direction: column; /* عمودي دائماً أفضل للشاشات الصغيرة */ gap: 8px; margin-bottom: 18px; align-items: stretch; }
-.promo-section input[type="text"] {
-    flex-grow: 1; padding: 9px 12px; border: 1.5px solid var(--grey-color-medium); border-radius: 6px; font-size: 0.9em; transition: border-color 0.2s, box-shadow 0.2s;
-}
-.promo-section input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2.5px rgba(23, 162, 184, 0.2); outline: none; }
-.promo-section button {
-    padding: 9px 15px; background-color: var(--secondary-color); color: var(--white-color); border-radius: 6px; font-size: 0.85em; font-weight: 600;
-}
-.promo-section button:hover { background-color: var(--primary-color); }
-.promo-status-feedback { font-size: 0.8em !important; margin-top: -10px !important; margin-bottom: 12px !important; text-align: center; font-weight: 600; }
+.promo-section { display: flex; flex-direction: column; gap: 6px; margin-bottom: 15px; align-items: stretch; }
+.promo-section input[type="text"] { padding: 8px 10px; border: 1px solid var(--grey-color-medium); border-radius: 5px; font-size: 0.85em; }
+.promo-section button { padding: 8px 12px; background-color: var(--secondary-color); color: var(--white-color); border-radius: 5px; font-size: 0.8em; font-weight: 600; }
+.promo-status-feedback { font-size: 0.75em !important; margin-top: -8px !important; margin-bottom: 10px !important; text-align: center; font-weight: 600; }
 
-.total-section { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; margin-bottom: 15px; border-top: 1px solid var(--grey-color-light); border-bottom: 1px solid var(--grey-color-light); font-size: 1.05em; }
+.total-section { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; margin-bottom: 12px; border-top: 1px solid #eaeaea; border-bottom: 1px solid #eaeaea; font-size: 1em; }
 .total-section span { color: var(--text-color-light); }
 #total-price-display { color: var(--success-color); font-weight: 700; }
-#pay-now-btn {
-    width: 100%; padding: 12px; font-size: 1.05em; font-weight: 700; background-color: var(--success-color); color: var(--white-color); border: none; border-radius: 6px; box-shadow: 0 2px 5px rgba(40,167,69,0.2);
-}
-#pay-now-btn:hover:not(:disabled) { background-color: #218838; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
-#pay-now-btn:disabled { background-color: var(--grey-color-medium); cursor: not-allowed; box-shadow: none; }
+#pay-now-btn { width: 100%; padding: 10px; font-size: 1em; font-weight: 600; background-color: var(--success-color); color: var(--white-color); border: none; border-radius: 5px; box-shadow: 0 1px 3px rgba(40,167,69,0.15); }
 
-/* (بقية ملف CSS كما هو من أنماط صفحة الحساب والفوتر...) */
+
+/* (بقية ملف CSS لأنماط صفحة الحساب والفوتر تبقى كما هي من النسخة السابقة) */
 main.account-main-content.new-account-layout { padding: 50px 0; background-color: var(--bg-color-alt); min-height: calc(100vh - 150px); }
 .account-page-container { display: flex; background-color: var(--white-color); border-radius: 15px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); overflow: hidden; max-width: 1000px; margin: 0 auto; }
 .account-sidebar { flex: 0 0 280px; background-color: #fdfdfd; padding: 30px 25px; display: flex; flex-direction: column; align-items: center; text-align: center; border-left: 1px solid var(--grey-color-light); }
@@ -284,17 +268,17 @@ footer { background-color: var(--footer-bg-color); color: var(--footer-text-colo
 .footer-icons-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 20px 30px; }
 .social-media-icons, .app-store-icons { display: flex; gap: 18px; }
 .app-store-icons .app-icon-link i, .social-media-icons .social-icon-link i { font-size: 1.6em; }
-.app-store-icons .app-icon-link, .social-media-icons .social-icon-link { width: 42px; height: 42px; } /* Kept from previous as it's reasonable */
+.app-store-icons .app-icon-link, .social-media-icons .social-icon-link { width: 42px; height: 42px; }
 .footer-links-row { font-size: 0.85em; gap: 12px 25px; }
 .footer-copyright-row { font-size: 0.8em; margin-top: 0; }
 
 
 /* --- تجاوبية --- */
 @media (max-width: 992px) { /* للأجهزة اللوحية وما دون */
-    header .container { height: auto; min-height: var(--header-height-mobile); flex-wrap: wrap; } /* السماح بالالتفاف إذا لزم الأمر */
-    .logo { margin-left: 0; /* إزالة الهامش للسماح بالتوسيط إذا لزم الأمر */ }
+    header .container { height: auto; min-height: var(--header-height-mobile); flex-wrap: wrap; }
+    .logo { margin-left: 0; }
     nav { order: 3; width: 100%; margin-top: 5px; justify-content: center; }
-    .user-actions { order: 2; min-width: auto; margin-right: 0; /* إزالة الهامش للسماح بالتوسيط إذا لزم الأمر */ }
+    .user-actions { order: 2; min-width: auto; margin-right: 0; }
 
     .account-page-container { flex-direction: column; }
     .account-sidebar { flex: 0 0 auto; width: 100%; border-left: none; border-bottom: 1px solid var(--grey-color-light); padding: 20px; }
@@ -304,37 +288,41 @@ footer { background-color: var(--footer-bg-color); color: var(--footer-text-colo
     .tab-nav { justify-content: center; }
 }
 
-@media (max-width: 768px) { /* للهواتف بالعرض الرأسي */
+@media (max-width: 768px) { /* للهواتف بالعرض الرأسي، أو الأجهزة اللوحية الصغيرة */
+    body { font-size: 14px; /* تصغير الخط الأساسي قليلاً */ }
     .container { padding: 0 10px; }
-    header { padding: 5px 0; } /* تقليل الحشو الكلي للهيدر */
+    header { padding: 0; /* إزالة الحشو من الهيدر، نعتمد على حاوية .container */ }
     header .container {
-        justify-content: space-between; /* محاولة للحفاظ على اللوجو يساراً والأزرار يميناً */
-        gap: 8px;
-        height: var(--header-height-mobile);
+        flex-wrap: wrap; /* السماح بالالتفاف */
+        justify-content: space-between;
+        gap: 5px;
+        height: auto; /* الارتفاع يتحدد بالمحتوى */
+        min-height: var(--header-height-mobile);
+        padding: 5px 0; /* حشو داخلي للحاوية */
     }
-    .logo { flex-basis: auto; text-align: right; margin-bottom: 0; }
-    .logo h1 { font-size: 1.6em; }
-    nav { order: 1; flex-basis: auto; margin: 0; flex-grow: 1; justify-content: center; /* توسيط القائمة بين اللوجو والأزرار */ }
-    nav ul { justify-content: center; gap: 0 6px; }
+    .logo { flex-basis: auto; text-align: right; margin-bottom: 0; flex-grow: 1; /* السماح للوجو بأخذ بعض المساحة */ }
+    .logo h1 { font-size: 1.5em; }
+    nav { order: 3; flex-basis: 100%; margin-top: 5px; justify-content: center; } /* القائمة تحت */
+    nav ul { gap: 0 6px; }
     nav ul li a { font-size: 0.8em; padding: 4px 5px; }
-    .user-actions { order: 3; flex-basis: auto; justify-content: flex-end; margin-top: 0; gap: 5px; }
+    .user-actions { order: 2; flex-basis: auto; justify-content: flex-end; margin-top: 0; gap: 5px; }
 
-    .user-greeting { display: none; } /* إخفاء الترحيب على الهواتف لتوفير مساحة */
+    .user-greeting { display: none; }
     .user-actions .btn-register,
     .user-actions .btn-logout,
-    .user-actions a.btn-logout { padding: 4px 8px; font-size: 0.65em; }
-    .games-trigger-btn { padding: 4px 8px; font-size: 0.7em; }
-    .games-trigger-btn .plus-icon { width: 10px; height: 10px; font-size: 0.6em; }
+    .user-actions a.btn-logout { padding: 4px 8px; font-size: 0.7em; }
+    .games-trigger-btn { padding: 4px 8px; font-size: 0.75em; /* الحفاظ على وضوح زر الألعاب */ }
+    .games-trigger-btn .plus-icon { width: 10px; height: 10px; font-size: 0.65em; }
 
-    .hero { padding: 35px 15px; }
-    .hero .game-logo-main { font-size: 2.5em; }
-    .hero .slogan { font-size: 0.9em; }
-    .main-actions .btn-play { font-size: 1em; padding: 10px 25px; min-width: 150px;}
+    .hero { padding: 30px 15px; }
+    .hero .game-logo-main { font-size: 2.6em; }
+    .hero .slogan { font-size: 0.95em; }
+    .main-actions .btn-play { font-size: 1em; padding: 10px 25px; min-width: auto; width: 80%; max-width: 280px; /* عرض أقصى للزر */ }
 
-    .content-section h2 { font-size: 1.6em; /* تصغير درجة إضافية */ }
-    .content-section p { font-size: 0.9em; /* تصغير درجة إضافية */ }
+    .content-section h2 { font-size: 1.6em; }
+    .content-section p { font-size: 0.9em; }
 
-    .purchase-dropdown-menu { min-width: calc(100vw - 20px); max-width: calc(100vw - 20px); padding: 12px; left: 10px; transform: none; right: 10px; }
+    .purchase-dropdown-menu { min-width: calc(100vw - 30px); max-width: calc(100vw - 30px); padding: 10px; left: 15px; right: 15px; transform: none; }
     .dropdown-title { font-size: 1em; }
 
     .form-row { flex-direction: column; gap: 0px; }
@@ -342,63 +330,55 @@ footer { background-color: var(--footer-bg-color); color: var(--footer-text-colo
 }
 
 /* استهداف العرض الأفقي للهواتف بشكل خاص */
-@media (max-height: 480px) and (min-width: 568px) and (orientation: landscape) {
-    body { font-size: 14px; /* تصغير الخط الأساسي قليلاً في الوضع الأفقي */ }
+@media (max-height: 500px) and (min-width: 568px) and (orientation: landscape) {
+    body { font-size: 13px; /* تصغير إضافي للخط الأساسي */ }
     .container { padding: 0 8px; }
-    header { padding: 4px 0; }
-    header .container { gap: 4px; height: calc(var(--header-height-mobile) - 10px); /* تقليل ارتفاع الهيدر أكثر */ }
-    .logo h1 { font-size: 1.2em; }
-    nav { margin: 0 2px; min-width: 0; } /* السماح للقائمة بالتقلص */
-    nav ul { gap: 0 4px; }
-    nav ul li a { font-size: 0.6em; padding: 3px; }
-    .user-actions { gap: 3px; }
-    /* زر عدد الألعاب: الحفاظ عليه واضحاً */
-    .games-trigger-btn {
-        padding: 5px 8px; /* حشو معقول */
-        font-size: 0.7em; /* خط واضح */
-        font-weight: 700;
-        border-radius: 15px;
-        line-height: 1.2; /* تحسين ارتفاع الخط */
+    header { padding: 0; }
+    header .container {
+        flex-wrap: nowrap !important;
+        gap: 5px; /* زيادة المسافة قليلاً لتجنب الالتصاق الشديد */
+        height: calc(var(--header-height-mobile) - 12px); /* تقليل ارتفاع الهيدر أكثر */
+        padding: 0 8px; /* حشو للحاوية الداخلية */
     }
-    .games-trigger-btn #remaining-games-count {
-        /* لا حاجة لإخفاء الرقم إذا كان الزر بحجم جيد */
+    .logo { margin-left: 0; flex-shrink: 0; /* منع اللوجو من التقلص بشكل مفرط */ }
+    .logo h1 { font-size: 1.25em; /* حجم معقول للوجو */ }
+    nav {
+        flex-grow: 1; /* القائمة تأخذ المساحة المتبقية */
+        min-width: 0; /* السماح للقائمة بالتقلص */
+        margin: 0 5px; /* مسافة بين اللوجو/الأزرار والقائمة */
+        justify-content: center; /* توسيط القائمة إذا أمكن */
     }
-    .games-trigger-btn span:not(.plus-icon):not(#remaining-games-count) {
-        display: none; /* إخفاء نص "عدد الألعاب:" لتوفير مساحة */
-    }
-    .games-trigger-btn .plus-icon { width: 9px; height: 9px; font-size: 0.65em; }
+    nav ul { justify-content: center; gap: 0 5px; } /* توسيط وتعديل المسافة */
+    nav ul li a { font-size: 0.7em; /* خط صغير للقائمة */ padding: 3px 4px; }
+    .user-actions { flex-shrink: 0; /* منع أزرار المستخدم من التقلص المفرط */ gap: 4px; margin-right: 0; }
 
+    .user-greeting { display: none !important; }
     .user-actions .btn-register,
     .user-actions .btn-logout,
-    .user-actions a.btn-logout { padding: 3px 6px; font-size: 0.6em; border-radius: 10px; }
-
-    /* القائمة المنسدلة لشراء الألعاب في العرض الأفقي */
-    .purchase-dropdown-menu {
-        min-width: 220px; /* عرض أدنى مناسب */
-        max-width: 280px; /* عرض أقصى معقول */
-        padding: 12px; /* حشو متوازن */
-        top: calc(100% + 5px); /* مسافة جيدة من الزر */
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    .user-actions a.btn-logout { padding: 3px 7px; font-size: 0.65em; border-radius: 10px; }
+    .games-trigger-btn {
+        padding: 4px 7px; /* تعديل ليكون أوضح */
+        font-size: 0.7em; /* تعديل ليكون أوضح */
+        border-radius: 12px;
     }
-    .dropdown-title { font-size: 1em; margin-bottom: 10px; padding-bottom: 6px; }
-    .purchase-options-list { margin-bottom: 10px; }
-    .purchase-option { padding: 8px 10px; margin-bottom: 6px; border-radius: 5px;}
-    .purchase-option span:first-child { font-size: 0.8em; }
-    .purchase-option .price { font-size: 0.85em; }
-    .promo-section { flex-direction: column; gap: 6px; margin-bottom: 10px; }
-    .promo-section input[type="text"], .promo-section button { font-size: 0.8em; padding: 7px 9px; }
-    .total-section { font-size: 0.9em; padding: 8px 0; margin-bottom: 10px; }
-    #pay-now-btn { font-size: 0.95em; padding: 9px; }
+    .games-trigger-btn span:not(.plus-icon):not(#remaining-games-count) { display: none !important; }
+    .games-trigger-btn #remaining-games-count { font-size: 0.9em; /* جعل الرقم أوضح قليلاً */ margin: 0 2px;}
+    .games-trigger-btn .plus-icon { width: 9px; height: 9px; font-size: 0.7em; }
 
-    .hero { padding: 20px 10px; }
-    .hero .game-logo-main { font-size: 2em; margin-bottom: 8px; }
-    .hero .slogan { font-size: 0.85em; margin-bottom: 12px; }
-    .main-actions .btn-play {
-        font-size: 1em; /* إعادة حجم زر اللعب ليكون واضحاً */
-        padding: 10px 25px; /* حشو مناسب */
-        min-width: auto;
-    }
-    .content-section { padding: 25px 0; }
-    .content-section h2 { font-size: 1.5em; /* تصغير درجة إضافية */ }
-    .content-section p { font-size: 0.85em; /* تصغير درجة إضافية */ }
+    .purchase-dropdown-menu { min-width: 230px; max-width: 270px; padding: 10px; top: calc(100% + 3px); }
+    .dropdown-title { font-size: 0.95em; }
+    .purchase-option span:first-child { font-size: 0.75em; }
+    .purchase-option .price { font-size: 0.8em; }
+    .promo-section input[type="text"], .promo-section button { font-size: 0.75em; }
+    .total-section { font-size: 0.85em; }
+    #pay-now-btn { font-size: 0.9em; }
+
+    .hero { padding: 15px 10px; /* تقليل الحشو أكثر */ }
+    .hero .game-logo-main { font-size: 1.8em; margin-bottom: 6px; }
+    .hero .slogan { font-size: 0.75em; margin-bottom: 10px; }
+    .main-actions .btn-play { font-size: 0.9em; padding: 7px 18px; }
+
+    .content-section { padding: 20px 0; }
+    .content-section h2 { font-size: 1.4em; }
+    .content-section p { font-size: 0.8em; }
 }
