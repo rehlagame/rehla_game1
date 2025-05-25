@@ -18,9 +18,9 @@
     --team2-color: #fd7e14;
 
     /* عرض الشريط الجانبي الافتراضي للشاشات الكبيرة */
-    --sidebar-width-default: 550px; /* زيادة العرض بنسبة 20% (كان 455px، أصبح 550px) */
+    --sidebar-width-default: 550px; /* تم زيادته بنسبة 20% من 455px */
     /* عرض الشريط الجانبي المصغر للوضع الأفقي على الهواتف */
-    --sidebar-width-landscape-mobile: 240px; /* زيادة العرض بنسبة 20% (كان 200px، أصبح 240px) */
+    --sidebar-width-landscape-mobile: 240px; /* تم زيادته بنسبة 20% من 200px */
 }
 
 /* === أنماط خاصة بتطبيق WebView وملء الشاشة للعبة === */
@@ -80,7 +80,7 @@ body.game-active-page #game-sidebar {
 }
 
 body.game-active-page #question-interaction-area {
-    max-width: 80%; /* تصغير العرض بنسبة 20% */
+    max-width: 80%; /* تم تصغيره بنسبة 20% */
     margin: 0 auto; /* لتوسيط المربع */
 }
 
@@ -694,7 +694,7 @@ footer .container {
     padding-bottom: 4px;
     margin-bottom: 6px;
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* تغيير إلى visible لضمان ظهور السكور */
     text-align: center;
     border-top: none;
 }
@@ -809,48 +809,48 @@ footer .container {
         flex-basis: calc(50% - 4px); 
         min-width: 0; /* منع التوسع الزائد */
         max-width: calc(50% - 4px); /* تحديد العرض الأقصى */
-        padding: 8px; /* تقليل الحشو */
+        padding: 10px; /* زيادة الحشو قليلاً لتحسين الوضوح */
         max-height: 250px; /* تحديد ارتفاع أقصى */
         overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
     }
     .team-info-card h2 { 
-        font-size: 0.9em; 
-        margin-bottom: 4px; 
+        font-size: 1em; /* زيادة حجم الخط */
+        margin-bottom: 6px; 
     }
     .team-info-card .current-station { 
-        font-size: 0.7em; 
-        margin-bottom: 4px; 
-        padding-top: 4px; 
+        font-size: 0.8em; /* زيادة حجم الخط */
+        margin-bottom: 6px; 
+        padding-top: 6px; 
     }
     .team-info-card .current-station span { 
-        font-size: 0.85em; 
+        font-size: 0.9em; /* زيادة حجم الخط */
     }
     .path-display h4 { 
-        font-size: 0.65em; 
+        font-size: 0.7em; /* زيادة حجم الخط */
         margin-bottom: 4px; 
     }
     .path-display li { 
-        font-size: 0.7em; 
-        padding: 4px 6px; 
-        margin-bottom: 3px; 
+        font-size: 0.75em; /* زيادة حجم الخط */
+        padding: 5px 8px; 
+        margin-bottom: 4px; 
     }
     .path-display li::before { 
-        min-width: 14px; 
-        height: 14px; 
-        line-height: 14px; 
-        font-size: 0.6em; 
-        margin-left: 4px; 
+        min-width: 16px; 
+        height: 16px; 
+        line-height: 16px; 
+        font-size: 0.65em; 
+        margin-left: 5px; 
     }
     .team-info-card .score > span:first-child { 
-        font-size: 0.65em; 
+        font-size: 0.8em; /* زيادة حجم الخط */
     }
     .score-value-container { 
-        padding: 2px 4px; 
-        min-width: 50px; 
+        padding: 4px 8px; /* زيادة الحشو */
+        min-width: 60px; /* زيادة العرض */
     }
     .score-value-container span[id*="-score"] { 
-        font-size: 0.85em; 
-        margin: 0 4px; 
+        font-size: 1em; /* زيادة حجم الخط */
+        margin: 0 6px; /* زيادة الهوامش */
     }
     #question-interaction-area { 
         min-height: auto; 
@@ -902,19 +902,19 @@ footer .container {
         flex-basis: calc(50% - 4px); 
         min-width: 0; /* منع التوسع الزائد */
         max-width: calc(50% - 4px); /* تحديد العرض الأقصى */
-        padding: 6px; /* تقليل الحشو */
+        padding: 8px; /* زيادة الحشو قليلاً */
         max-height: 200px; /* تحديد ارتفاع أقصى */
         overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
     }
-    .team-info-card h2 { font-size: 0.8em; margin-bottom: 3px; }
-    .team-info-card .current-station { font-size: 0.6em; margin-bottom: 3px; padding-top: 3px; }
-    .team-info-card .current-station span { font-size: 0.75em; }
-    .path-display h4 { font-size: 0.55em; margin-bottom: 3px; }
-    .path-display li { font-size: 0.6em; padding: 3px 5px; margin-bottom: 2px; }
-    .path-display li::before { min-width: 12px; height: 12px; line-height: 12px; font-size: 0.55em; margin-left: 3px; }
-    .team-info-card .score > span:first-child { font-size: 0.6em; }
-    .score-value-container { padding: 1px 3px; min-width: 40px; }
-    .score-value-container span[id*="-score"] { font-size: 0.8em; margin: 0 4px; }
+    .team-info-card h2 { font-size: 0.9em; margin-bottom: 4px; }
+    .team-info-card .current-station { font-size: 0.65em; margin-bottom: 4px; padding-top: 4px; }
+    .team-info-card .current-station span { font-size: 0.8em; }
+    .path-display h4 { font-size: 0.6em; margin-bottom: 3px; }
+    .path-display li { font-size: 0.65em; padding: 4px 6px; margin-bottom: 3px; }
+    .path-display li::before { min-width: 14px; height: 14px; line-height: 14px; font-size: 0.6em; margin-left: 4px; }
+    .team-info-card .score > span:first-child { font-size: 0.7em; }
+    .score-value-container { padding: 3px 6px; min-width: 50px; }
+    .score-value-container span[id*="-score"] { font-size: 0.9em; margin: 0 5px; }
     .btn-adjust-score { width: 18px; height: 18px; font-size: 0.6em; }
 
     #question-interaction-area { padding: 8px; max-width: 100%; /* تعديل العرض ليتناسب مع الشاشة الصغيرة */ }
