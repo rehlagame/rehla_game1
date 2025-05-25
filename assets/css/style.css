@@ -15,93 +15,194 @@
     --success-color: #28a745;
     --apple-btn-bg: #000000;
     --apple-btn-text: #ffffff;
-    --footer-bg-color: #2c3e50; /* لون أزرق مسود / رمادي غامق أنيق للفوتر */
-    --footer-text-color: #bdc3c7; /* لون نص فاتح يتناسب مع الخلفية الداكنة للفوتر */
-    --footer-icon-bg-hover: var(--primary-color); /* لون خلفية الأيقونة عند المرور */
-    --footer-icon-color: #ecf0f1; /* لون الأيقونات الأساسي في الفوتر */
-    --profile-red-accent: #E74C3C; /* لون أحمر مميز لصفحة الحساب */
-}
-/* —————————————————————————————————————————————————————— */
-/* تحسين الاستجابة لملء عرض الشاشة ومنع ظهور شريط التمرير الأفقي */
-html, body {
-    width: 100%;
-    overflow-x: hidden;
+    --footer-bg-color: #2c3e50;
+    --footer-text-color: #bdc3c7;
+    --footer-icon-bg-hover: var(--primary-color);
+    --footer-icon-color: #ecf0f1;
+    --profile-red-accent: #E74C3C;
 }
 
-/* الوعاء العام يصبح 100% عرضاً حتى لا يترك فراغاً جانبيّاً */
+/* --- إعادة الضبط الأساسية وأنماط الجسم العامة --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    /* يمكنك إضافة smooth scrolling هنا إذا أردت أن يكون افتراضيًا للموقع كله */
+    /* scroll-behavior: smooth; */
+}
+
+body {
+    font-family: 'Cairo', sans-serif;
+    direction: rtl;
+    background-color: var(--bg-color-light);
+    color: var(--text-color);
+    line-height: 1.6;
+    width: 100%;
+    min-height: 100vh; /* يضمن أن الجسم يملأ ارتفاع الشاشة على الأقل */
+    overflow-x: hidden; /* منع التمرير الأفقي غير المرغوب فيه عالميًا */
+}
+
+/* --- الصور المتجاوبة --- */
+img {
+    max-width: 100%; /* أهم خاصية لجعل الصور متجاوبة */
+    height: auto;    /* للحفاظ على نسبة العرض إلى الارتفاع */
+    display: block;  /* لإزالة أي مسافات إضافية قد تظهر أسفل الصور المضمنة */
+}
+
+/* --- الحاويات والأقسام --- */
+/* الوعاء العام الأساسي (الذي يستخدم في معظم الصفحات) */
 .container {
-    width: 100%;
-    max-width: 100%;
-    padding: 0 1rem; /* مسافة جانبية 16px تقريباً */
+    max-width: 1200px; /* العرض الأقصى للمحتوى */
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 20px; /* المسافات الجانبية */
+    padding-left: 20px;
+    width: 100%; /* للتأكد من أنه يأخذ العرض الكامل ضمن حدوده القصوى */
 }
 
-/* —————————————————————————————————————————————————————— */
-/* تعديل قسم الهيرو ليملأ كامل ارتفاع الشاشة، بدون نقص عند التدوير */
+/*
+    ملاحظة: كان لديك تعريفان لـ .container. هذا هو التعريف الفعال (الأخير).
+    التعريف الأول الذي كان يجعل .container يمتد 100% مع padding: 0 1rem;
+    لم يكن فعالاً بسبب هذا التعريف اللاحق.
+    إذا أردت حاوية تمتد 100% بعرض الشاشة (edge-to-edge) لبعض الأقسام،
+    يمكنك إنشاء كلاس جديد مثل .container-fluid.
+*/
+
+/* --- تعديل قسم الهيرو ليملأ كامل ارتفاع الشاشة --- */
 .hero {
-    padding: 0;             /* إزالة الحشو الكبير */
-    min-height: 100vh;      /* ارتفاع يساوي ارتفاع الشاشة */
-    box-sizing: border-box; /* احتساب الحشو داخل الحجم */
+    padding-top: 100px;    /* الحشو الأصلي */
+    padding-bottom: 100px; /* الحشو الأصلي */
+    min-height: 100vh;     /* ارتفاع يساوي ارتفاع الشاشة على الأقل */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #a8dadc 100%);
+    color: var(--white-color);
+    text-align: center;
+    width: 100%; /* يضمن امتداد الخلفية بعرض الشاشة بالكامل */
 }
 
-/* إذا أردت مسافة عليا/سفلى للنصوص ضمن الهيرو */
-.hero .container {
-    padding: 2rem 0;
+.hero .container { /* لتوسيط محتوى الهيرو إذا كان أعرض من 1200px */
+    padding-top: 2rem; /* مسافة داخلية عليا لمحتوى الهيرو */
+    padding-bottom: 2rem;/* مسافة داخلية سفلى لمحتوى الهيرو */
+    text-align: center;
+    /* لا حاجة لتحديد width أو max-width هنا، يرثها من .container العام */
 }
 
-/* —————————————————————————————————————————————————————— */
-/* تأكد أن جميع الصور والعناصر الخلفية تمتد بعرض 100% */
-img, .hero, section, footer {
-    width: 100%;
+
+/* --- الأقسام العامة والفوتر --- */
+section,
+footer {
+    width: 100%; /* يضمن أن هذه العناصر يمكن أن تمتد بعرض الشاشة إذا كانت خلفياتها مطلوبة لكامل العرض */
 }
 
-/* —————————————————————————————————————————————————————— */
-/* عند تدوير الجهاز للعرض (Landscape) */
-@media screen and (orientation: landscape) {
-    /* قلل الحشو داخل الأقسام لتفادي التقطيع */
-    .content-section, .content-section.alt-bg {
-        padding: 40px 1rem;
-    }
-    /* الهيرو لا يحتاج ارتفاع أكبر */
-    .hero {
-        min-height: 100vh;
-    }
+/* --- الروابط والقوائم والعناوين الأساسية --- */
+a {
+    text-decoration: none;
+    color: var(--secondary-color);
+    transition: color 0.3s ease;
 }
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-html { }
-body { font-family: 'Cairo', sans-serif; direction: rtl; background-color: var(--bg-color-light); color: var(--text-color); line-height: 1.6; }
-.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-a { text-decoration: none; color: var(--secondary-color); transition: color 0.3s ease; }
-a:hover { color: var(--primary-color); }
-ul { list-style: none; }
-h1, h2 { color: var(--primary-color); margin-bottom: 15px; }
+a:hover {
+    color: var(--primary-color);
+}
+ul {
+    list-style: none;
+}
+h1, h2 { /* H1 و H2 العامة */
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
 
 /* --- الهيدر --- */
 header {
     background-color: var(--white-color);
     padding: 12px 0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    /* position: fixed; */
-    /* top: 0; */
-    /* left: 0; */
-    /* right: 0; */
-    /* z-index: 1000; */
     transition: background-color 0.4s ease, box-shadow 0.4s ease;
+    width: 100%; /* يضمن امتداد الهيدر بعرض الشاشة بالكامل */
+    /* position: fixed; */ /* معلّق حاليًا، إذا تم تفعيله، script.js يعالج الحشو */
+    /* top: 0; left: 0; right: 0; z-index: 1000; */
 }
-header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-.logo { flex-shrink: 0; }
-.logo h1 { margin: 0; font-size: 2em; font-weight: 700; }
-.logo h1 a { color: var(--primary-color); }
-.logo h1 a:hover { color: var(--secondary-color); }
-nav { flex-grow: 1; display: flex; justify-content: center; margin: 0 15px; }
-nav ul { display: flex; flex-wrap: wrap; justify-content: center; }
-nav ul li { margin: 5px 15px; }
-nav ul li a { color: var(--text-color); font-weight: bold; padding-bottom: 5px; border-bottom: 2px solid transparent; transition: border-color 0.3s ease, color 0.3s ease; white-space: nowrap; }
-nav ul li a:hover, nav ul li a.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
-.user-actions { display: flex; align-items: center; flex-wrap: nowrap; justify-content: flex-end; gap: 10px; flex-shrink: 0; }
+header.scrolled { /* مثال: تغيير بسيط عند التمرير (يضاف عبر script.js) */
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.logo {
+    flex-shrink: 0;
+}
+.logo h1 {
+    margin: 0;
+    font-size: 2em;
+    font-weight: 700;
+}
+.logo h1 a {
+    color: var(--primary-color);
+}
+.logo h1 a:hover {
+    color: var(--secondary-color);
+}
+nav {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    margin: 0 15px;
+}
+nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+nav ul li {
+    margin: 5px 15px;
+}
+nav ul li a {
+    color: var(--text-color);
+    font-weight: bold;
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap;
+}
+nav ul li a:hover,
+nav ul li a.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+.user-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-shrink: 0;
+}
 
 /* --- الأزرار --- */
-.btn { padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; text-align: center; border: none; font-size: 1em; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; }
+.btn {
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    border: none;
+    font-size: 1em;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
 .btn-register {
     background-color: var(--white-color);
     color: var(--primary-color);
@@ -115,152 +216,601 @@ nav ul li a:hover, nav ul li a.active { color: var(--primary-color); border-bott
     color: var(--secondary-color);
     border-color: var(--secondary-color);
 }
-.btn-icon { background-color: var(--accent-color); color: var(--text-color); width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.5em; font-weight: bold; line-height: 1; margin-left: 10px; }
-.btn-icon:hover { background-color: #ffca2c; transform: scale(1.1); }
+.btn-icon {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    line-height: 1;
+    margin-left: 10px;
+}
+.btn-icon:hover {
+    background-color: #ffca2c;
+    transform: scale(1.1);
+}
 
-/* --- الهيرو --- */
-.hero { background: linear-gradient(135deg, var(--primary-color) 0%, #a8dadc 100%); color: var(--white-color); text-align: center; padding: 100px 0; min-height: calc(100vh - 75px); display: flex; flex-direction: column; justify-content: center; align-items: center; }
-.hero .game-logo-main { font-size: clamp(4em, 10vw, 7em); font-weight: 700; margin-bottom: 20px; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); color: var(--white-color); }
-.hero .slogan { font-size: clamp(1.2em, 3vw, 1.8em); margin-bottom: 40px; max-width: 700px; line-height: 1.8; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15); }
-.main-actions .btn { margin: 10px; min-width: 180px; }
-.main-actions .btn-play { background-color: var(--accent-color); color: var(--text-color); font-size: 1.2em; padding: 12px 35px; border: 2px solid var(--accent-color); }
-.main-actions .btn-play:hover { background-color: #ffcd39; border-color: #ffcd39; color: var(--text-color); transform: translateY(-3px); box-shadow: 0 6px 12px rgba(255, 193, 7, 0.3); }
-.main-actions .btn-secondary { background-color: transparent; color: var(--white-color); border: 2px solid var(--white-color); }
-.main-actions .btn-secondary:hover { background-color: var(--white-color); color: var(--primary-color); }
+/* --- الهيرو (محتوى) --- */
+.hero .game-logo-main {
+    font-size: clamp(4em, 10vw, 7em);
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    color: var(--white-color);
+}
+.hero .slogan {
+    font-size: clamp(1.2em, 3vw, 1.8em);
+    margin-bottom: 40px;
+    max-width: 700px;
+    line-height: 1.8;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+}
+.main-actions .btn {
+    margin: 10px;
+    min-width: 180px;
+}
+.main-actions .btn-play {
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    font-size: 1.2em;
+    padding: 12px 35px;
+    border: 2px solid var(--accent-color);
+}
+.main-actions .btn-play:hover {
+    background-color: #ffcd39;
+    border-color: #ffcd39;
+    color: var(--text-color);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(255, 193, 7, 0.3);
+}
+.main-actions .btn-secondary {
+    background-color: transparent;
+    color: var(--white-color);
+    border: 2px solid var(--white-color);
+}
+.main-actions .btn-secondary:hover {
+    background-color: var(--white-color);
+    color: var(--primary-color);
+}
 
 /* --- أقسام المحتوى --- */
-section { scroll-margin-top: 80px; }
-.content-section { padding: 60px 0; text-align: center; }
-.content-section h2 { font-size: 2.5em; margin-bottom: 30px; color: var(--primary-color); }
-.content-section p { font-size: 1.1em; max-width: 800px; margin: 0 auto 20px auto; color: var(--grey-color-dark); }
-.content-section.alt-bg { background-color: var(--bg-color-alt); }
+section {
+    scroll-margin-top: 80px; /* للملاحة السلسة مع الهيدر الثابت (إذا كان ثابتًا) */
+}
+.content-section {
+    padding: 60px 0;
+    text-align: center;
+}
+.content-section h2 {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    color: var(--primary-color);
+}
+.content-section p {
+    font-size: 1.1em;
+    max-width: 800px;
+    margin: 0 auto 20px auto;
+    color: var(--grey-color-dark);
+}
+.content-section.alt-bg {
+    background-color: var(--bg-color-alt);
+}
 
 /* --- عناصر الهيدر الديناميكية --- */
-.user-greeting { font-weight: bold; color: var(--text-color); white-space: nowrap; }
-.btn-logout { background-color: var(--secondary-color); color: var(--white-color); padding: 8px 18px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; transition: background-color 0.3s ease; font-size: 0.9em; line-height: normal; }
-.btn-logout:hover { background-color: var(--primary-color); }
-.user-actions a.btn-logout { padding: 8px 18px; text-decoration: none; }
+.user-greeting {
+    font-weight: bold;
+    color: var(--text-color);
+    white-space: nowrap;
+}
+.btn-logout {
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    font-size: 0.9em;
+    line-height: normal;
+}
+.btn-logout:hover {
+    background-color: var(--primary-color);
+}
+.user-actions a.btn-logout { /* لزر "حسابي" */
+    padding: 8px 18px;
+    text-decoration: none;
+}
 
 /* --- أنماط صفحة الحساب الجديدة (Logged.html - تصميم "حسابي") --- */
-main.account-main-content.new-account-layout { padding: 50px 0; background-color: var(--bg-color-alt); min-height: calc(100vh - 200px); }
-.account-page-container { display: flex; background-color: var(--white-color); border-radius: 15px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08); overflow: hidden; max-width: 1000px; margin: 0 auto; }
-.account-sidebar { flex: 0 0 280px; background-color: #fdfdfd; padding: 30px 25px; display: flex; flex-direction: column; align-items: center; text-align: center; border-left: 1px solid var(--grey-color-light); }
-.profile-summary .profile-picture-wrapper-logged { position: relative; width: 120px; height: 120px; margin: 0 auto 20px auto; }
-.profile-picture-logged { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color); background-color: var(--grey-color-light); }
-.photo-upload-label-logged { position: absolute; bottom: 5px; left: 5px; background-color: var(--profile-red-accent); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: background-color 0.3s ease; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); }
-.photo-upload-label-logged:hover { background-color: #c0392b; }
-.photo-upload-label-logged i { font-size: 14px; }
-#profile-summary-name { font-size: 1.4em; font-weight: 700; color: var(--text-color); margin-bottom: 5px; }
-#profile-summary-email { font-size: 0.95em; color: var(--grey-color-dark); margin-bottom: 30px; word-break: break-all; }
-.btn-logout-sidebar { background-color: transparent; color: var(--profile-red-accent); border: 1px solid var(--profile-red-accent); padding: 10px 20px; border-radius: 25px; font-weight: bold; width: 100%; margin-top: auto; transition: all 0.3s ease; }
-.btn-logout-sidebar i { margin-left: 8px; }
-.btn-logout-sidebar:hover { background-color: var(--profile-red-accent); color: var(--white-color); }
-.account-content { flex-grow: 1; padding: 30px 35px; }
-.account-title-main { font-size: 2em; color: var(--profile-red-accent); margin-bottom: 25px; font-weight: 700; }
-.tabs-container { margin-bottom: 30px; }
-.tab-nav { display: flex; border-bottom: 1px solid var(--grey-color-light); margin-bottom: 25px; }
-.tab-link { background: none; border: none; padding: 12px 20px; font-size: 1.05em; font-weight: 600; color: var(--grey-color-dark); cursor: pointer; position: relative; transition: color 0.3s ease; border-bottom: 3px solid transparent; margin-bottom: -1px; }
-.tab-link:hover { color: var(--text-color); }
-.tab-link.active { color: var(--profile-red-accent); border-bottom-color: var(--profile-red-accent); }
-.tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeIn 0.5s; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-#profile-info-form, #change-password-form-logged { display: flex; flex-direction: column; gap: 20px; }
-.form-row { display: flex; gap: 20px; }
-.form-group-logged { flex: 1; display: flex; flex-direction: column; }
-.form-group-logged label { font-size: 0.9em; font-weight: 600; color: var(--grey-color-dark); margin-bottom: 8px; }
-.form-group-logged input[type="text"], .form-group-logged input[type="email"], .form-group-logged input[type="tel"], .form-group-logged input[type="password"], .form-group-logged input[type="date"], .form-group-logged select.country-code-select-logged { width: 100%; padding: 12px 15px; border: 1px solid var(--grey-color-light); border-radius: 8px; font-size: 1em; font-family: 'Cairo', sans-serif; background-color: #fcfdff; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
-.form-group-logged input:focus, .form-group-logged select:focus { border-color: var(--profile-red-accent); box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15); outline: none; }
-.form-group-logged input[readonly], .form-group-logged input[disabled] { background-color: var(--bg-color-alt); cursor: not-allowed; color: var(--grey-color-dark); }
-.form-group-logged small { font-size: 0.8em; color: var(--grey-color-dark); margin-top: 5px; }
-.phone-input-container-logged { display: flex; gap: 8px; }
-.country-code-select-logged { flex-basis: 150px; flex-shrink: 0; padding: 12px 8px !important; }
-.form-group-logged input[type="tel"] { flex-grow: 1; }
-.date-input-logged::-webkit-calendar-picker-indicator { opacity: 0.6; cursor: pointer; filter: invert(0.5) sepia(1) saturate(5) hue-rotate(350deg); }
-.btn-save-changes-logged { background-color: var(--profile-red-accent); color: var(--white-color); padding: 12px 30px; font-size: 1em; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; align-self: flex-start; margin-top: 10px; transition: background-color 0.3s ease; }
-.btn-save-changes-logged:hover { background-color: #c0392b; }
-.form-message { padding: 10px 15px; border-radius: 6px; margin-top: 15px; font-size: 0.9em; }
-.form-message.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
-.form-message.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
-.btn-delete-account-logged { background-color: transparent; color: var(--danger-color); border: 1px solid var(--danger-color); padding: 8px 15px; font-size: 0.9em; border-radius: 20px; margin-top: 30px; float: left; transition: all 0.3s ease; }
-.btn-delete-account-logged:hover { background-color: var(--danger-color); color: var(--white-color); }
+main.account-main-content.new-account-layout {
+    padding: 50px 0;
+    background-color: var(--bg-color-alt);
+    min-height: calc(100vh - 200px); /* مثال لارتفاع المحتوى الرئيسي */
+}
+.account-page-container {
+    display: flex;
+    background-color: var(--white-color);
+    border-radius: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.account-sidebar {
+    flex: 0 0 280px;
+    background-color: #fdfdfd;
+    padding: 30px 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-left: 1px solid var(--grey-color-light); /* في RTL سيكون هذا الخط على اليمين */
+}
+.profile-summary .profile-picture-wrapper-logged {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px auto;
+}
+.profile-picture-logged {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--primary-color);
+    background-color: var(--grey-color-light);
+}
+.photo-upload-label-logged {
+    position: absolute;
+    bottom: 5px;
+    left: 5px; /* في RTL سيكون هذا "right: 5px" إذا لم يتم عكسه تلقائيًا */
+    background-color: var(--profile-red-accent);
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+.photo-upload-label-logged:hover {
+    background-color: #c0392b;
+}
+.photo-upload-label-logged i {
+    font-size: 14px;
+}
+#profile-summary-name {
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 5px;
+}
+#profile-summary-email {
+    font-size: 0.95em;
+    color: var(--grey-color-dark);
+    margin-bottom: 30px;
+    word-break: break-all;
+}
+.btn-logout-sidebar {
+    background-color: transparent;
+    color: var(--profile-red-accent);
+    border: 1px solid var(--profile-red-accent);
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    width: 100%;
+    margin-top: auto;
+    transition: all 0.3s ease;
+}
+.btn-logout-sidebar i {
+    margin-left: 8px; /* في RTL سيكون هذا margin-right */
+}
+.btn-logout-sidebar:hover {
+    background-color: var(--profile-red-accent);
+    color: var(--white-color);
+}
+.account-content {
+    flex-grow: 1;
+    padding: 30px 35px;
+}
+.account-title-main {
+    font-size: 2em;
+    color: var(--profile-red-accent);
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+.tabs-container {
+    margin-bottom: 30px;
+}
+.tab-nav {
+    display: flex;
+    border-bottom: 1px solid var(--grey-color-light);
+    margin-bottom: 25px;
+}
+.tab-link {
+    background: none;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1.05em;
+    font-weight: 600;
+    color: var(--grey-color-dark);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -1px; /* ليتداخل مع الخط السفلي */
+}
+.tab-link:hover {
+    color: var(--text-color);
+}
+.tab-link.active {
+    color: var(--profile-red-accent);
+    border-bottom-color: var(--profile-red-accent);
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.5s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+#profile-info-form,
+#change-password-form-logged {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+.form-group-logged {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.form-group-logged label {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--grey-color-dark);
+    margin-bottom: 8px;
+}
+.form-group-logged input[type="text"],
+.form-group-logged input[type="email"],
+.form-group-logged input[type="tel"],
+.form-group-logged input[type="password"],
+.form-group-logged input[type="date"],
+.form-group-logged select.country-code-select-logged {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--grey-color-light);
+    border-radius: 8px;
+    font-size: 1em;
+    font-family: 'Cairo', sans-serif;
+    background-color: #fcfdff;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.form-group-logged input:focus,
+.form-group-logged select:focus {
+    border-color: var(--profile-red-accent);
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15);
+    outline: none;
+}
+.form-group-logged input[readonly],
+.form-group-logged input[disabled] {
+    background-color: var(--bg-color-alt);
+    cursor: not-allowed;
+    color: var(--grey-color-dark);
+}
+.form-group-logged small {
+    font-size: 0.8em;
+    color: var(--grey-color-dark);
+    margin-top: 5px;
+}
+.phone-input-container-logged {
+    display: flex;
+    gap: 8px;
+}
+.country-code-select-logged {
+    flex-basis: 150px;
+    flex-shrink: 0;
+    padding: 12px 8px !important;
+}
+.form-group-logged input[type="tel"] {
+    flex-grow: 1;
+}
+.date-input-logged::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+    cursor: pointer;
+    filter: invert(0.5) sepia(1) saturate(5) hue-rotate(350deg);
+}
+.btn-save-changes-logged {
+    background-color: var(--profile-red-accent);
+    color: var(--white-color);
+    padding: 12px 30px;
+    font-size: 1em;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    align-self: flex-start; /* في RTL سيكون هذا flex-end */
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+.btn-save-changes-logged:hover {
+    background-color: #c0392b;
+}
+.form-message {
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+.form-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.form-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.btn-delete-account-logged {
+    background-color: transparent;
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
+    padding: 8px 15px;
+    font-size: 0.9em;
+    border-radius: 20px;
+    margin-top: 30px;
+    float: left; /* في RTL سيكون هذا float: right */
+    transition: all 0.3s ease;
+}
+.btn-delete-account-logged:hover {
+    background-color: var(--danger-color);
+    color: var(--white-color);
+}
 
 /* --- أنماط قائمة شراء الألعاب --- */
-.games-counter-container { position: relative; display: inline-block; }
-.games-trigger-btn { background-color: #ff8c00; color: white; padding: 8px 15px; border-radius: 20px; font-size: 0.9em; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 8px; transition: background-color 0.3s ease; line-height: normal; }
-.games-trigger-btn:hover { background-color: #e07b00; }
-.games-trigger-btn #remaining-games-count { font-weight: bold; }
-.games-trigger-btn .plus-icon { background-color: rgba(255, 255, 255, 0.2); border-radius: 50%; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center; font-weight: bold; line-height: 1; }
-.purchase-dropdown-menu { display: none; position: absolute; top: calc(100% + 8px); left: 0; background-color: white; border-radius: 10px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18); padding: 20px 25px; min-width: 320px; z-index: 1001; border: 1px solid #e0e0e0; text-align: right; animation: fadeInScaleUp 0.35s cubic-bezier(0.165, 0.84, 0.44, 1); }
-.purchase-dropdown-menu.show { display: block; }
-.dropdown-title { margin-top: 0; margin-bottom: 20px; font-size: 1.2em; font-weight: 700; color: var(--primary-color); text-align: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; }
-.purchase-options-list { list-style: none; padding: 0; margin: 0 0 20px 0; }
-.purchase-option { display: flex; justify-content: space-between; align-items: center; padding: 15px 12px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease; border: 2px solid transparent; background-color: #fdfdfd; }
-.purchase-option:hover { background-color: #f5f9fc; transform: translateY(-2px); border-color: #d0e8ff; }
-.purchase-option.selected { background-color: #e7f3ff; border-color: var(--secondary-color); font-weight: bold; transform: translateY(0); }
-.purchase-option.selected:hover { background-color: #dbefff; }
-.purchase-option .price { color: var(--secondary-color); font-weight: bold; white-space: nowrap; margin-right: 15px; font-size: 1.05em; }
-.promo-section { display: flex; gap: 10px; margin-bottom: 20px; align-items: center; }
-.promo-section input[type="text"] { flex-grow: 1; padding: 10px 12px; border: 1px solid var(--grey-color-light); border-radius: 6px; font-size: 1em; }
-.promo-section input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.2); outline: none; }
-.promo-section button { padding: 10px 15px; flex-shrink: 0; background-color: var(--grey-color-dark); color: var(--white-color); border-color: var(--grey-color-dark); border-radius: 6px; }
-.promo-section button:hover { background-color: #5a6268; border-color: #545b62; }
-.total-section { display: flex; justify-content: space-between; align-items: center; padding: 15px 5px; margin-bottom: 20px; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; font-size: 1.15em; }
-.total-section span { color: var(--grey-color-dark); }
-#total-price-display { color: var(--success-color); font-weight: 700; }
-#pay-now-btn { width: 100%; padding: 14px; font-size: 1.15em; font-weight: bold; background-color: var(--success-color); color: var(--white-color); border: none; border-radius: 8px; }
-#pay-now-btn:hover { background-color: #218838; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
-#pay-now-btn:disabled { background-color: var(--grey-color-light); cursor: not-allowed; transform: none; box-shadow: none; }
-@keyframes fadeInScaleUp { from { opacity: 0; transform: translateY(-10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.games-counter-container {
+    position: relative;
+    display: inline-block;
+}
+.games-trigger-btn {
+    background-color: #ff8c00;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+    line-height: normal;
+}
+.games-trigger-btn:hover {
+    background-color: #e07b00;
+}
+.games-trigger-btn #remaining-games-count {
+    font-weight: bold;
+}
+.games-trigger-btn .plus-icon {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    line-height: 1;
+}
+.purchase-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    /* left: 0;  في RTL، قد يكون right: 0 أفضل أو يتم التحكم به بـ JS */
+    /* يتم التحكم بموضع القائمة المنسدلة في main.js ليناسب الاتجاه */
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+    padding: 20px 25px;
+    min-width: 320px;
+    z-index: 1001;
+    border: 1px solid #e0e0e0;
+    text-align: right; /* مناسب لـ RTL */
+    animation: fadeInScaleUp 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.purchase-dropdown-menu.show {
+    display: block;
+}
+.dropdown-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+.purchase-options-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+.purchase-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+    border: 2px solid transparent;
+    background-color: #fdfdfd;
+}
+.purchase-option:hover {
+    background-color: #f5f9fc;
+    transform: translateY(-2px);
+    border-color: #d0e8ff;
+}
+.purchase-option.selected {
+    background-color: #e7f3ff;
+    border-color: var(--secondary-color);
+    font-weight: bold;
+    transform: translateY(0);
+}
+.purchase-option.selected:hover {
+    background-color: #dbefff;
+}
+.purchase-option .price {
+    color: var(--secondary-color);
+    font-weight: bold;
+    white-space: nowrap;
+    margin-right: 15px; /* في RTL، هذا جيد */
+    font-size: 1.05em;
+}
+.promo-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+.promo-section input[type="text"] {
+    flex-grow: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--grey-color-light);
+    border-radius: 6px;
+    font-size: 1em;
+}
+.promo-section input[type="text"]:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(23, 162, 184, 0.2);
+    outline: none;
+}
+.promo-section button {
+    padding: 10px 15px;
+    flex-shrink: 0;
+    background-color: var(--grey-color-dark);
+    color: var(--white-color);
+    /* border-color: var(--grey-color-dark); /* تم إزالتها إذا كان الزر يستخدم كلاس .btn */
+    border-radius: 6px;
+}
+.promo-section button:hover {
+    background-color: #5a6268;
+    /* border-color: #545b62; */
+}
+.total-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5px;
+    margin-bottom: 20px;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 1.15em;
+}
+.total-section span {
+    color: var(--grey-color-dark);
+}
+#total-price-display {
+    color: var(--success-color);
+    font-weight: 700;
+}
+#pay-now-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.15em;
+    font-weight: bold;
+    background-color: var(--success-color);
+    color: var(--white-color);
+    border: none;
+    border-radius: 8px;
+}
+#pay-now-btn:hover { /* :not(:disabled) مضافة لضمان عدم تطبيق التأثير عند التعطيل */
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+}
+#pay-now-btn:disabled {
+    background-color: var(--grey-color-light);
+    color: var(--grey-color-dark); /* تعديل اللون ليتناسب */
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.7; /* إضافة شفافية للزر المعطل */
+}
+@keyframes fadeInScaleUp {
+    from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
-/* --- الفوتر (تصميم حديث مستوحى من harperwilde.com) --- */
+/* --- الفوتر (تصميم حديث) --- */
 footer {
-    background-color: var(--footer-bg-color); /* #2c3e50 - لون داكن */
-    color: var(--footer-text-color);         /* #bdc3c7 - لون نص فاتح */
-    padding: 50px 20px 40px 20px; /* حشو علوي وسفلي أكبر */
-    margin-top: 60px; /* مسافة أكبر فوق الفوتر */
-    font-size: 1em; /* حجم خط أساسي للفوتر */
-    border-top: 3px solid var(--primary-color); /* الحفاظ على الخط العلوي الحالي */
-    text-align: center; /* محاذاة كل محتوى الفوتر للوسط */
-    font-family: 'Cairo', sans-serif; /* التأكيد على استخدام خط كايرو */
+    background-color: var(--footer-bg-color);
+    color: var(--footer-text-color);
+    padding: 50px 20px 40px 20px;
+    margin-top: 60px;
+    font-size: 1em;
+    border-top: 3px solid var(--primary-color);
+    text-align: center;
+    font-family: 'Cairo', sans-serif;
 }
 
 .footer-container-modern {
     display: flex;
-    flex-direction: column; /* ترتيب الصفوف فوق بعضها (أيقونات، روابط، حقوق) */
-    align-items: center;    /* محاذاة كل الصفوف للوسط */
-    gap: 30px;              /* زيادة المسافة بين كل صف */
-    max-width: 800px;       /* تحديد عرض أقصى لمحتوى الفوتر لتركيز أفضل */
-    margin: 0 auto;         /* توسيط الحاوية نفسها إذا كانت الصفحة أعرض */
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .footer-icons-row {
     display: flex;
-    flex-wrap: wrap;        /* السماح بالالتفاف في الشاشات الصغيرة */
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 25px 35px; /* مسافات مرنة (عمودي أفقي) بين مجموعات الأيقونات */
+    gap: 25px 35px;
 }
 
 .social-media-icons,
 .app-store-icons {
     display: flex;
-    gap: 20px; /* تعديل المسافة بين الأيقونات الفردية قليلاً */
+    gap: 20px;
 }
 
 .app-store-icons .app-icon-link i,
 .social-media-icons .social-icon-link i {
-    font-size: 1.7em; /* حجم الأيقونة نفسها، يمكن تعديله حسب الرغبة */
+    font-size: 1.7em;
 }
 .app-store-icons .app-icon-link,
 .social-media-icons .social-icon-link {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 45px;  /* تعديل حجم خلفية الأيقونة قليلاً */
+    width: 45px;
     height: 45px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.08); /* خلفية شفافة قليلاً أغمق قليلاً */
+    background-color: rgba(255, 255, 255, 0.08);
     color: var(--footer-icon-color);
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     text-decoration: none;
@@ -278,9 +828,9 @@ footer {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 15px 30px; /* مسافة بين الروابط إذا التفّت (عمودي أفقي) */
-    font-size: 0.9em; /* خط أصغر قليلاً للروابط النصية */
-    font-weight: 400; /* وزن خط عادي (أقل بروزاً من الأيقونات) */
+    gap: 15px 30px;
+    font-size: 0.9em;
+    font-weight: 400;
 }
 
 .footer-links-row .footer-text-link,
@@ -301,68 +851,131 @@ footer {
     font-weight: 500;
     text-decoration: none;
 }
-/* إزالة الأنماط القديمة لفقرة المطور */
-p.developer-credit {
-    font-size: inherit !important; /* التأكد من إلغاء الحجم القديم */
+
+p.developer-credit { /* لإلغاء الأنماط القديمة إذا كانت موجودة */
+    font-size: inherit !important;
     color: inherit !important;
     text-align: inherit !important;
     border-bottom: none !important;
 }
-/* التأكد من إزالة الخط السفلي من رابط المطور القديم إذا كان كلاس مستخدماً */
-.developer-credit a {
+.developer-credit a { /* لإلغاء الأنماط القديمة إذا كانت موجودة */
     border-bottom: none !important;
-    font-weight: 500 !important; /* الحفاظ على وزن الخط إذا كان الكلاس القديم مستخدماً */
-    color: var(--accent-color) !important; /* الحفاظ على اللون إذا كان الكلاس القديم مستخدماً */
+    font-weight: 500 !important;
+    color: var(--accent-color) !important;
 }
-
 
 .footer-copyright-row {
-    font-size: 0.85em; /* خط أصغر قليلاً لحقوق النشر */
-    opacity: 0.8; /* جعل نص حقوق النشر أقل بروزاً قليلاً */
-    font-weight: 400; /* وزن خط عادي */
-    margin-top: 5px; /* تقليل المسافة فوق حقوق النشر قليلاً */
+    font-size: 0.85em;
+    opacity: 0.8;
+    font-weight: 400;
+    margin-top: 5px;
 }
-
 .footer-copyright-row p {
     margin-bottom: 0;
 }
-.footer-copyright-row sup { /* للتأكد من أن علامة ® تظهر بشكل جيد */
+.footer-copyright-row sup {
     font-size: 0.75em;
     vertical-align: super;
 }
 
-
-/* إزالة الأنماط القديمة للأعمدة إذا لم تعد مستخدمة */
-.footer-main-container {
-    display: none !important; /* إخفاء الحاوية القديمة تماماً */
+.footer-main-container { /* لإخفاء حاوية الفوتر القديمة إذا كانت موجودة */
+    display: none !important;
 }
 
 
-/* --- تجاوبية --- */
+/* --- Media Queries للتجاوبية --- */
+/* عند تدوير الجهاز للعرض (Landscape) - قاعدة عامة */
+@media screen and (orientation: landscape) {
+    .content-section, .content-section.alt-bg {
+        padding: 40px 1rem; /* تقليل الحشو في الوضع الأفقي لتوفير مساحة */
+    }
+    .hero { /* الهيرو يجب أن يظل يملأ الشاشة */
+        min-height: 100vh;
+    }
+}
+
 @media (max-width: 992px) {
-    header .container { justify-content: space-between; }
-    nav { order: 3; width: 100%; margin-top: 10px; justify-content: center; }
-    nav ul { padding-bottom: 5px; }
-    .user-actions { order: 2; min-width: auto; }
-    .account-page-container { flex-direction: column; }
-    .account-sidebar { flex: 0 0 auto; width: 100%; border-left: none; border-bottom: 1px solid var(--grey-color-light); padding: 25px; }
-    .btn-logout-sidebar { margin-top: 20px; max-width: 250px; }
-    .account-content { padding: 25px; }
-    .account-title-main { font-size: 1.8em; text-align: center; }
-    .tab-nav { justify-content: center; }
+    header .container {
+        /* justify-content: space-between; /* لا حاجة للتغيير، الأصل جيد */
+    }
+    nav {
+        order: 3; /* لوضع القائمة أسفل الشعار والأزرار في الشاشات الصغيرة */
+        width: 100%;
+        margin-top: 10px;
+        /* justify-content: center; /* لا حاجة للتغيير، الأصل جيد */
+    }
+    nav ul {
+        padding-bottom: 5px;
+    }
+    .user-actions {
+        order: 2; /* لوضع أزرار المستخدم بجانب الشعار قبل القائمة */
+        min-width: auto;
+    }
+    .account-page-container {
+        flex-direction: column;
+    }
+    .account-sidebar {
+        flex: 0 0 auto;
+        width: 100%;
+        border-left: none; /* إزالة الخط الأيسر لأنه سيكون فوق المحتوى */
+        border-bottom: 1px solid var(--grey-color-light);
+        padding: 25px;
+    }
+    .btn-logout-sidebar {
+        margin-top: 20px;
+        max-width: 250px; /* تحديد عرض أقصى لزر الخروج في الشريط الجانبي */
+    }
+    .account-content {
+        padding: 25px;
+    }
+    .account-title-main {
+        font-size: 1.8em;
+        text-align: center;
+    }
+    .tab-nav {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 768px) {
-    .user-actions { flex-wrap: wrap; justify-content: center; width: 100%; margin-top: 10px; }
-    .user-actions .btn-register { padding: 8px 20px; font-size: 0.9em; }
-    .hero { padding: 60px 0; }
-    .hero .game-logo-main { font-size: 3.5em; }
-    .hero .slogan { font-size: 1.1em; }
-    .main-actions .btn { width: 80%; margin: 10px auto; display: block; min-width: auto; }
-    section { scroll-margin-top: 80px; }
-    .content-section h2 { font-size: 2em; }
-    .purchase-dropdown-menu { min-width: 280px; padding: 15px 20px; left: 50%; transform: translateX(-50%); top: calc(100% + 5px); }
-    .games-counter-container { margin-left: 0; }
+    .user-actions {
+        /* flex-wrap: wrap; /* لا حاجة، الأصل nowrap مناسب */
+        /* justify-content: center; /* الأصل flex-end أفضل للهيدر */
+        width: 100%; /* إذا أردت أن تأخذ الأزرار عرض كامل عند الالتفاف */
+        margin-top: 10px;
+    }
+    /* .user-actions .btn-register { padding: 8px 20px; font-size: 0.9em; } /* تم تعريفه بالفعل */
+
+    .hero {
+        padding-top: 60px; /* تقليل الحشو في الهيرو */
+        padding-bottom: 60px;
+    }
+    .hero .game-logo-main {
+        font-size: 3.5em;
+    }
+    .hero .slogan {
+        font-size: 1.1em;
+    }
+    .main-actions .btn {
+        width: 80%; /* جعل الأزرار الرئيسية أعرض في الهيرو */
+        margin: 10px auto;
+        display: block;
+        min-width: auto;
+    }
+    /* section { scroll-margin-top: 80px; } /* تم تعريفه بالفعل */
+    .content-section h2 {
+        font-size: 2em;
+    }
+    .purchase-dropdown-menu {
+        min-width: 280px;
+        padding: 15px 20px;
+        left: 50%; /* لتوسيط القائمة المنسدلة */
+        transform: translateX(-50%);
+        top: calc(100% + 5px);
+    }
+    .games-counter-container {
+        margin-left: 0; /* في RTL سيكون margin-right */
+    }
 
     /* تجاوبية الفوتر */
     footer {
@@ -391,19 +1004,46 @@ p.developer-credit {
         font-size: 0.8em;
     }
 
-    .form-row { flex-direction: column; gap: 0px; }
-    .form-group-logged { margin-bottom: 20px; }
-    .form-group-logged:last-child { margin-bottom: 0; }
-    .btn-save-changes-logged { width: 100%; }
-    .btn-delete-account-logged { float: none; display: block; margin: 25px auto 0 auto; width: fit-content; }
-    .tab-link { padding: 10px 15px; font-size: 1em; }
+    .form-row { /* في صفحة الحساب */
+        flex-direction: column;
+        gap: 0px; /* إزالة المسافة العمودية عند التكديس */
+    }
+    .form-group-logged {
+        margin-bottom: 20px;
+    }
+    .form-group-logged:last-child {
+        margin-bottom: 0;
+    }
+    .btn-save-changes-logged {
+        width: 100%; /* جعل زر الحفظ يأخذ عرض كامل */
+    }
+    .btn-delete-account-logged {
+        float: none;
+        display: block;
+        margin: 25px auto 0 auto;
+        width: fit-content; /* ليتناسب مع النص */
+    }
+    .tab-link {
+        padding: 10px 15px;
+        font-size: 1em;
+    }
 }
 
 @media (max-width: 480px) {
-    nav ul li { margin: 5px 8px; }
-    .games-trigger-btn span:first-child { display: none; }
-    .games-trigger-btn { padding: 8px 12px; }
-    .purchase-dropdown-menu { min-width: 90vw; left: 5%; transform: translateX(0); }
+    nav ul li {
+        margin: 5px 8px; /* تقليل المسافة بين عناصر القائمة */
+    }
+    .games-trigger-btn span:first-child { /* إخفاء نص "عدد الألعاب" */
+        display: none;
+    }
+    .games-trigger-btn { /* تصغير زر شراء الألعاب */
+        padding: 8px 12px;
+    }
+    .purchase-dropdown-menu {
+        min-width: 90vw; /* جعل القائمة المنسدلة تأخذ معظم عرض الشاشة */
+        left: 5%;
+        transform: translateX(0); /* إزالة التوسيط لأنها تأخذ عرض شبه كامل */
+    }
 
     /* تجاوبية الفوتر لشاشات أصغر */
     .app-store-icons .app-icon-link,
@@ -415,21 +1055,46 @@ p.developer-credit {
     .social-media-icons .social-icon-link i {
         font-size: 1.5em;
     }
-    .social-media-icons, .app-store-icons {
+    .social-media-icons,
+    .app-store-icons {
         gap: 15px;
     }
-    /* .developer-credit, .copyright-text -  تم استبدالها بـ .footer-links-row و .footer-copyright-row */
-    .footer-links-row, .footer-copyright-row { /* تعديل حجم الخط إذا لزم الأمر */
+    .footer-links-row,
+    .footer-copyright-row {
         font-size: 0.82em;
     }
 
-    .account-sidebar { padding: 20px 15px; }
-    .profile-picture-wrapper-logged { width: 100px; height: 100px; }
-    #profile-summary-name { font-size: 1.2em; }
-    #profile-summary-email { font-size: 0.9em; }
-    .account-content { padding: 20px 15px; }
-    .account-title-main { font-size: 1.6em; }
-    .country-code-select-logged { flex-basis: 120px !important; font-size: 0.9em; }
-    .form-group-logged input, .form-group-logged select { font-size: 0.95em; padding: 10px 12px; }
-    .tab-link { font-size: 0.9em; padding: 10px 10px; }
+    /* صفحة الحساب */
+    .account-sidebar {
+        padding: 20px 15px;
+    }
+    .profile-picture-wrapper-logged {
+        width: 100px;
+        height: 100px;
+    }
+    #profile-summary-name {
+        font-size: 1.2em;
+    }
+    #profile-summary-email {
+        font-size: 0.9em;
+    }
+    .account-content {
+        padding: 20px 15px;
+    }
+    .account-title-main {
+        font-size: 1.6em;
+    }
+    .country-code-select-logged {
+        flex-basis: 120px !important; /* تصغير حقل مفتاح الدولة */
+        font-size: 0.9em;
+    }
+    .form-group-logged input,
+    .form-group-logged select {
+        font-size: 0.95em;
+        padding: 10px 12px;
+    }
+    .tab-link {
+        font-size: 0.9em;
+        padding: 10px 10px;
+    }
 }
