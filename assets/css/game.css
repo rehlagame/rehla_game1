@@ -30,8 +30,9 @@ body.game-active-page {
     margin: 0;
     padding: 0;
     width: 100vw;
-    height: 100vh;
-    overflow: hidden; /* منع التمرير على مستوى الـ body */
+    min-height: 100vh; /* تعديل لدعم Safari */
+    height: auto;
+    overflow-y: auto; /* السماح بالتمرير العمودي */
     background-color: var(--bg-color-light);
     font-family: var(--body-font);
     color: var(--text-color);
@@ -45,28 +46,28 @@ body.game-active-page main.game-content {
     width: 100%;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* مهم: منع main من التمرير، التمرير يتم داخل الأعمدة */
+    overflow-y: auto; /* السماح بالتمرير العمودي */
     padding: 0;
     margin: 0;
     padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 60px); /* مساحة للـ Footer */
     padding-left: env(safe-area-inset-left, 0px);
     padding-right: env(safe-area-inset-right, 0px);
     box-sizing: border-box;
 }
 
 body.game-active-page #game-play-area {
-    flex-grow: 1; /* لجعل منطقة اللعب تملأ المساحة المتاحة في main */
+    flex-grow: 1;
     width: 100%;
-    min-height: 0; /* مهم لأطفال flex/grid */
-    margin-top: 0; /* إزالة الهامش العلوي الافتراضي */
+    min-height: 0;
+    margin-top: 0;
     display: grid;
     grid-template-columns: 1fr var(--sidebar-width-default);
     gap: 15px;
-    align-items: stretch; /* الأعمدة تمتد لملء ارتفاع الخلية */
-    padding: 10px; /* حشو داخلي لمنطقة اللعب */
+    align-items: stretch;
+    padding: 10px;
     box-sizing: border-box;
-    overflow: hidden; /* منع #game-play-area من التمرير بنفسها */
+    overflow-y: auto; /* السماح بالتمرير العمودي */
 }
 
 body.game-active-page #question-interaction-area,
@@ -88,6 +89,22 @@ body.game-active-page #game-sidebar {
     max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 20px - 20px); /* (100vh - safe_areas - padding_game_play_area - sticky_top_offset) */
 }
 
+/* --- أنماط الـ Footer --- */
+footer {
+    position: relative; /* تأكد من أن الـ Footer ليس fixed أو sticky */
+    width: 100%;
+    padding: 20px 0;
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+    background-color: #f8f9fa;
+    text-align: center;
+    z-index: 1;
+}
+
+footer .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
 
 /* --- إعدادات اللعبة (Setup Section) --- */
 /* (الكود الأصلي لقسم الإعداد - لا تغييرات كبيرة هنا) */
@@ -107,11 +124,9 @@ body.game-active-page #game-sidebar {
 
 /* --- منطقة اللعب الفعلية (Game Play Area) - الأنماط الأصلية --- */
 .hidden { display: none !important; }
-/* #game-play-area (الأنماط الأصلية لهذا المعرف تم دمجها/تعديلها أعلاه ضمن body.game-active-page #game-play-area) */
 
 /* --- العمود الثاني (يمين): الشريط الجانبي (الأنماط الأصلية مع تعديلات طفيفة للتمرير والتثبيت) --- */
 #game-sidebar {
-    /* position: sticky; top: 20px; height: calc(100vh - 40px); <-- تم تعديلها أعلاه */
     display: flex; flex-direction: column; gap: 15px; /* تقليل gap */
 }
 #current-turn-info { text-align: center; font-size: 1.15em; font-weight: 700; padding: 12px; background-color: var(--white-color); color: var(--black-color); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 1px solid var(--grey-color-medium); flex-shrink: 0; position: relative; }
@@ -133,7 +148,6 @@ body.game-active-page #game-sidebar {
 .path-display li.current-path-station { background-color: var(--accent-color); color: var(--black-color); font-weight: 700; border-color: #e0a800; box-shadow: 0 2px 4px rgba(0,0,0,0.08); opacity: 1; } .path-display li.current-path-station::before { background-color: var(--primary-color); color: white; }
 
 /* --- العمود الأول (يسار): منطقة السؤال والتفاعل (الأنماط الأصلية مع تعديلات طفيفة للتمرير والحشو) --- */
-/* #question-interaction-area (الأنماط الأصلية تم دمجها/تعديلها أعلاه ضمن body.game-active-page #question-interaction-area) */
 #question-timer { position: absolute; top: 15px; left: 15px; background-color: var(--black-color); color: var(--white-color); padding: 6px 12px; border-radius: 12px; font-size: 1em; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: 0 2px 4px rgba(0,0,0,0.25); z-index: 10; min-width: 50px; text-align: center; transition: background-color 0.3s ease; }
 #question-interaction-area h3 { margin-top: 0; margin-bottom: 8px; color: var(--primary-color); font-size: 1.5em; text-align: center; padding-top: 5px; }
 #question-details { text-align: center; margin-bottom: 12px; font-size: 1em; color: var(--grey-color-dark); }
@@ -197,7 +211,6 @@ body.game-active-page #game-sidebar {
 .btn-adjust-score.btn-increment:hover { background-color: var(--success-color); } .btn-adjust-score.btn-decrement:hover { background-color: var(--danger-color); }
 .btn-adjust-score:active { transform: translateY(-50%) scale(0.95); transition-duration: 0.1s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-
 /* === Media Queries للتجاوبية === */
 
 /* الوضع الرأسي للهواتف (والشاشات المشابهة) - التكديس */
@@ -205,7 +218,6 @@ body.game-active-page #game-sidebar {
     body.game-active-page #game-play-area {
         display: block; /* تكديس الأعمدة */
         padding: 10px;
-        /* overflow-y: auto; لا حاجة هنا، main.game-content يتولى التمرير */
     }
     #game-sidebar {
         position: static; height: auto; overflow-y: visible;
@@ -228,7 +240,7 @@ body.game-active-page #game-sidebar {
 }
 
 /* الوضع الأفقي للهواتف (والشاشات المشابهة) - عمودان */
-@media (max-height: 550px) and (orientation: landscape), /* يستهدف الارتفاعات الصغيرة جدًا */
+@media (max-height: 550px) and (orientation: landscape),
        (max-width: 991px) and (orientation: landscape) {
     body.game-active-page main.game-content {
         padding: 5px;
@@ -236,7 +248,8 @@ body.game-active-page #game-sidebar {
     body.game-active-page #game-play-area {
         grid-template-columns: 1fr var(--sidebar-width-landscape-mobile);
         gap: 8px;
-        padding: 0; /* الحشو يأتي من main.game-content */
+        padding: 5px; /* تعديل الحشو */
+        overflow-y: auto; /* السماح بالتمرير العمودي */
     }
     #game-sidebar {
         margin-top: 0;
@@ -244,10 +257,10 @@ body.game-active-page #game-sidebar {
         padding: 8px;
         /* max-height تم تعريفها في القاعدة العامة لـ #game-sidebar */
     }
-    /* تصغير الخطوط والعناصر بشكل كبير للوضع الأفقي الضيق */
-    #current-turn-info { font-size: 0.8em; padding: 5px; padding-left: 25px; }
+    /* تحسين أحجام الخطوط والعناصر للوضع الأفقي الضيق */
+    #current-turn-info { font-size: 1em; padding: 8px; padding-left: 25px; }
     .team-info-card { padding: 6px; }
-    .team-info-card h2 { font-size: 0.8em; margin-bottom: 3px; }
+    .team-info-card h2 { font-size: 0.9em; margin-bottom: 3px; }
     .team-info-card .current-station { font-size: 0.65em; margin-bottom: 3px; padding-top: 3px; }
     .team-info-card .current-station span { font-size: 0.75em; }
     .path-display h4 { font-size: 0.6em; margin-bottom: 3px; }
@@ -260,15 +273,15 @@ body.game-active-page #game-sidebar {
 
     #question-interaction-area { padding: 8px; }
     #question-timer { top: 5px; left: 5px; font-size: 0.75em; padding: 3px 6px; min-width: 35px; }
-    #question-interaction-area h3 { font-size: 1em; margin-bottom: 4px; }
+    #question-interaction-area h3 { font-size: 1.2em; margin-bottom: 4px; }
     #question-details { font-size: 0.7em; margin-bottom: 5px; }
     #question-difficulty { padding: 2px 4px; font-size: 0.65em; }
     #question-image-container { margin-top: 4px; margin-bottom: 6px; }
-    #question-image { max-height: 60px; } /* تصغير كبير جدًا للصورة */
-    #question-text { font-size: 0.8em; margin-bottom: 6px; line-height: 1.2; }
+    #question-image { max-height: 80px; } /* زيادة الحجم قليلاً */
+    #question-text { font-size: 1em; margin-bottom: 6px; line-height: 1.2; }
     #answer-options { grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 6px; }
-    .option-btn { font-size: 0.7em; padding: 4px 6px;}
-    #reveal-answer-btn { width: 90%; padding: 5px 8px; font-size: 0.75em;}
+    .option-btn { font-size: 0.85em; padding: 6px 8px; }
+    #reveal-answer-btn { width: 90%; padding: 6px 10px; font-size: 0.9em; }
     #answer-reveal-section { padding: 5px 8px; margin-top: 6px; }
     .correct-answer-display { font-size: 0.85em; margin-bottom: 6px; padding: 3px; }
     .assign-points-prompt { font-size: 0.75em; margin-bottom: 5px; }
