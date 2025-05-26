@@ -604,6 +604,7 @@ async function initializeGame() {
 
         if(gameSetupSection) gameSetupSection.classList.add('hidden');
         if(gamePlayArea) gamePlayArea.classList.remove('hidden');
+        window.scrollTo(0, 0); 
         if(questionInteractionArea) questionInteractionArea.classList.remove('hidden');
         const gameSidebar = document.getElementById('game-sidebar');
         if(gameSidebar) gameSidebar.classList.remove('hidden');
