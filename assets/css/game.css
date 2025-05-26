@@ -119,22 +119,31 @@ footer .container {
 #game-setup-section { padding: 40px 0; text-align: center; }
 #game-setup-section h1 { font-size: 2.5em; margin-bottom: 15px; color: var(--primary-color); }
 #game-setup-section .intro-text { font-size: 1.1em; color: var(--grey-color-dark); max-width: 700px; margin: 0 auto 30px auto; line-height: 1.7; }
-#game-setup-form { background-color: var(--white-color); padding: 30px 40px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); max-width: 800px; margin: 0 auto; text-align: right; }
-.team-setup-container { display: flex; justify-content: space-between; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; }
-.team-setup { 
-    flex-basis: calc(50% - 15px); 
-    max-width: calc(50% - 15px); /* الحفاظ على العرض الأصلي للشاشات الكبيرة */
-    border: 1px solid var(--grey-color-medium); 
-    padding: 20px; 
-    border-radius: 8px; 
-    background-color: var(--grey-color-light); 
-    min-width: 280px; 
+#game-setup-form { 
+    background-color: var(--white-color); 
+    padding: 25px 30px; /* تقليل الحشو قليلاً */
+    border-radius: 10px; 
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08); 
+    max-width: 600px; /* تقليل العرض الأقصى (كان 800px) */
+    margin: 0 auto; 
+    text-align: right; 
 }
-.input-group { margin-bottom: 20px; text-align: right; }
-.input-group label { display: block; margin-bottom: 8px; color: var(--grey-color-dark); font-weight: bold; font-size: 0.9em; }
-.input-group input[type="text"] { width: 100%; padding: 12px 15px; border: 1px solid var(--grey-color-medium); border-radius: 8px; font-size: 1em; transition: border-color 0.3s ease, box-shadow 0.3s ease; font-family: var(--body-font); box-sizing: border-box; }
+.team-setup-container { display: flex; justify-content: space-between; gap: 20px; /* تقليل المسافة بين البطاقتين */ margin-bottom: 20px; flex-wrap: wrap; }
+.team-setup {
+    flex-basis: calc(50% - 10px); /* تقليل المسافة بين البطاقتين */
+    max-width: calc(50% - 10px); /* الحفاظ على العرض الأصلي للشاشات الكبيرة */
+    border: 1px solid var(--grey-color-medium);
+    padding: 15px; /* تقليل الحشو */
+    border-radius: 8px;
+    background-color: var(--grey-color-light);
+    min-width: 240px; /* تقليل الحد الأدنى للعرض */
+}
+.team-setup h2 { text-align: center; color: var(--secondary-color); margin-top: 0; margin-bottom: 15px; font-size: 1.2em; }
+.input-group { margin-bottom: 15px; text-align: right; }
+.input-group label { display: block; margin-bottom: 6px; color: var(--grey-color-dark); font-weight: bold; font-size: 0.85em; }
+.input-group input[type="text"] { width: 100%; padding: 10px 12px; border: 1px solid var(--grey-color-medium); border-radius: 8px; font-size: 0.95em; transition: border-color 0.3s ease, box-shadow 0.3s ease; font-family: var(--body-font); box-sizing: border-box; }
 .input-group input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(23,162,184,0.2); outline: none; }
-.btn-start-game { width: auto; padding: 12px 40px; font-size: 1.2em; display: block; margin: 20px auto 0 auto; border: none; cursor: pointer; transition: background-color 0.3s ease; border-radius: 8px; background-color: var(--primary-color); color: var(--white-color); }
+.btn-start-game { width: auto; padding: 10px 35px; font-size: 1.1em; display: block; margin: 15px auto 0 auto; border: none; cursor: pointer; transition: background-color 0.3s ease; border-radius: 8px; background-color: var(--primary-color); color: var(--white-color); }
 .btn-start-game:hover { background-color: #117a8b; color: var(--white-color); }
 
 /* --- منطقة اللعب الفعلية (Game Play Area) - الأنماط الأصلية --- */
@@ -182,7 +191,7 @@ footer .container {
     display: flex; 
     flex-direction: column; 
     box-sizing: border-box; 
-    max-height: 360px; /* زيادة الارتفاع بنسبة 20% (كان 300px) */
+    max-height: 420px; /* زيادة الارتفاع لإظهار 4 محطات (كان 360px) */
     overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
 }
 
@@ -820,7 +829,7 @@ footer .container {
         min-width: 0; /* منع التوسع الزائد */
         max-width: calc(50% - 4px); /* تحديد العرض الأقصى */
         padding: 10px; /* زيادة الحشو قليلاً لتحسين الوضوح */
-        max-height: 300px; /* زيادة الارتفاع بنسبة 20% (كان 250px) */
+        max-height: 350px; /* زيادة الارتفاع لإظهار 4 محطات (كان 300px) */
         overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
     }
     .team-info-card h2 { 
@@ -872,15 +881,15 @@ footer .container {
     /* إعدادات اللعبة */
     .team-setup { 
         flex-basis: 100%; 
-        max-width: 300px; /* تصغير العرض بنسبة 25% (كان حوالي 400px) */
-        padding: 15px; /* تصغير الحشو */
+        max-width: 250px; /* تصغير العرض بنسبة إضافية (كان 300px) */
+        padding: 12px; /* تصغير الحشو */
         margin: 0 auto; /* توسيط العنصر */
     }
-    .team-setup h2 { font-size: 1.1em; margin-bottom: 15px; }
-    .input-group label { font-size: 0.85em; }
-    .input-group input[type="text"] { padding: 10px 12px; font-size: 0.95em; }
-    #game-setup-form { padding: 20px; }
-    .btn-start-game { width: 80%; margin-left:auto; margin-right:auto; }
+    .team-setup h2 { font-size: 1em; margin-bottom: 12px; }
+    .input-group label { font-size: 0.8em; }
+    .input-group input[type="text"] { padding: 8px 10px; font-size: 0.9em; }
+    #game-setup-form { padding: 15px; max-width: 550px; /* تقليل العرض الأقصى (كان 600px) */ }
+    .btn-start-game { width: 80%; margin-left:auto; margin-right:auto; padding: 8px 30px; font-size: 1em; }
     /* تصغيرات إضافية للخطوط إذا لزم الأمر */
     #current-turn-info { font-size: 1em; padding: 8px; padding-left: 30px; }
     #question-interaction-area h3 { font-size: 1.2em; }
@@ -922,7 +931,7 @@ footer .container {
         min-width: 0; /* منع التوسع الزائد */
         max-width: calc(50% - 4px); /* تحديد العرض الأقصى */
         padding: 8px; /* زيادة الحشو قليلاً */
-        max-height: 240px; /* زيادة الارتفاع بنسبة 20% (كان 200px) */
+        max-height: 280px; /* زيادة الارتفاع لإظهار 4 محطات (كان 240px) */
         overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
     }
     .team-info-card h2 { font-size: 0.9em; margin-bottom: 4px; }
