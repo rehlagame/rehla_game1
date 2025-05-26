@@ -58,24 +58,16 @@ img {
     max-width: 1200px; /* العرض الأقصى للمحتوى */
     margin-right: auto;
     margin-left: auto;
-    padding-right: 20px; /* المسافات الجانبية */
-    padding-left: 20px;
+    padding-right: 15px; /* تقليل الحشو الجانبي */
+    padding-left: 15px;
     width: 100%; /* للتأكد من أنه يأخذ العرض الكامل ضمن حدوده القصوى */
 }
 
-/*
-    ملاحظة: كان لديك تعريفان لـ .container. هذا هو التعريف الفعال (الأخير).
-    التعريف الأول الذي كان يجعل .container يمتد 100% مع padding: 0 1rem;
-    لم يكن فعالاً بسبب هذا التعريف اللاحق.
-    إذا أردت حاوية تمتد 100% بعرض الشاشة (edge-to-edge) لبعض الأقسام،
-    يمكنك إنشاء كلاس جديد مثل .container-fluid.
-*/
-
 /* --- تعديل قسم الهيرو ليملأ كامل ارتفاع الشاشة --- */
 .hero {
-    padding-top: 100px;    /* الحشو الأصلي */
-    padding-bottom: 100px; /* الحشو الأصلي */
-    min-height: 100vh;     /* ارتفاع يساوي ارتفاع الشاشة على الأقل */
+    padding-top: 80px;    /* تقليل الحشو */
+    padding-bottom: 80px;
+    min-height: 100vh;    /* ارتفاع يساوي ارتفاع الشاشة على الأقل */
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -87,13 +79,11 @@ img {
     width: 100%; /* يضمن امتداد الخلفية بعرض الشاشة بالكامل */
 }
 
-.hero .container { /* لتوسيط محتوى الهيرو إذا كان أعرض من 1200px */
-    padding-top: 2rem; /* مسافة داخلية عليا لمحتوى الهيرو */
-    padding-bottom: 2rem;/* مسافة داخلية سفلى لمحتوى الهيرو */
+.hero .container {
+    padding-top: 1.5rem; /* تقليل الحشو العلوي */
+    padding-bottom: 1.5rem; /* تقليل الحشو السفلي */
     text-align: center;
-    /* لا حاجة لتحديد width أو max-width هنا، يرثها من .container العام */
 }
-
 
 /* --- الأقسام العامة والفوتر --- */
 section,
@@ -115,20 +105,20 @@ ul {
 }
 h1, h2 { /* H1 و H2 العامة */
     color: var(--primary-color);
-    margin-bottom: 15px;
+    margin-bottom: 12px; /* تقليل الهامش */
 }
 
 /* --- الهيدر --- */
 header {
     background-color: var(--white-color);
-    padding: 12px 0;
+    padding: 10px 0; /* تقليل الحشو */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: background-color 0.4s ease, box-shadow 0.4s ease;
-    width: 100%; /* يضمن امتداد الهيدر بعرض الشاشة بالكامل */
+    width: 100%;
     /* position: fixed; */ /* معلّق حاليًا، إذا تم تفعيله، script.js يعالج الحشو */
     /* top: 0; left: 0; right: 0; z-index: 1000; */
 }
-header.scrolled { /* مثال: تغيير بسيط عند التمرير (يضاف عبر script.js) */
+header.scrolled {
     background-color: rgba(255, 255, 255, 0.95);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -143,7 +133,7 @@ header .container {
 }
 .logo h1 {
     margin: 0;
-    font-size: 2em;
+    font-size: 1.8em; /* تقليل حجم الخط */
     font-weight: 700;
 }
 .logo h1 a {
@@ -156,7 +146,7 @@ nav {
     flex-grow: 1;
     display: flex;
     justify-content: center;
-    margin: 0 15px;
+    margin: 0 10px; /* تقليل الهامش */
 }
 nav ul {
     display: flex;
@@ -164,15 +154,16 @@ nav ul {
     justify-content: center;
 }
 nav ul li {
-    margin: 5px 15px;
+    margin: 5px 12px; /* تقليل المسافة */
 }
 nav ul li a {
     color: var(--text-color);
     font-weight: bold;
-    padding-bottom: 5px;
+    padding-bottom: 4px;
     border-bottom: 2px solid transparent;
     transition: border-color 0.3s ease, color 0.3s ease;
     white-space: nowrap;
+    font-size: 0.95em; /* تقليل حجم الخط */
 }
 nav ul li a:hover,
 nav ul li a.active {
@@ -184,20 +175,20 @@ nav ul li a.active {
     align-items: center;
     flex-wrap: nowrap;
     justify-content: flex-end;
-    gap: 10px;
+    gap: 8px; /* تقليل المسافة */
     flex-shrink: 0;
 }
 
 /* --- الأزرار --- */
 .btn {
-    padding: 10px 25px;
+    padding: 8px 20px; /* تقليل الحشو */
     border-radius: 25px;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
     border: none;
-    font-size: 1em;
+    font-size: 0.95em; /* تقليل حجم الخط */
     white-space: nowrap;
     display: inline-flex;
     align-items: center;
@@ -207,9 +198,9 @@ nav ul li a.active {
     background-color: var(--white-color);
     color: var(--primary-color);
     border: 1px solid var(--primary-color);
-    padding: 8px 20px;
+    padding: 7px 18px; /* تقليل الحشو */
     border-radius: 20px;
-    font-size: 0.9em;
+    font-size: 0.85em; /* تقليل حجم الخط */
 }
 .btn-register:hover {
     background-color: var(--bg-color-alt);
@@ -219,16 +210,16 @@ nav ul li a.active {
 .btn-icon {
     background-color: var(--accent-color);
     color: var(--text-color);
-    width: 40px;
-    height: 40px;
+    width: 36px; /* تقليل الحجم */
+    height: 36px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.5em;
+    font-size: 1.4em;
     font-weight: bold;
     line-height: 1;
-    margin-left: 10px;
+    margin-left: 8px; /* تقليل الهامش */
 }
 .btn-icon:hover {
     background-color: #ffca2c;
@@ -237,28 +228,30 @@ nav ul li a.active {
 
 /* --- الهيرو (محتوى) --- */
 .hero .game-logo-main {
-    font-size: clamp(4em, 10vw, 7em);
+    font-size: clamp(3.5em, 8vw, 6em); /* تقليل الحجم */
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* تقليل الهامش */
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     color: var(--white-color);
 }
 .hero .slogan {
-    font-size: clamp(1.2em, 3vw, 1.8em);
-    margin-bottom: 40px;
-    max-width: 700px;
+    font-size: clamp(1em, 2.5vw, 1.6em); /* تقليل الحجم */
+    margin-bottom: 30px; /* تقليل الهامش */
+    max-width: 600px; /* تقليل العرض الأقصى */
     line-height: 1.8;
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+    margin-left: auto; /* للتوسيط */
+    margin-right: auto;
 }
 .main-actions .btn {
-    margin: 10px;
-    min-width: 180px;
+    margin: 8px; /* تقليل الهامش */
+    min-width: 160px; /* تقليل العرض الأدنى */
 }
 .main-actions .btn-play {
     background-color: var(--accent-color);
     color: var(--text-color);
-    font-size: 1.2em;
-    padding: 12px 35px;
+    font-size: 1.1em; /* تقليل حجم الخط */
+    padding: 10px 30px; /* تقليل الحشو */
     border: 2px solid var(--accent-color);
 }
 .main-actions .btn-play:hover {
@@ -272,6 +265,8 @@ nav ul li a.active {
     background-color: transparent;
     color: var(--white-color);
     border: 2px solid var(--white-color);
+    padding: 10px 30px; /* تقليل الحشو */
+    font-size: 1.1em; /* تقليل حجم الخط */
 }
 .main-actions .btn-secondary:hover {
     background-color: var(--white-color);
@@ -280,21 +275,21 @@ nav ul li a.active {
 
 /* --- أقسام المحتوى --- */
 section {
-    scroll-margin-top: 80px; /* للملاحة السلسة مع الهيدر الثابت (إذا كان ثابتًا) */
+    scroll-margin-top: 60px; /* تقليل الهامش العلوي */
 }
 .content-section {
-    padding: 60px 0;
+    padding: 50px 0; /* تقليل الحشو */
     text-align: center;
 }
 .content-section h2 {
-    font-size: 2.5em;
-    margin-bottom: 30px;
+    font-size: 2.2em; /* تقليل حجم الخط */
+    margin-bottom: 25px; /* تقليل الهامش */
     color: var(--primary-color);
 }
 .content-section p {
-    font-size: 1.1em;
-    max-width: 800px;
-    margin: 0 auto 20px auto;
+    font-size: 1em; /* تقليل حجم الخط */
+    max-width: 700px; /* تقليل العرض الأقصى */
+    margin: 0 auto 15px auto; /* تقليل الهامش */
     color: var(--grey-color-dark);
 }
 .content-section.alt-bg {
@@ -306,32 +301,33 @@ section {
     font-weight: bold;
     color: var(--text-color);
     white-space: nowrap;
+    font-size: 0.9em; /* تقليل حجم الخط */
 }
 .btn-logout {
     background-color: var(--secondary-color);
     color: var(--white-color);
-    padding: 8px 18px;
+    padding: 7px 16px; /* تقليل الحشو */
     border-radius: 20px;
     border: none;
     cursor: pointer;
     font-weight: bold;
     transition: background-color 0.3s ease;
-    font-size: 0.9em;
+    font-size: 0.85em; /* تقليل حجم الخط */
     line-height: normal;
 }
 .btn-logout:hover {
     background-color: var(--primary-color);
 }
-.user-actions a.btn-logout { /* لزر "حسابي" */
-    padding: 8px 18px;
+.user-actions a.btn-logout {
+    padding: 7px 16px; /* تقليل الحشو */
     text-decoration: none;
 }
 
 /* --- أنماط صفحة الحساب الجديدة (Logged.html - تصميم "حسابي") --- */
 main.account-main-content.new-account-layout {
-    padding: 50px 0;
+    padding: 40px 0; /* تقليل الحشو */
     background-color: var(--bg-color-alt);
-    min-height: calc(100vh - 200px); /* مثال لارتفاع المحتوى الرئيسي */
+    min-height: calc(100vh - 180px); /* تقليل الارتفاع الأدنى */
 }
 .account-page-container {
     display: flex;
@@ -339,24 +335,24 @@ main.account-main-content.new-account-layout {
     border-radius: 15px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    max-width: 1000px;
+    max-width: 900px; /* تقليل العرض الأقصى */
     margin: 0 auto;
 }
 .account-sidebar {
-    flex: 0 0 280px;
+    flex: 0 0 260px; /* تقليل العرض */
     background-color: #fdfdfd;
-    padding: 30px 25px;
+    padding: 25px 20px; /* تقليل الحشو */
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    border-left: 1px solid var(--grey-color-light); /* في RTL سيكون هذا الخط على اليمين */
+    border-left: 1px solid var(--grey-color-light);
 }
 .profile-summary .profile-picture-wrapper-logged {
     position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 20px auto;
+    width: 110px; /* تقليل الحجم */
+    height: 110px;
+    margin: 0 auto 15px auto; /* تقليل الهامش */
 }
 .profile-picture-logged {
     width: 100%;
@@ -369,11 +365,11 @@ main.account-main-content.new-account-layout {
 .photo-upload-label-logged {
     position: absolute;
     bottom: 5px;
-    left: 5px; /* في RTL سيكون هذا "right: 5px" إذا لم يتم عكسه تلقائيًا */
+    left: 5px;
     background-color: var(--profile-red-accent);
     color: white;
-    width: 30px;
-    height: 30px;
+    width: 28px; /* تقليل الحجم */
+    height: 28px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -386,33 +382,34 @@ main.account-main-content.new-account-layout {
     background-color: #c0392b;
 }
 .photo-upload-label-logged i {
-    font-size: 14px;
+    font-size: 13px; /* تقليل الحجم */
 }
 #profile-summary-name {
-    font-size: 1.4em;
+    font-size: 1.3em; /* تقليل حجم الخط */
     font-weight: 700;
     color: var(--text-color);
-    margin-bottom: 5px;
+    margin-bottom: 4px; /* تقليل الهامش */
 }
 #profile-summary-email {
-    font-size: 0.95em;
+    font-size: 0.9em; /* تقليل حجم الخط */
     color: var(--grey-color-dark);
-    margin-bottom: 30px;
+    margin-bottom: 25px; /* تقليل الهامش */
     word-break: break-all;
 }
 .btn-logout-sidebar {
     background-color: transparent;
     color: var(--profile-red-accent);
     border: 1px solid var(--profile-red-accent);
-    padding: 10px 20px;
+    padding: 8px 18px; /* تقليل الحشو */
     border-radius: 25px;
     font-weight: bold;
     width: 100%;
     margin-top: auto;
     transition: all 0.3s ease;
+    font-size: 0.9em; /* تقليل حجم الخط */
 }
 .btn-logout-sidebar i {
-    margin-left: 8px; /* في RTL سيكون هذا margin-right */
+    margin-left: 6px;
 }
 .btn-logout-sidebar:hover {
     background-color: var(--profile-red-accent);
@@ -420,34 +417,34 @@ main.account-main-content.new-account-layout {
 }
 .account-content {
     flex-grow: 1;
-    padding: 30px 35px;
+    padding: 25px 30px; /* تقليل الحشو */
 }
 .account-title-main {
-    font-size: 2em;
+    font-size: 1.8em; /* تقليل حجم الخط */
     color: var(--profile-red-accent);
-    margin-bottom: 25px;
+    margin-bottom: 20px; /* تقليل الهامش */
     font-weight: 700;
 }
 .tabs-container {
-    margin-bottom: 30px;
+    margin-bottom: 25px; /* تقليل الهامش */
 }
 .tab-nav {
     display: flex;
     border-bottom: 1px solid var(--grey-color-light);
-    margin-bottom: 25px;
+    margin-bottom: 20px; /* تقليل الهامش */
 }
 .tab-link {
     background: none;
     border: none;
-    padding: 12px 20px;
-    font-size: 1.05em;
+    padding: 10px 18px; /* تقليل الحشو */
+    font-size: 1em; /* تقليل حجم الخط */
     font-weight: 600;
     color: var(--grey-color-dark);
     cursor: pointer;
     position: relative;
     transition: color 0.3s ease;
     border-bottom: 3px solid transparent;
-    margin-bottom: -1px; /* ليتداخل مع الخط السفلي */
+    margin-bottom: -1px;
 }
 .tab-link:hover {
     color: var(--text-color);
@@ -471,11 +468,11 @@ main.account-main-content.new-account-layout {
 #change-password-form-logged {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 15px; /* تقليل المسافة */
 }
 .form-row {
     display: flex;
-    gap: 20px;
+    gap: 15px; /* تقليل المسافة */
 }
 .form-group-logged {
     flex: 1;
@@ -483,10 +480,10 @@ main.account-main-content.new-account-layout {
     flex-direction: column;
 }
 .form-group-logged label {
-    font-size: 0.9em;
+    font-size: 0.85em; /* تقليل حجم الخط */
     font-weight: 600;
     color: var(--grey-color-dark);
-    margin-bottom: 8px;
+    margin-bottom: 6px; /* تقليل الهامش */
 }
 .form-group-logged input[type="text"],
 .form-group-logged input[type="email"],
@@ -495,10 +492,10 @@ main.account-main-content.new-account-layout {
 .form-group-logged input[type="date"],
 .form-group-logged select.country-code-select-logged {
     width: 100%;
-    padding: 12px 15px;
+    padding: 10px 12px; /* تقليل الحشو */
     border: 1px solid var(--grey-color-light);
     border-radius: 8px;
-    font-size: 1em;
+    font-size: 0.95em; /* تقليل حجم الخط */
     font-family: 'Cairo', sans-serif;
     background-color: #fcfdff;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -516,18 +513,18 @@ main.account-main-content.new-account-layout {
     color: var(--grey-color-dark);
 }
 .form-group-logged small {
-    font-size: 0.8em;
+    font-size: 0.75em; /* تقليل حجم الخط */
     color: var(--grey-color-dark);
-    margin-top: 5px;
+    margin-top: 4px; /* تقليل الهامش */
 }
 .phone-input-container-logged {
     display: flex;
-    gap: 8px;
+    gap: 6px; /* تقليل المسافة */
 }
 .country-code-select-logged {
-    flex-basis: 150px;
+    flex-basis: 130px; /* تقليل العرض */
     flex-shrink: 0;
-    padding: 12px 8px !important;
+    padding: 10px 6px !important;
 }
 .form-group-logged input[type="tel"] {
     flex-grow: 1;
@@ -540,24 +537,24 @@ main.account-main-content.new-account-layout {
 .btn-save-changes-logged {
     background-color: var(--profile-red-accent);
     color: var(--white-color);
-    padding: 12px 30px;
-    font-size: 1em;
+    padding: 10px 25px; /* تقليل الحشو */
+    font-size: 0.95em; /* تقليل حجم الخط */
     font-weight: bold;
     border-radius: 8px;
     border: none;
     cursor: pointer;
-    align-self: flex-start; /* في RTL سيكون هذا flex-end */
-    margin-top: 10px;
+    align-self: flex-start;
+    margin-top: 8px; /* تقليل الهامش */
     transition: background-color 0.3s ease;
 }
 .btn-save-changes-logged:hover {
     background-color: #c0392b;
 }
 .form-message {
-    padding: 10px 15px;
+    padding: 8px 12px; /* تقليل الحشو */
     border-radius: 6px;
-    margin-top: 15px;
-    font-size: 0.9em;
+    margin-top: 10px; /* تقليل الهامش */
+    font-size: 0.85em; /* تقليل حجم الخط */
 }
 .form-message.success {
     background-color: #d4edda;
@@ -573,11 +570,11 @@ main.account-main-content.new-account-layout {
     background-color: transparent;
     color: var(--danger-color);
     border: 1px solid var(--danger-color);
-    padding: 8px 15px;
-    font-size: 0.9em;
+    padding: 7px 12px; /* تقليل الحشو */
+    font-size: 0.85em; /* تقليل حجم الخط */
     border-radius: 20px;
-    margin-top: 30px;
-    float: left; /* في RTL سيكون هذا float: right */
+    margin-top: 25px; /* تقليل الهامش */
+    float: left;
     transition: all 0.3s ease;
 }
 .btn-delete-account-logged:hover {
@@ -593,14 +590,14 @@ main.account-main-content.new-account-layout {
 .games-trigger-btn {
     background-color: #ff8c00;
     color: white;
-    padding: 8px 15px;
+    padding: 7px 12px; /* تقليل الحشو */
     border-radius: 20px;
-    font-size: 0.9em;
+    font-size: 0.85em; /* تقليل حجم الخط */
     cursor: pointer;
     border: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px; /* تقليل المسافة */
     transition: background-color 0.3s ease;
     line-height: normal;
 }
@@ -613,8 +610,8 @@ main.account-main-content.new-account-layout {
 .games-trigger-btn .plus-icon {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
-    width: 16px;
-    height: 16px;
+    width: 14px; /* تقليل الحجم */
+    height: 14px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -624,17 +621,15 @@ main.account-main-content.new-account-layout {
 .purchase-dropdown-menu {
     display: none;
     position: absolute;
-    top: calc(100% + 8px);
-    /* left: 0;  في RTL، قد يكون right: 0 أفضل أو يتم التحكم به بـ JS */
-    /* يتم التحكم بموضع القائمة المنسدلة في main.js ليناسب الاتجاه */
+    top: calc(100% + 6px); /* تقليل المسافة */
     background-color: white;
     border-radius: 10px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
-    padding: 20px 25px;
-    min-width: 320px;
+    padding: 15px 20px; /* تقليل الحشو */
+    min-width: 300px; /* تقليل العرض */
     z-index: 1001;
     border: 1px solid #e0e0e0;
-    text-align: right; /* مناسب لـ RTL */
+    text-align: right;
     animation: fadeInScaleUp 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 .purchase-dropdown-menu.show {
@@ -642,26 +637,26 @@ main.account-main-content.new-account-layout {
 }
 .dropdown-title {
     margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.2em;
+    margin-bottom: 15px; /* تقليل الهامش */
+    font-size: 1.1em; /* تقليل حجم الخط */
     font-weight: 700;
     color: var(--primary-color);
     text-align: center;
     border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 15px;
+    padding-bottom: 12px; /* تقليل الحشو */
 }
 .purchase-options-list {
     list-style: none;
     padding: 0;
-    margin: 0 0 20px 0;
+    margin: 0 0 15px 0; /* تقليل الهامش */
 }
 .purchase-option {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 12px;
+    padding: 12px 10px; /* تقليل الحشو */
     border-radius: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 8px; /* تقليل الهامش */
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
     border: 2px solid transparent;
@@ -685,21 +680,21 @@ main.account-main-content.new-account-layout {
     color: var(--secondary-color);
     font-weight: bold;
     white-space: nowrap;
-    margin-right: 15px; /* في RTL، هذا جيد */
-    font-size: 1.05em;
+    margin-right: 12px;
+    font-size: 1em; /* تقليل حجم الخط */
 }
 .promo-section {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 8px; /* تقليل المسافة */
+    margin-bottom: 15px; /* تقليل الهامش */
     align-items: center;
 }
 .promo-section input[type="text"] {
     flex-grow: 1;
-    padding: 10px 12px;
+    padding: 8px 10px; /* تقليل الحشو */
     border: 1px solid var(--grey-color-light);
     border-radius: 6px;
-    font-size: 1em;
+    font-size: 0.95em; /* تقليل حجم الخط */
 }
 .promo-section input[type="text"]:focus {
     border-color: var(--primary-color);
@@ -707,26 +702,25 @@ main.account-main-content.new-account-layout {
     outline: none;
 }
 .promo-section button {
-    padding: 10px 15px;
+    padding: 8px 12px; /* تقليل الحشو */
     flex-shrink: 0;
     background-color: var(--grey-color-dark);
     color: var(--white-color);
-    /* border-color: var(--grey-color-dark); /* تم إزالتها إذا كان الزر يستخدم كلاس .btn */
     border-radius: 6px;
+    font-size: 0.9em; /* تقليل حجم الخط */
 }
 .promo-section button:hover {
     background-color: #5a6268;
-    /* border-color: #545b62; */
 }
 .total-section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 5px;
-    margin-bottom: 20px;
+    padding: 12px 5px; /* تقليل الحشو */
+    margin-bottom: 15px; /* تقليل الهامش */
     border-top: 1px solid #f0f0f0;
     border-bottom: 1px solid #f0f0f0;
-    font-size: 1.15em;
+    font-size: 1.1em; /* تقليل حجم الخط */
 }
 .total-section span {
     color: var(--grey-color-dark);
@@ -737,26 +731,26 @@ main.account-main-content.new-account-layout {
 }
 #pay-now-btn {
     width: 100%;
-    padding: 14px;
-    font-size: 1.15em;
+    padding: 12px; /* تقليل الحشو */
+    font-size: 1.1em; /* تقليل حجم الخط */
     font-weight: bold;
     background-color: var(--success-color);
     color: var(--white-color);
     border: none;
     border-radius: 8px;
 }
-#pay-now-btn:hover { /* :not(:disabled) مضافة لضمان عدم تطبيق التأثير عند التعطيل */
+#pay-now-btn:hover:not(:disabled) {
     background-color: #218838;
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
 }
 #pay-now-btn:disabled {
     background-color: var(--grey-color-light);
-    color: var(--grey-color-dark); /* تعديل اللون ليتناسب */
+    color: var(--grey-color-dark);
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
-    opacity: 0.7; /* إضافة شفافية للزر المعطل */
+    opacity: 0.7;
 }
 @keyframes fadeInScaleUp {
     from { opacity: 0; transform: translateY(-10px) scale(0.98); }
@@ -767,9 +761,9 @@ main.account-main-content.new-account-layout {
 footer {
     background-color: var(--footer-bg-color);
     color: var(--footer-text-color);
-    padding: 50px 20px 40px 20px;
-    margin-top: 60px;
-    font-size: 1em;
+    padding: 40px 15px 30px 15px; /* تقليل الحشو */
+    margin-top: 50px; /* تقليل الهامش */
+    font-size: 0.95em; /* تقليل حجم الخط */
     border-top: 3px solid var(--primary-color);
     text-align: center;
     font-family: 'Cairo', sans-serif;
@@ -779,8 +773,8 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 30px;
-    max-width: 800px;
+    gap: 25px; /* تقليل المسافة */
+    max-width: 700px; /* تقليل العرض الأقصى */
     margin: 0 auto;
 }
 
@@ -789,26 +783,26 @@ footer {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 25px 35px;
+    gap: 20px 30px; /* تقليل المسافة */
 }
 
 .social-media-icons,
 .app-store-icons {
     display: flex;
-    gap: 20px;
+    gap: 15px; /* تقليل المسافة */
 }
 
 .app-store-icons .app-icon-link i,
 .social-media-icons .social-icon-link i {
-    font-size: 1.7em;
+    font-size: 1.6em; /* تقليل الحجم */
 }
 .app-store-icons .app-icon-link,
 .social-media-icons .social-icon-link {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 45px;
-    height: 45px;
+    width: 42px; /* تقليل الحجم */
+    height: 42px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.08);
     color: var(--footer-icon-color);
@@ -828,8 +822,8 @@ footer {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 15px 30px;
-    font-size: 0.9em;
+    gap: 12px 25px; /* تقليل المسافة */
+    font-size: 0.85em; /* تقليل حجم الخط */
     font-weight: 400;
 }
 
@@ -852,23 +846,23 @@ footer {
     text-decoration: none;
 }
 
-p.developer-credit { /* لإلغاء الأنماط القديمة إذا كانت موجودة */
+p.developer-credit {
     font-size: inherit !important;
     color: inherit !important;
     text-align: inherit !important;
     border-bottom: none !important;
 }
-.developer-credit a { /* لإلغاء الأنماط القديمة إذا كانت موجودة */
+.developer-credit a {
     border-bottom: none !important;
     font-weight: 500 !important;
     color: var(--accent-color) !important;
 }
 
 .footer-copyright-row {
-    font-size: 0.85em;
+    font-size: 0.8em; /* تقليل حجم الخط */
     opacity: 0.8;
     font-weight: 400;
-    margin-top: 5px;
+    margin-top: 4px; /* تقليل الهامش */
 }
 .footer-copyright-row p {
     margin-bottom: 0;
@@ -878,37 +872,35 @@ p.developer-credit { /* لإلغاء الأنماط القديمة إذا كان
     vertical-align: super;
 }
 
-.footer-main-container { /* لإخفاء حاوية الفوتر القديمة إذا كانت موجودة */
+.footer-main-container {
     display: none !important;
 }
-
 
 /* --- Media Queries للتجاوبية --- */
 /* عند تدوير الجهاز للعرض (Landscape) - قاعدة عامة */
 @media screen and (orientation: landscape) {
     .content-section, .content-section.alt-bg {
-        padding: 40px 1rem; /* تقليل الحشو في الوضع الأفقي لتوفير مساحة */
+        padding: 30px 1rem; /* تقليل الحشو */
     }
-    .hero { /* الهيرو يجب أن يظل يملأ الشاشة */
+    .hero {
         min-height: 100vh;
     }
 }
 
 @media (max-width: 992px) {
     header .container {
-        /* justify-content: space-between; /* لا حاجة للتغيير، الأصل جيد */
+        /* justify-content: space-between; */
     }
     nav {
-        order: 3; /* لوضع القائمة أسفل الشعار والأزرار في الشاشات الصغيرة */
+        order: 3;
         width: 100%;
-        margin-top: 10px;
-        /* justify-content: center; /* لا حاجة للتغيير، الأصل جيد */
+        margin-top: 8px; /* تقليل الهامش */
     }
     nav ul {
-        padding-bottom: 5px;
+        padding-bottom: 4px;
     }
     .user-actions {
-        order: 2; /* لوضع أزرار المستخدم بجانب الشعار قبل القائمة */
+        order: 2;
         min-width: auto;
     }
     .account-page-container {
@@ -917,19 +909,21 @@ p.developer-credit { /* لإلغاء الأنماط القديمة إذا كان
     .account-sidebar {
         flex: 0 0 auto;
         width: 100%;
-        border-left: none; /* إزالة الخط الأيسر لأنه سيكون فوق المحتوى */
+        border-left: none;
         border-bottom: 1px solid var(--grey-color-light);
-        padding: 25px;
+        padding: 20px 15px; /* تقليل الحشو */
     }
     .btn-logout-sidebar {
-        margin-top: 20px;
-        max-width: 250px; /* تحديد عرض أقصى لزر الخروج في الشريط الجانبي */
+        margin-top: 15px; /* تقليل الهامش */
+        max-width: 220px; /* تقليل العرض */
+        padding: 7px 16px; /* تقليل الحشو */
+        font-size: 0.85em; /* تقليل حجم الخط */
     }
     .account-content {
-        padding: 25px;
+        padding: 20px 15px; /* تقليل الحشو */
     }
     .account-title-main {
-        font-size: 1.8em;
+        font-size: 1.6em; /* تقليل حجم الخط */
         text-align: center;
     }
     .tab-nav {
@@ -939,162 +933,169 @@ p.developer-credit { /* لإلغاء الأنماط القديمة إذا كان
 
 @media (max-width: 768px) {
     .user-actions {
-        /* flex-wrap: wrap; /* لا حاجة، الأصل nowrap مناسب */
-        /* justify-content: center; /* الأصل flex-end أفضل للهيدر */
-        width: 100%; /* إذا أردت أن تأخذ الأزرار عرض كامل عند الالتفاف */
-        margin-top: 10px;
+        width: 100%;
+        margin-top: 8px;
     }
-    /* .user-actions .btn-register { padding: 8px 20px; font-size: 0.9em; } /* تم تعريفه بالفعل */
 
     .hero {
-        padding-top: 60px; /* تقليل الحشو في الهيرو */
-        padding-bottom: 60px;
+        padding-top: 50px; /* تقليل الحشو */
+        padding-bottom: 50px;
     }
     .hero .game-logo-main {
-        font-size: 3.5em;
+        font-size: 3em; /* تقليل الحجم */
     }
     .hero .slogan {
-        font-size: 1.1em;
+        font-size: 1em; /* تقليل الحجم */
+        max-width: 90%; /* جعل العرض نسبيًا */
     }
     .main-actions .btn {
-        width: 80%; /* جعل الأزرار الرئيسية أعرض في الهيرو */
-        margin: 10px auto;
+        width: 85%; /* زيادة طفيفة في العرض */
+        margin: 8px auto;
         display: block;
         min-width: auto;
+        padding: 8px 25px; /* تقليل الحشو */
+        font-size: 1em; /* تقليل حجم الخط */
     }
-    /* section { scroll-margin-top: 80px; } /* تم تعريفه بالفعل */
+    section {
+        scroll-margin-top: 50px; /* تقليل الهامش */
+    }
     .content-section h2 {
-        font-size: 2em;
+        font-size: 1.8em; /* تقليل حجم الخط */
     }
     .purchase-dropdown-menu {
         min-width: 280px;
-        padding: 15px 20px;
-        left: 50%; /* لتوسيط القائمة المنسدلة */
+        padding: 12px 15px; /* تقليل الحشو */
+        left: 50%;
         transform: translateX(-50%);
-        top: calc(100% + 5px);
+        top: calc(100% + 4px);
     }
     .games-counter-container {
-        margin-left: 0; /* في RTL سيكون margin-right */
+        margin-left: 0;
     }
 
     /* تجاوبية الفوتر */
     footer {
-        padding: 40px 20px 30px 20px;
+        padding: 30px 15px 25px 15px; /* تقليل الحشو */
     }
     .footer-container-modern {
-        gap: 25px;
+        gap: 20px;
     }
     .footer-icons-row {
-        gap: 20px 25px;
-    }
-    .app-store-icons .app-icon-link i,
-    .social-media-icons .social-icon-link i {
-        font-size: 1.6em;
-    }
-    .app-store-icons .app-icon-link,
-    .social-media-icons .social-icon-link {
-        width: 42px;
-        height: 42px;
-    }
-    .footer-links-row {
-        font-size: 0.85em;
-        gap: 10px 20px;
-    }
-    .footer-copyright-row {
-        font-size: 0.8em;
-    }
-
-    .form-row { /* في صفحة الحساب */
-        flex-direction: column;
-        gap: 0px; /* إزالة المسافة العمودية عند التكديس */
-    }
-    .form-group-logged {
-        margin-bottom: 20px;
-    }
-    .form-group-logged:last-child {
-        margin-bottom: 0;
-    }
-    .btn-save-changes-logged {
-        width: 100%; /* جعل زر الحفظ يأخذ عرض كامل */
-    }
-    .btn-delete-account-logged {
-        float: none;
-        display: block;
-        margin: 25px auto 0 auto;
-        width: fit-content; /* ليتناسب مع النص */
-    }
-    .tab-link {
-        padding: 10px 15px;
-        font-size: 1em;
-    }
-}
-
-@media (max-width: 480px) {
-    nav ul li {
-        margin: 5px 8px; /* تقليل المسافة بين عناصر القائمة */
-    }
-    .games-trigger-btn span:first-child { /* إخفاء نص "عدد الألعاب" */
-        display: none;
-    }
-    .games-trigger-btn { /* تصغير زر شراء الألعاب */
-        padding: 8px 12px;
-    }
-    .purchase-dropdown-menu {
-        min-width: 90vw; /* جعل القائمة المنسدلة تأخذ معظم عرض الشاشة */
-        left: 5%;
-        transform: translateX(0); /* إزالة التوسيط لأنها تأخذ عرض شبه كامل */
-    }
-
-    /* تجاوبية الفوتر لشاشات أصغر */
-    .app-store-icons .app-icon-link,
-    .social-media-icons .social-icon-link {
-        width: 40px;
-        height: 40px;
+        gap: 15px 20px;
     }
     .app-store-icons .app-icon-link i,
     .social-media-icons .social-icon-link i {
         font-size: 1.5em;
     }
+    .app-store-icons .app-icon-link,
+    .social-media-icons .social-icon-link {
+        width: 40px;
+        height: 40px;
+    }
+    .footer-links-row {
+        font-size: 0.8em;
+        gap: 8px 15px;
+    }
+    .footer-copyright-row {
+        font-size: 0.75em;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0px;
+    }
+    .form-group-logged {
+        margin-bottom: 15px;
+    }
+    .form-group-logged:last-child {
+        margin-bottom: 0;
+    }
+    .btn-save-changes-logged {
+        width: 100%;
+        padding: 8px 20px; /* تقليل الحشو */
+        font-size: 0.9em; /* تقليل حجم الخط */
+    }
+    .btn-delete-account-logged {
+        float: none;
+        display: block;
+        margin: 20px auto 0 auto;
+        width: fit-content;
+        padding: 6px 10px; /* تقليل الحشو */
+        font-size: 0.8em; /* تقليل حجم الخط */
+    }
+    .tab-link {
+        padding: 8px 12px;
+        font-size: 0.95em;
+    }
+}
+
+@media (max-width: 480px) {
+    nav ul li {
+        margin: 5px 6px;
+    }
+    .games-trigger-btn span:first-child {
+        display: none;
+    }
+    .games-trigger-btn {
+        padding: 6px 10px;
+    }
+    .purchase-dropdown-menu {
+        min-width: 90vw;
+        left: 5%;
+        transform: translateX(0);
+        padding: 10px 12px; /* تقليل الحشو */
+    }
+
+    /* تجاوبية الفوتر لشاشات أصغر */
+    .app-store-icons .app-icon-link,
+    .social-media-icons .social-icon-link {
+        width: 38px;
+        height: 38px;
+    }
+    .app-store-icons .app-icon-link i,
+    .social-media-icons .social-icon-link i {
+        font-size: 1.4em;
+    }
     .social-media-icons,
     .app-store-icons {
-        gap: 15px;
+        gap: 12px;
     }
     .footer-links-row,
     .footer-copyright-row {
-        font-size: 0.82em;
+        font-size: 0.78em;
     }
 
     /* صفحة الحساب */
     .account-sidebar {
-        padding: 20px 15px;
+        padding: 15px 10px;
     }
     .profile-picture-wrapper-logged {
-        width: 100px;
-        height: 100px;
+        width: 90px;
+        height: 90px;
     }
     #profile-summary-name {
-        font-size: 1.2em;
+        font-size: 1.1em;
     }
     #profile-summary-email {
-        font-size: 0.9em;
+        font-size: 0.85em;
     }
     .account-content {
-        padding: 20px 15px;
+        padding: 15px 10px;
     }
     .account-title-main {
-        font-size: 1.6em;
+        font-size: 1.4em;
     }
     .country-code-select-logged {
-        flex-basis: 120px !important; /* تصغير حقل مفتاح الدولة */
+        flex-basis: 110px !important;
         font-size: 0.9em;
     }
     .form-group-logged input,
     .form-group-logged select {
-        font-size: 0.95em;
-        padding: 10px 12px;
+        font-size: 0.9em;
+        padding: 8px 10px;
     }
     .tab-link {
-        font-size: 0.9em;
-        padding: 10px 10px;
+        font-size: 0.85em;
+        padding: 8px 8px;
     }
 }
