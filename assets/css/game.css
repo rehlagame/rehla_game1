@@ -1,3 +1,4 @@
+/* --- START OF FILE assets/css/game.css (مُعدل بناءً على الكود الأصلي مع التركيز على WebView Landscape) --- */
 
 :root {
     /* تعريف متغيرات الألوان لتسهيل التعديل */
@@ -18,9 +19,9 @@
     --team2-color: #fd7e14;
 
     /* عرض الشريط الجانبي الافتراضي للشاشات الكبيرة */
-    --sidebar-width-default: 550px; /* تم زيادته بنسبة 20% من 455px */
+    --sidebar-width-default: 455px;
     /* عرض الشريط الجانبي المصغر للوضع الأفقي على الهواتف */
-    --sidebar-width-landscape-mobile: 240px; /* تم زيادته بنسبة 20% من 200px */
+    --sidebar-width-landscape-mobile: 200px; /* قيمة مبدئية، قابلة للتعديل */
 }
 
 /* === أنماط خاصة بتطبيق WebView وملء الشاشة للعبة === */
@@ -79,11 +80,6 @@ body.game-active-page #game-sidebar {
     position: relative; /* لضمان احتواء العناصر المطلقة مثل #question-timer */
 }
 
-body.game-active-page #question-interaction-area {
-    max-width: 80%; /* تم تصغيره بنسبة 20% */
-    margin: 0 auto; /* لتوسيط المربع */
-}
-
 body.game-active-page #game-sidebar {
     background-color: #fdfdfd;
     box-shadow: -2px 0 5px rgba(0,0,0,0.05); /* ظل في RTL سيكون على اليمين */
@@ -130,186 +126,29 @@ footer .container {
 /* --- منطقة اللعب الفعلية (Game Play Area) - الأنماط الأصلية --- */
 .hidden { display: none !important; }
 
-/* --- العمود الثاني (يمين): الشريط الجانبي (الأنماط المعدلة لتحسين عرض الفريقين) --- */
+/* --- العمود الثاني (يمين): الشريط الجانبي (الأنماط الأصلية مع تعديلات طفيفة للتمرير والتثبيت) --- */
 #game-sidebar {
-    display: flex; 
-    flex-direction: column; 
-    gap: 15px; /* تقليل gap */
+    display: flex; flex-direction: column; gap: 15px; /* تقليل gap */
 }
+#current-turn-info { text-align: center; font-size: 1.15em; font-weight: 700; padding: 12px; background-color: var(--white-color); color: var(--black-color); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border: 1px solid var(--grey-color-medium); flex-shrink: 0; position: relative; }
+.team-name-highlight { color: var(--primary-color); }
+.teams-dashboard { display: flex; flex-direction: column; /* جعلها عمودية دائمًا داخل الشريط الجانبي */ gap: 10px; align-items: stretch; flex-shrink: 0; }
+.team-info-card { background-color: var(--white-color); border: 1px solid var(--grey-color-medium); padding: 12px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; box-sizing: border-box; }
+.team-info-card h2 { color: var(--primary-color); margin-top: 0; margin-bottom: 8px; text-align: center; font-size: 1.1em; font-weight: 700; border-bottom: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-bottom: 0; }
+.team-info-card .current-station { font-size: 0.8em; color: var(--grey-color-dark); margin-bottom: 6px; text-align: center; border-top: 1px solid var(--grey-color-light); padding-top: 6px; }
+.team-info-card .current-station span { display: block; font-weight: 700; color: var(--black-color); font-size: 1.05em; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.team-info-card.active-team { border-color: var(--primary-color); background-color: #f0fbff; box-shadow: 0 5px 15px rgba(23,162,184,0.12); }
+#team1-info.active-team { border-color: var(--team1-color); box-shadow: 0 5px 15px rgba(13,110,253,0.12); } #team1-info.active-team h2 { color: var(--team1-color); }
+#team2-info.active-team { border-color: var(--team2-color); box-shadow: 0 5px 15px rgba(253,126,20,0.12); } #team2-info.active-team h2 { color: var(--team2-color); }
+.path-display { margin-top: 8px; flex-grow: 1; }
+.path-display h4 { margin-bottom: 6px; color: var(--secondary-color); font-size: 0.75em; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.path-display ol { list-style: none; padding-right: 0; margin: 0; counter-reset: path-counter; }
+.path-display li { display: flex; align-items: center; background-color: var(--grey-color-light); margin-bottom: 5px; padding: 6px 8px; border-radius: 5px; position: relative; font-size: 0.8em; counter-increment: path-counter; border: 1px solid var(--grey-color-medium); transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease; overflow: hidden; white-space: nowrap; }
+.path-display li::before { content: counter(path-counter); min-width: 18px; height: 18px; line-height: 18px; border-radius: 50%; background-color: var(--secondary-color); color: white; text-align: center; font-size: 0.75em; font-weight: bold; margin-left: 6px; flex-shrink: 0; transition: background-color 0.3s ease; }
+.path-display li.completed-path-station { background-color: #e9ecef; color: var(--grey-color-dark); opacity: 0.75; border-color: #ced4da; } .path-display li.completed-path-station::before { background-color: var(--success-color); }
+.path-display li.current-path-station { background-color: var(--accent-color); color: var(--black-color); font-weight: 700; border-color: #e0a800; box-shadow: 0 2px 4px rgba(0,0,0,0.08); opacity: 1; } .path-display li.current-path-station::before { background-color: var(--primary-color); color: white; }
 
-#current-turn-info { 
-    text-align: center; 
-    font-size: 1.15em; 
-    font-weight: 700; 
-    padding: 12px; 
-    background-color: var(--white-color); 
-    color: var(--black-color); 
-    border-radius: 8px; 
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06); 
-    border: 1px solid var(--grey-color-medium); 
-    flex-shrink: 0; 
-    position: relative; 
-}
-
-.team-name-highlight { 
-    color: var(--primary-color); 
-}
-
-.teams-dashboard { 
-    display: flex; 
-    flex-direction: column; /* افتراضيًا عمودي للشاشات الكبيرة */
-    gap: 10px; 
-    align-items: stretch; 
-    flex-shrink: 0; 
-}
-
-.team-info-card { 
-    background-color: var(--white-color); 
-    border: 1px solid var(--grey-color-medium); 
-    padding: 12px; 
-    border-radius: 10px; 
-    box-shadow: 0 3px 10px rgba(0,0,0,0.05); 
-    display: flex; 
-    flex-direction: column; 
-    box-sizing: border-box; 
-    max-height: 300px; /* تحديد ارتفاع أقصى للبطاقة */
-    overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
-}
-
-.team-info-card h2 { 
-    color: var(--primary-color); 
-    margin-top: 0; 
-    margin-bottom: 8px; 
-    text-align: center; 
-    font-size: 1.1em; 
-    font-weight: 700; 
-    border-bottom: none; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-    padding-bottom: 0; 
-}
-
-.team-info-card .current-station { 
-    font-size: 0.8em; 
-    color: var(--grey-color-dark); 
-    margin-bottom: 6px; 
-    text-align: center; 
-    border-top: 1px solid var(--grey-color-light); 
-    padding-top: 6px; 
-}
-
-.team-info-card .current-station span { 
-    display: block; 
-    font-weight: 700; 
-    color: var(--black-color); 
-    font-size: 1.05em; 
-    margin-top: 2px; 
-    white-space: nowrap; 
-    overflow: hidden; 
-    text-overflow: ellipsis; 
-}
-
-.team-info-card.active-team { 
-    border-color: var(--primary-color); 
-    background-color: #f0fbff; 
-    box-shadow: 0 5px 15px rgba(23,162,184,0.12); 
-}
-
-#team1-info.active-team { 
-    border-color: var(--team1-color); 
-    box-shadow: 0 5px 15px rgba(13,110,253,0.12); 
-} 
-#team1-info.active-team h2 { 
-    color: var(--team1-color); 
-}
-
-#team2-info.active-team { 
-    border-color: var(--team2-color); 
-    box-shadow: 0 5px 15px rgba(253,126,20,0.12); 
-} 
-#team2-info.active-team h2 { 
-    color: var(--team2-color); 
-}
-
-.path-display { 
-    margin-top: 8px; 
-    flex-grow: 1; 
-}
-
-.path-display h4 { 
-    margin-bottom: 6px; 
-    color: var(--secondary-color); 
-    font-size: 0.75em; 
-    text-align: center; 
-    text-transform: uppercase; 
-    letter-spacing: 0.5px; 
-    font-weight: 600; 
-}
-
-.path-display ol { 
-    list-style: none; 
-    padding-right: 0; 
-    margin: 0; 
-    counter-reset: path-counter; 
-}
-
-.path-display li { 
-    display: flex; 
-    align-items: center; 
-    background-color: var(--grey-color-light); 
-    margin-bottom: 5px; 
-    padding: 6px 8px; 
-    border-radius: 5px; 
-    position: relative; 
-    font-size: 0.8em; 
-    counter-increment: path-counter; 
-    border: 1px solid var(--grey-color-medium); 
-    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease; 
-    overflow: hidden; 
-    white-space: nowrap; 
-}
-
-.path-display li::before { 
-    content: counter(path-counter); 
-    min-width: 18px; 
-    height: 18px; 
-    line-height: 18px; 
-    border-radius: 50%; 
-    background-color: var(--secondary-color); 
-    color: white; 
-    text-align: center; 
-    font-size: 0.75em; 
-    font-weight: bold; 
-    margin-left: 6px; 
-    flex-shrink: 0; 
-    transition: background-color 0.3s ease; 
-}
-
-.path-display li.completed-path-station { 
-    background-color: #e9ecef; 
-    color: var(--grey-color-dark); 
-    opacity: 0.75; 
-    border-color: #ced4da; 
-} 
-.path-display li.completed-path-station::before { 
-    background-color: var(--success-color); 
-}
-
-.path-display li.current-path-station { 
-    background-color: var(--accent-color); 
-    color: var(--black-color); 
-    font-weight: 700; 
-    border-color: #e0a800; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08); 
-    opacity: 1; 
-} 
-.path-display li.current-path-station::before { 
-    background-color: var(--primary-color); 
-    color: white; 
-}
-
-/* --- العمود الأول (يسار): منطقة السؤال والتفاعل (الأنماط المعدلة لتعديل مكان الزر) --- */
+/* --- العمود الأول (يسار): منطقة السؤال والتفاعل (الأنماط المعدلة للحفاظ على مكان الوقت وإعادة الزر لمكانه الأصلي) --- */
 #question-timer {
     position: absolute;
     top: 12px; /* الموقع العلوي ليكون متناسقًا داخل المربع */
@@ -437,10 +276,10 @@ footer .container {
 
 #reveal-answer-btn {
     display: block;
-    width: 35%; /* العرض المطلوب */
-    margin: 10px auto 0 auto; /* الموقع الأصلي متمركزًا أسفل نص السؤال */
-    padding: 12px 18px;
-    font-size: 1.15em;
+    width: 70%; /* العودة إلى العرض الأصلي */
+    margin: 10px auto 0 auto; /* العودة إلى الموقع الأصلي متمركزًا */
+    padding: 12px 18px; /* العودة إلى الحشو الأصلي */
+    font-size: 1.15em; /* العودة إلى حجم الخط الأصلي */
     background-color: var(--accent-color);
     color: var(--black-color);
     border: none;
@@ -694,7 +533,7 @@ footer .container {
     padding-bottom: 4px;
     margin-bottom: 6px;
     position: relative;
-    overflow: visible; /* تغيير إلى visible لضمان ظهور السكور */
+    overflow: hidden;
     text-align: center;
     border-top: none;
 }
@@ -791,83 +630,22 @@ footer .container {
         padding: 10px;
     }
     #game-sidebar {
-        position: static; 
-        height: auto; 
-        overflow-y: visible;
-        margin-top: 15px; 
-        width: 100%; 
-        padding: 10px; 
-        box-shadow: none;
+        position: static; height: auto; overflow-y: visible;
+        margin-top: 15px; width: 100%; padding: 10px; box-shadow: none;
     }
-    .teams-dashboard { 
-        flex-direction: row; /* عرض الفريقين جنبًا إلى جنب */
-        flex-wrap: nowrap; /* منع التفاف العناصر */
-        gap: 8px; 
-        justify-content: space-between; /* توزيع الفريقين بشكل متساوٍ */
-    }
-    .team-info-card { 
-        flex-basis: calc(50% - 4px); 
-        min-width: 0; /* منع التوسع الزائد */
-        max-width: calc(50% - 4px); /* تحديد العرض الأقصى */
-        padding: 10px; /* زيادة الحشو قليلاً لتحسين الوضوح */
-        max-height: 250px; /* تحديد ارتفاع أقصى */
-        overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
-    }
-    .team-info-card h2 { 
-        font-size: 1em; /* زيادة حجم الخط */
-        margin-bottom: 6px; 
-    }
-    .team-info-card .current-station { 
-        font-size: 0.8em; /* زيادة حجم الخط */
-        margin-bottom: 6px; 
-        padding-top: 6px; 
-    }
-    .team-info-card .current-station span { 
-        font-size: 0.9em; /* زيادة حجم الخط */
-    }
-    .path-display h4 { 
-        font-size: 0.7em; /* زيادة حجم الخط */
-        margin-bottom: 4px; 
-    }
-    .path-display li { 
-        font-size: 0.75em; /* زيادة حجم الخط */
-        padding: 5px 8px; 
-        margin-bottom: 4px; 
-    }
-    .path-display li::before { 
-        min-width: 16px; 
-        height: 16px; 
-        line-height: 16px; 
-        font-size: 0.65em; 
-        margin-left: 5px; 
-    }
-    .team-info-card .score > span:first-child { 
-        font-size: 0.8em; /* زيادة حجم الخط */
-    }
-    .score-value-container { 
-        padding: 4px 8px; /* زيادة الحشو */
-        min-width: 60px; /* زيادة العرض */
-    }
-    .score-value-container span[id*="-score"] { 
-        font-size: 1em; /* زيادة حجم الخط */
-        margin: 0 6px; /* زيادة الهوامش */
-    }
-    #question-interaction-area { 
-        min-height: auto; 
-        padding: 10px; 
-        margin-bottom: 0; 
-        max-width: 100%; /* تعديل العرض ليتناسب مع الشاشة الصغيرة */
-    }
+    .teams-dashboard { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+    .team-info-card { flex-basis: calc(50% - 4px); min-width: 150px; }
+    #question-interaction-area { min-height: auto; padding: 10px; margin-bottom: 0; }
     /* إعدادات اللعبة */
-    .team-setup { flex-basis: 100%; } 
-    #game-setup-form { padding: 20px; }
+    .team-setup { flex-basis: 100%; } #game-setup-form { padding: 20px; }
     .btn-start-game { width: 80%; margin-left:auto; margin-right:auto; }
     /* تصغيرات إضافية للخطوط إذا لزم الأمر */
     #current-turn-info { font-size: 1em; padding: 8px; padding-left: 30px; }
+    .team-info-card h2 { font-size: 0.9em; }
     #question-interaction-area h3 { font-size: 1.2em; }
     #question-text { font-size: 1.1em; }
     .option-btn { font-size: 0.9em; padding: 8px 10px; }
-    #reveal-answer-btn { width: 50%; font-size: 0.95em; padding: 8px 12px; }
+    #reveal-answer-btn { font-size: 0.95em; padding: 8px 12px; }
     #question-image { max-height: 120px; }
 }
 
@@ -885,39 +663,25 @@ footer .container {
     }
     #game-sidebar {
         margin-top: 0;
-        position: sticky; 
-        top: 5px;
+        position: sticky; top: 5px;
         padding: 8px;
         /* max-height تم تعريفها في القاعدة العامة لـ #game-sidebar */
     }
     /* تحسين أحجام الخطوط والعناصر للوضع الأفقي الضيق */
     #current-turn-info { font-size: 1em; padding: 8px; padding-left: 25px; }
-    .teams-dashboard { 
-        flex-direction: row; /* عرض الفريقين جنبًا إلى جنب */
-        flex-wrap: nowrap; /* منع التفاف العناصر */
-        gap: 8px; 
-        justify-content: space-between; /* توزيع الفريقين بشكل متساوٍ */
-    }
-    .team-info-card { 
-        flex-basis: calc(50% - 4px); 
-        min-width: 0; /* منع التوسع الزائد */
-        max-width: calc(50% - 4px); /* تحديد العرض الأقصى */
-        padding: 8px; /* زيادة الحشو قليلاً */
-        max-height: 200px; /* تحديد ارتفاع أقصى */
-        overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
-    }
-    .team-info-card h2 { font-size: 0.9em; margin-bottom: 4px; }
-    .team-info-card .current-station { font-size: 0.65em; margin-bottom: 4px; padding-top: 4px; }
-    .team-info-card .current-station span { font-size: 0.8em; }
+    .team-info-card { padding: 6px; }
+    .team-info-card h2 { font-size: 0.9em; margin-bottom: 3px; }
+    .team-info-card .current-station { font-size: 0.65em; margin-bottom: 3px; padding-top: 3px; }
+    .team-info-card .current-station span { font-size: 0.75em; }
     .path-display h4 { font-size: 0.6em; margin-bottom: 3px; }
-    .path-display li { font-size: 0.65em; padding: 4px 6px; margin-bottom: 3px; }
-    .path-display li::before { min-width: 14px; height: 14px; line-height: 14px; font-size: 0.6em; margin-left: 4px; }
-    .team-info-card .score > span:first-child { font-size: 0.7em; }
-    .score-value-container { padding: 3px 6px; min-width: 50px; }
-    .score-value-container span[id*="-score"] { font-size: 0.9em; margin: 0 5px; }
+    .path-display li { font-size: 0.65em; padding: 3px 5px; margin-bottom: 2px; }
+    .path-display li::before { min-width: 12px; height: 12px; line-height: 12px; font-size: 0.55em; margin-left: 3px; }
+    .team-info-card .score > span:first-child { font-size: 0.65em; }
+    .score-value-container { padding: 1px 3px; min-width: 50px; }
+    .score-value-container span[id*="-score"] { font-size: 0.85em; margin: 0 4px; }
     .btn-adjust-score { width: 18px; height: 18px; font-size: 0.6em; }
 
-    #question-interaction-area { padding: 8px; max-width: 100%; /* تعديل العرض ليتناسب مع الشاشة الصغيرة */ }
+    #question-interaction-area { padding: 8px; }
     #question-timer { top: 8px; left: 8px; font-size: 0.75em; padding: 3px 6px; min-width: 35px; }
     #question-interaction-area h3 { font-size: 1.2em; margin-bottom: 4px; margin-top: 35px; }
     #question-details { font-size: 0.7em; margin-bottom: 5px; }
@@ -927,7 +691,7 @@ footer .container {
     #question-text { font-size: 1em; margin-bottom: 6px; line-height: 1.2; }
     #answer-options { grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 6px; }
     .option-btn { font-size: 0.85em; padding: 6px 8px; }
-    #reveal-answer-btn { width: 50%; padding: 5px 8px; font-size: 0.95em; }
+    #reveal-answer-btn { width: 90%; padding: 5px 8px; font-size: 0.95em; }
     #answer-reveal-section { padding: 5px 8px; margin-top: 6px; }
     .correct-answer-display { font-size: 0.85em; margin-bottom: 6px; padding: 3px; }
     .assign-points-prompt { font-size: 0.75em; margin-bottom: 5px; }
