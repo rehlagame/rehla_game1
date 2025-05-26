@@ -83,9 +83,10 @@ body.game-active-page #game-sidebar {
 body.game-active-page #question-interaction-area {
     max-width: 80%; /* تم تصغيره بنسبة 20% */
     margin: 0 auto; /* لتوسيط المربع */
-    min-height: 300px; /* الحد الأدنى للارتفاع لضمان عدم التصغير الزائد */
-    max-height: 400px; /* الحد الأقصى للارتفاع */
+    height: 400px; /* تثبيت الارتفاع ليكون مناسبًا للأسئلة فوق المتوسط الطول */
     overflow-y: auto; /* السماح بالتمرير العمودي إذا كان المحتوى طويلًا */
+    display: flex; /* لضبط المحتوى داخل الصندوق */
+    flex-direction: column; /* ترتيب العناصر عموديًا */
 }
 
 body.game-active-page #game-sidebar {
@@ -191,7 +192,7 @@ footer .container {
     display: flex; 
     flex-direction: column; 
     box-sizing: border-box; 
-    max-height: 420px; /* زيادة الارتفاع لإظهار 4 محطات (كان 360px) */
+    max-height: 450px; /* زيادة الارتفاع لإظهار 4 محطات بشكل أوضح (كان 420px) */
     overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
 }
 
@@ -358,7 +359,7 @@ footer .container {
 
 #question-details {
     text-align: center;
-    margin-bottom: 12px;
+    margin-bottom: 10px; /* تقليل المسافة لتوفير مساحة */
     font-size: 1em;
     color: var(--grey-color-dark);
 }
@@ -384,15 +385,15 @@ footer .container {
 }
 
 #question-image-container {
-    margin-top: 8px;
-    margin-bottom: 15px;
+    margin-top: 6px; /* تقليل المسافة العلوية */
+    margin-bottom: 10px; /* تقليل المسافة السفلية */
     text-align: center;
 }
 
 #question-image {
     display: block;
     max-width: 100%;
-    max-height: 200px;
+    max-height: 150px; /* تقليل الارتفاع الأقصى للصورة لتوفير مساحة */
     margin: 0 auto;
     border-radius: 6px;
     border: 1px solid var(--grey-color-medium);
@@ -405,15 +406,15 @@ footer .container {
 #question-text {
     font-size: 1.3em;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* تقليل المسافة السفلية */
     line-height: 1.6;
     text-align: center;
     color: var(--black-color);
-    flex-grow: 1; /* flex-grow مهم ليأخذ السؤال المساحة المتاحة */
+    flex-grow: 1; /* flex-grow ليأخذ المساحة المتاحة */
 }
 
 #answer-options-wrapper {
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* تقليل المسافة */
     display: flex;
     flex-direction: column;
 }
@@ -422,7 +423,7 @@ footer .container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* تقليل المسافة */
 }
 
 .option-btn {
@@ -495,7 +496,7 @@ footer .container {
     padding: 20px 25px;
     margin-top: 15px;
     text-align: center;
-    box-shadow: 0 3px 12px rgba(23,162,184,0.08);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
     transition: opacity 0.5s ease, transform 0.3s ease;
     transform: translateY(10px);
     opacity: 0;
@@ -639,7 +640,7 @@ footer .container {
 }
 
 .question-navigation-btns {
-    margin-top: 20px;
+    margin-top: 15px; /* تقليل المسافة */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -829,7 +830,7 @@ footer .container {
         min-width: 0; /* منع التوسع الزائد */
         max-width: calc(50% - 4px); /* تحديد العرض الأقصى */
         padding: 10px; /* زيادة الحشو قليلاً لتحسين الوضوح */
-        max-height: 350px; /* زيادة الارتفاع لإظهار 4 محطات (كان 300px) */
+        max-height: 380px; /* زيادة الارتفاع لإظهار 4 محطات بشكل أوضح (كان 350px) */
         overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
     }
     .team-info-card h2 { 
@@ -872,12 +873,12 @@ footer .container {
         margin: 0 6px; /* زيادة الهوامش */
     }
     #question-interaction-area { 
-        min-height: 250px; /* تقليل الحد الأدنى للارتفاع ليناسب الشاشة الصغيرة */
-        max-height: 350px; /* تقليل الحد الأقصى للارتفاع */
+        height: 350px; /* تثبيت الارتفاع ليناسب الشاشة الصغيرة */
         padding: 10px; 
         margin-bottom: 0; 
         max-width: 100%; /* تعديل العرض ليتناسب مع الشاشة الصغيرة */
     }
+    #question-image { max-height: 120px; } /* تقليل ارتفاع الصورة لتوفير مساحة */
     /* إعدادات اللعبة */
     .team-setup { 
         flex-basis: 100%; 
@@ -896,7 +897,6 @@ footer .container {
     #question-text { font-size: 1.1em; }
     .option-btn { font-size: 0.9em; padding: 8px 10px; }
     #reveal-answer-btn { width: 50%; font-size: 0.95em; padding: 8px 12px; }
-    #question-image { max-height: 120px; }
 }
 
 /* الوضع الأفقي للهواتف (والشاشات المشابهة) - عمودان */
@@ -931,7 +931,7 @@ footer .container {
         min-width: 0; /* منع التوسع الزائد */
         max-width: calc(50% - 4px); /* تحديد العرض الأقصى */
         padding: 8px; /* زيادة الحشو قليلاً */
-        max-height: 280px; /* زيادة الارتفاع لإظهار 4 محطات (كان 240px) */
+        max-height: 300px; /* زيادة الارتفاع لإظهار 4 محطات بشكل أوضح (كان 280px) */
         overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
     }
     .team-info-card h2 { font-size: 0.9em; margin-bottom: 4px; }
@@ -948,8 +948,7 @@ footer .container {
     #question-interaction-area { 
         padding: 8px; 
         max-width: 100%; /* تعديل العرض ليتناسب مع الشاشة الصغيرة */
-        min-height: 200px; /* تقليل الحد الأدنى للارتفاع */
-        max-height: 300px; /* تقليل الحد الأقصى للارتفاع */
+        height: 300px; /* تثبيت الارتفاع ليناسب الشاشة الصغيرة */
     }
     #question-timer { top: 8px; left: 8px; font-size: 0.75em; padding: 3px 6px; min-width: 35px; }
     #question-interaction-area h3 { font-size: 1.2em; margin-bottom: 4px; margin-top: 35px; }
