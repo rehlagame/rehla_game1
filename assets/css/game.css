@@ -1,14 +1,13 @@
-/* --- START OF FILE assets/css/game.css (محسن لتحسين مظهر الويب مع الحفاظ على WebView Landscape) --- */
+/* --- START OF FILE assets/css/game.css (مُعدل بناءً على الكود الأصلي مع التركيز على WebView Landscape) --- */
 
-/* تعريف متغيرات الألوان والأبعاد */
 :root {
-    /* الألوان الأساسية (تم الاحتفاظ بها كما هي مع تحسينات طفيفة) */
-    --primary-color: #1a73e8; /* تغيير إلى أزرق أكثر أناقة */
+    /* تعريف متغيرات الألوان لتسهيل التعديل */
+    --primary-color: #17a2b8;
     --secondary-color: #6c757d;
-    --accent-color: #f4b400; /* تغيير إلى أصفر دافئ */
+    --accent-color: #ffc107;
     --success-color: #28a745;
     --danger-color: #dc3545;
-    --warning-color: #f4b400;
+    --warning-color: #ffc107;
     --info-color: #17a2b8;
     --white-color: #fff;
     --grey-color-light: #f8f9fa;
@@ -18,27 +17,24 @@
     --body-font: 'Cairo', sans-serif;
     --team1-color: #0d6efd;
     --team2-color: #fd7e14;
-    --bg-color-light: #e8f0fe; /* خلفية فاتحة جديدة للموقع */
 
-    /* عرض الشريط الجانبي الافتراضي للشاشات الكبيرة (تم تعديله ليكون نسبيًا) */
-    --sidebar-width-default: 30vw; /* عرض نسبي بدلاً من قيمة ثابتة */
-    --sidebar-max-width: 600px; /* حد أقصى للعرض */
-    /* عرض الشريط الجانبي المصغر للوضع الأفقي على الهواتف (تم الاحتفاظ به) */
+    /* عرض الشريط الجانبي الافتراضي للشاشات الكبيرة */
+    --sidebar-width-default: 550px;
+    /* عرض الشريط الجانبي المصغر للوضع الأفقي على الهواتف */
     --sidebar-width-landscape-mobile: 240px;
 }
 
 /* === أنماط خاصة بتطبيق WebView وملء الشاشة للعبة === */
-/* يفترض أن يتم إضافة الكلاس .game-active-page إلى <body> في game.html */
 body.game-active-page {
     margin: 0;
     padding: 0;
     width: 100vw;
-    min-height: 100vh; /* تعديل لدعم Safari */
+    min-height: 100vh;
     height: auto;
-    overflow-y: auto; /* السماح بالتمرير العمودي */
-    background: linear-gradient(135deg, #e8f0fe 0%, #ffffff 100%); /* خلفية تدرجية لتحسين المظهر */
+    overflow-y: auto;
+    background-color: var(--bg-color-light); /* افترضت وجود هذا المتغير، إذا لم يكن، استخدم لونًا ثابتًا مثل #f0f2f5 */
     font-family: var(--body-font);
-    color: var(--black-color); /* تم تعديل --text-color إلى --black-color لتوحيد الألوان */
+    color: var(--text-color); /* افترضت وجود هذا المتغير، إذا لم يكن، استخدم لونًا ثابتًا مثل #333 */
     direction: rtl;
     display: flex;
     flex-direction: column;
@@ -49,7 +45,7 @@ body.game-active-page main.game-content {
     width: 100%;
     display: flex;
     flex-direction: column;
-    overflow-y: auto; /* السماح بالتمرير العمودي */
+    overflow-y: auto;
     padding: 0;
     margin: 0;
     padding-top: env(safe-area-inset-top, 0px);
@@ -65,41 +61,41 @@ body.game-active-page #game-play-area {
     min-height: 0;
     margin-top: 0; /* التأكد من البدء من أعلى الصفحة */
     display: grid;
-    grid-template-columns: 1fr minmax(300px, var(--sidebar-width-default)); /* تحسين توزيع الأعمدة */
-    gap: 20px; /* زيادة المسافة بين الأعمدة */
+    grid-template-columns: 1fr var(--sidebar-width-default); /* منطقة السؤال تأخذ المساحة المتبقية */
+    gap: 15px;
     align-items: start; /* ضمان بدء العناصر من الأعلى */
-    padding: 20px; /* زيادة الحشو */
+    padding: 10px;
     box-sizing: border-box;
     overflow-y: auto; /* السماح بالتمرير العمودي */
-    max-width: 1400px; /* حد أقصى للعرض لتجنب التمدد الزائد */
-    margin: 0 auto; /* توسيط المحتوى */
 }
 
+/* أنماط مشتركة لمنطقة السؤال والشريط الجانبي */
 body.game-active-page #question-interaction-area,
 body.game-active-page #game-sidebar {
     overflow-y: auto; /* السماح بالتمرير العمودي الداخلي لهذه العناصر */
-    padding: 20px; /* زيادة الحشو لتحسين المظهر */
-    border-radius: 12px; /* زيادة التقريب للزوايا */
+    padding: 12px;
+    border-radius: 8px;
     background-color: var(--white-color);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* ظل أكثر وضوحًا */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     position: relative; /* لضمان احتواء العناصر المطلقة مثل #question-timer */
 }
 
+/* أنماط منطقة السؤال الافتراضية (للشاشات الكبيرة) */
 body.game-active-page #question-interaction-area {
-    max-width: 70%; /* تقليل العرض لتجنب الفراغات الكبيرة */
-    margin: 0 auto; /* لتوسيط المربع */
-    min-height: 400px; /* زيادة الحد الأدنى للارتفاع */
-    max-height: 500px; /* زيادة الحد الأقصى للارتفاع */
-    overflow-y: auto; /* السماح بالتمرير العمودي إذا كان المحتوى طويلًا */
+    /* لا يوجد max-width أو margin: auto هنا، ستتمدد لملء عمود الشبكة */
+    min-height: 450px; /* يمكن تعديل هذا حسب الرغبة للشاشات الكبيرة */
+    max-height: 70vh; /* يمكن تعديل هذا حسب الرغبة، مع الأخذ في الاعتبار ارتفاع الشاشة */
+    /* تم نقل الخصائص المشتركة (padding, border-radius, إلخ) إلى القاعدة المجمعة أعلاه */
 }
 
+
 body.game-active-page #game-sidebar {
-    background-color: var(--white-color); /* خلفية بيضاء نظيفة */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* ظل أكثر وضوحًا */
+    background-color: #fdfdfd;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.05); /* ظل في RTL سيكون على اليمين */
     position: sticky;
     top: 10px;
     align-self: start; /* لعمل sticky داخل grid */
-    max-width: var(--sidebar-max-width); /* حد أقصى للعرض */
+    /* max-height يضمن أن الشريط لا يتجاوز ارتفاع الشاشة المرئي */
     max-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 20px - 20px); /* (100vh - safe_areas - padding_game_play_area - sticky_top_offset) */
 }
 
@@ -111,7 +107,7 @@ footer {
     padding-bottom: env(safe-area-inset-bottom, 20px);
     background-color: #f8f9fa;
     text-align: center;
-    z-index: 1;
+    z-index: 1; /* للتأكد أنه ليس فوق العناصر المتحركة في اللعبة إذا كان هناك تداخل */
 }
 
 footer .container {
@@ -121,112 +117,35 @@ footer .container {
 }
 
 /* --- إعدادات اللعبة (Setup Section) --- */
-#game-setup-section {
-    padding: 40px 0;
-    text-align: center;
-}
-
-#game-setup-section h1 {
-    font-size: 2.5em;
-    margin-bottom: 15px;
-    color: var(--primary-color);
-}
-
-#game-setup-section .intro-text {
-    font-size: 1.1em;
-    color: var(--grey-color-dark);
-    max-width: 700px;
-    margin: 0 auto 30px auto;
-    line-height: 1.7;
-}
-
-#game-setup-form {
-    background-color: var(--white-color);
-    padding: 40px; /* زيادة الحشو */
-    border-radius: 12px; /* زيادة التقريب */
-    box-shadow: 0 5px 25px rgba(0,0,0,0.1); /* ظل أكثر وضوحًا */
-    max-width: 900px; /* زيادة العرض */
-    margin: 0 auto;
-    text-align: right;
-}
-
-.team-setup-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 30px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-}
-
+#game-setup-section { padding: 40px 0; text-align: center; }
+#game-setup-section h1 { font-size: 2.5em; margin-bottom: 15px; color: var(--primary-color); }
+#game-setup-section .intro-text { font-size: 1.1em; color: var(--grey-color-dark); max-width: 700px; margin: 0 auto 30px auto; line-height: 1.7; }
+#game-setup-form { background-color: var(--white-color); padding: 30px 40px; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); max-width: 800px; margin: 0 auto; text-align: right; }
+.team-setup-container { display: flex; justify-content: space-between; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; }
 .team-setup {
     flex-basis: calc(50% - 15px);
-    max-width: calc(50% - 15px);
+    max-width: calc(50% - 15px); /* الحفاظ على العرض الأصلي للشاشات الكبيرة */
     border: 1px solid var(--grey-color-medium);
-    padding: 25px; /* زيادة الحشو */
-    border-radius: 10px; /* زيادة التقريب */
-    background-color: var(--grey-color-light);
-    min-width: 280px;
-}
-
-.input-group {
-    margin-bottom: 20px;
-    text-align: right;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--grey-color-dark);
-    font-weight: bold;
-    font-size: 0.9em;
-}
-
-.input-group input[type="text"] {
-    width: 100%;
-    padding: 14px 18px; /* زيادة الحشو */
-    border: 1px solid var(--grey-color-medium);
+    padding: 20px;
     border-radius: 8px;
-    font-size: 1.1em; /* زيادة حجم الخط */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    font-family: var(--body-font);
-    box-sizing: border-box;
+    background-color: var(--grey-color-light);
+    min-width: 280px; /* لضمان عدم تصغيره أكثر من اللازم في flex-wrap */
 }
-
-.input-group input[type="text"]:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(26,115,232,0.2); /* تحديث اللون مع --primary-color الجديد */
-    outline: none;
-}
-
-.btn-start-game {
-    width: auto;
-    padding: 15px 50px; /* زيادة الحشو */
-    font-size: 1.3em; /* زيادة حجم الخط */
-    display: block;
-    margin: 20px auto 0 auto;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    border-radius: 10px; /* زيادة التقريب */
-    background-color: var(--primary-color);
-    color: var(--white-color);
-}
-
-.btn-start-game:hover {
-    background-color: #1557b0; /* تحديث اللون مع --primary-color الجديد */
-    color: var(--white-color);
-}
+.input-group { margin-bottom: 20px; text-align: right; }
+.input-group label { display: block; margin-bottom: 8px; color: var(--grey-color-dark); font-weight: bold; font-size: 0.9em; }
+.input-group input[type="text"] { width: 100%; padding: 12px 15px; border: 1px solid var(--grey-color-medium); border-radius: 8px; font-size: 1em; transition: border-color 0.3s ease, box-shadow 0.3s ease; font-family: var(--body-font); box-sizing: border-box; }
+.input-group input[type="text"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(23,162,184,0.2); outline: none; }
+.btn-start-game { width: auto; padding: 12px 40px; font-size: 1.2em; display: block; margin: 20px auto 0 auto; border: none; cursor: pointer; transition: background-color 0.3s ease; border-radius: 8px; background-color: var(--primary-color); color: var(--white-color); }
+.btn-start-game:hover { background-color: #117a8b; color: var(--white-color); }
 
 /* --- منطقة اللعب الفعلية (Game Play Area) - الأنماط الأصلية --- */
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
 
 /* --- العمود الثاني (يمين): الشريط الجانبي (الأنماط المعدلة لتحسين عرض الفريقين) --- */
-#game-sidebar {
+#game-sidebar { /* الأنماط المشتركة تم نقلها للأعلى */
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 15px; /* تقليل gap */
 }
 
 #current-turn-info {
@@ -240,7 +159,7 @@ footer .container {
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     border: 1px solid var(--grey-color-medium);
     flex-shrink: 0;
-    position: relative;
+    position: relative; /* ضروري لأيقونة العودة الداخلية */
 }
 
 .team-name-highlight {
@@ -249,7 +168,7 @@ footer .container {
 
 .teams-dashboard {
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* افتراضيًا عمودي للشاشات الكبيرة */
     gap: 10px;
     align-items: stretch;
     flex-shrink: 0;
@@ -258,14 +177,14 @@ footer .container {
 .team-info-card {
     background-color: var(--white-color);
     border: 1px solid var(--grey-color-medium);
-    padding: 15px; /* زيادة الحشو */
-    border-radius: 12px; /* زيادة التقريب */
-    box-shadow: 0 3px 10px rgba(0,0,0,0.08); /* ظل أكثر وضوحًا */
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    max-height: 360px;
-    overflow-y: auto;
+    max-height: 360px; /* زيادة الارتفاع بنسبة 20% (كان 300px) */
+    overflow-y: auto; /* السماح بالتمرير العمودي داخل البطاقة */
 }
 
 .team-info-card h2 {
@@ -273,17 +192,17 @@ footer .container {
     margin-top: 0;
     margin-bottom: 8px;
     text-align: center;
-    font-size: 1.3em; /* زيادة حجم الخط */
+    font-size: 1.1em;
     font-weight: 700;
-    border-bottom: none;
+    border-bottom: none; /* إزالة الخط السفلي إذا كان موجودًا */
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    padding-bottom: 0;
+    padding-bottom: 0; /* تأكد من عدم وجود حشو سفلي إضافي */
 }
 
 .team-info-card .current-station {
-    font-size: 0.9em; /* زيادة حجم الخط */
+    font-size: 0.8em;
     color: var(--grey-color-dark);
     margin-bottom: 6px;
     text-align: center;
@@ -295,7 +214,7 @@ footer .container {
     display: block;
     font-weight: 700;
     color: var(--black-color);
-    font-size: 1.1em; /* زيادة حجم الخط */
+    font-size: 1.05em; /* تعديل ليتناسب مع .current-station */
     margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
@@ -304,15 +223,14 @@ footer .container {
 
 .team-info-card.active-team {
     border-color: var(--primary-color);
-    background-color: #e8f0fe; /* تحديث اللون ليتناسب مع الخلفية الجديدة */
-    box-shadow: 0 5px 15px rgba(26,115,232,0.12); /* تحديث اللون مع --primary-color */
+    background-color: #f0fbff; /* لون خلفية مميز للفريق النشط */
+    box-shadow: 0 5px 15px rgba(23,162,184,0.12);
 }
 
 #team1-info.active-team {
     border-color: var(--team1-color);
     box-shadow: 0 5px 15px rgba(13,110,253,0.12);
 }
-
 #team1-info.active-team h2 {
     color: var(--team1-color);
 }
@@ -321,14 +239,13 @@ footer .container {
     border-color: var(--team2-color);
     box-shadow: 0 5px 15px rgba(253,126,20,0.12);
 }
-
 #team2-info.active-team h2 {
     color: var(--team2-color);
 }
 
 .path-display {
     margin-top: 8px;
-    flex-grow: 1;
+    flex-grow: 1; /* ليأخذ المساحة المتبقية داخل البطاقة */
 }
 
 .path-display h4 {
@@ -343,9 +260,9 @@ footer .container {
 
 .path-display ol {
     list-style: none;
-    padding-right: 0;
+    padding-right: 0; /* إزالة الحشو الافتراضي للـ ol في RTL */
     margin: 0;
-    counter-reset: path-counter;
+    counter-reset: path-counter; /* لترقيم المحطات */
 }
 
 .path-display li {
@@ -353,15 +270,15 @@ footer .container {
     align-items: center;
     background-color: var(--grey-color-light);
     margin-bottom: 5px;
-    padding: 8px 10px; /* زيادة الحشو */
+    padding: 6px 8px;
     border-radius: 5px;
     position: relative;
-    font-size: 0.9em; /* زيادة حجم الخط */
+    font-size: 0.8em;
     counter-increment: path-counter;
     border: 1px solid var(--grey-color-medium);
     transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease;
-    overflow: hidden;
-    white-space: nowrap;
+    overflow: hidden; /* لمنع النص الطويل من الخروج */
+    white-space: nowrap; /* لمنع التفاف النص */
 }
 
 .path-display li::before {
@@ -375,62 +292,60 @@ footer .container {
     text-align: center;
     font-size: 0.75em;
     font-weight: bold;
-    margin-left: 6px;
-    flex-shrink: 0;
+    margin-left: 6px; /* مسافة بين الرقم والنص في RTL */
+    flex-shrink: 0; /* منع الرقم من التقلص */
     transition: background-color 0.3s ease;
 }
 
 .path-display li.completed-path-station {
-    background-color: #e9ecef;
+    background-color: #e9ecef; /* لون أغمق قليلاً للمحطات المكتملة */
     color: var(--grey-color-dark);
     opacity: 0.75;
     border-color: #ced4da;
 }
-
 .path-display li.completed-path-station::before {
-    background-color: var(--success-color);
+    background-color: var(--success-color); /* الرقم باللون الأخضر */
 }
 
 .path-display li.current-path-station {
-    background-color: var(--accent-color);
+    background-color: var(--accent-color); /* لون مميز للمحطة الحالية */
     color: var(--black-color);
     font-weight: 700;
-    border-color: #d69e00; /* تحديث اللون مع --accent-color الجديد */
+    border-color: #e0a800; /* درجة أغمق من الأصفر */
     box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-    opacity: 1;
+    opacity: 1; /* إزالة أي شفافية */
 }
-
 .path-display li.current-path-station::before {
-    background-color: var(--primary-color);
+    background-color: var(--primary-color); /* الرقم باللون الأساسي */
     color: white;
 }
 
 /* --- العمود الأول (يسار): منطقة السؤال والتفاعل --- */
 #question-timer {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: 12px; /* الموقع العلوي ليكون متناسقًا داخل المربع */
+    left: 12px; /* الموقع الأيسر */
     background-color: var(--black-color);
     color: var(--white-color);
     padding: 6px 12px;
-    border-radius: 12px;
+    border-radius: 12px; /* أكثر دائرية */
     font-size: 1em;
     font-weight: 700;
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: tabular-nums; /* لضمان عرض الأرقام بشكل ثابت */
     box-shadow: 0 2px 4px rgba(0,0,0,0.25);
-    z-index: 10;
-    min-width: 50px;
+    z-index: 10; /* فوق عناصر السؤال الأخرى */
+    min-width: 50px; /* لضمان عرض الوقت بشكل جيد */
     text-align: center;
     transition: background-color 0.3s ease;
 }
 
-#question-interaction-area h3 {
-    margin-top: 40px;
+#question-interaction-area h3 { /* عنوان السؤال */
+    margin-top: 40px; /* هامش علوي لتجنب التداخل مع الوقت */
     margin-bottom: 8px;
     color: var(--primary-color);
-    font-size: 1.8em; /* زيادة حجم العنوان */
+    font-size: 1.5em;
     text-align: center;
-    padding-top: 5px;
+    padding-top: 5px; /* مسافة صغيرة إضافية من الأعلى */
 }
 
 #question-details {
@@ -444,29 +359,20 @@ footer .container {
     font-weight: bold;
     padding: 4px 10px;
     border-radius: 5px;
-    color: white;
+    color: white; /* اللون الافتراضي للنص أبيض */
     display: inline-block;
     vertical-align: middle;
     font-size: 0.85em;
 }
 
-#question-difficulty.easy {
-    background-color: var(--success-color);
-}
-
-#question-difficulty.medium {
-    background-color: var(--warning-color);
-    color: var(--black-color);
-}
-
-#question-difficulty.hard {
-    background-color: var(--danger-color);
-}
+#question-difficulty.easy { background-color: var(--success-color); }
+#question-difficulty.medium { background-color: var(--warning-color); color: var(--black-color); } /* نص أسود للمتوسط لتباين أفضل */
+#question-difficulty.hard { background-color: var(--danger-color); }
 
 #question-points {
     font-weight: bold;
     vertical-align: middle;
-    margin-right: 4px;
+    margin-right: 4px; /* مسافة صغيرة قبل النقاط */
 }
 
 #question-image-container {
@@ -476,44 +382,44 @@ footer .container {
 }
 
 #question-image {
-    display: block;
-    max-width: 100%;
-    max-height: 250px; /* زيادة ارتفاع الصورة */
-    margin: 0 auto;
-    border-radius: 8px; /* زيادة التقريب */
+    display: block; /* لإزالة أي مسافات إضافية أسفل الصورة */
+    max-width: 100%; /* الصورة لا تتجاوز عرض الحاوية */
+    max-height: 200px; /* ارتفاع افتراضي للصورة, يمكن تعديله في الميديا كويري */
+    margin: 0 auto; /* لتوسيط الصورة */
+    border-radius: 6px;
     border: 1px solid var(--grey-color-medium);
-    background-color: var(--white-color);
-    object-fit: contain;
-    object-position: center;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1); /* ظل أكثر وضوحًا */
+    background-color: var(--white-color); /* خلفية بيضاء إذا كانت الصورة شفافة */
+    object-fit: contain; /* للحفاظ على نسبة أبعاد الصورة */
+    object-position: center; /* لتوسيط الصورة داخل الإطار */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.07);
 }
 
 #question-text {
-    font-size: 1.5em; /* زيادة حجم نص السؤال */
+    font-size: 1.3em;
     font-weight: 600;
     margin-bottom: 20px;
     line-height: 1.6;
     text-align: center;
     color: var(--black-color);
-    flex-grow: 1;
+    flex-grow: 1; /* flex-grow مهم ليأخذ السؤال المساحة المتاحة */
 }
 
 #answer-options-wrapper {
     margin-bottom: 20px;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* الأزرار فوق بعضها إذا لزم الأمر */
 }
 
 #answer-options {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* تخطيط مرن للأزرار */
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* مسافة قبل زر "عرض الإجابة" */
 }
 
 .option-btn {
-    padding: 15px 20px; /* زيادة الحشو */
-    font-size: 1.2em; /* زيادة حجم الخط */
+    padding: 12px 18px;
+    font-size: 1.1em;
     font-weight: 600;
     background-color: var(--grey-color-light);
     border: 1px solid var(--grey-color-medium);
@@ -521,7 +427,7 @@ footer .container {
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
-    font-family: var(--body-font);
+    font-family: var(--body-font); /* استخدام نفس خط الجسم */
 }
 
 .option-btn:hover:not(:disabled) {
@@ -536,18 +442,18 @@ footer .container {
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
-    background-color: var(--grey-color-light);
+    background-color: var(--grey-color-light); /* الحفاظ على اللون الأساسي للمعطل */
     border-color: var(--grey-color-medium);
 }
 
 #reveal-answer-btn {
     display: block;
-    width: 30%; /* تقليل العرض */
-    margin: 10px auto 0 auto;
-    padding: 15px 20px; /* زيادة الحشو */
-    font-size: 1.3em; /* زيادة حجم الخط */
+    width: 35%; /* العرض المطلوب */
+    margin: 10px auto 0 auto; /* الموقع الأصلي متمركزًا أسفل نص السؤال */
+    padding: 12px 18px;
+    font-size: 1.15em;
     background-color: var(--accent-color);
-    color: var(--black-color);
+    color: var(--black-color); /* لضمان التباين مع الأصفر */
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -557,17 +463,17 @@ footer .container {
 }
 
 #reveal-answer-btn:hover:not(:disabled) {
-    background-color: #d69e00; /* تحديث اللون مع --accent-color الجديد */
+    background-color: #e0a800; /* درجة أغمق من الأصفر */
     transform: translateY(-1px);
 }
 
 #reveal-answer-btn:active:not(:disabled) {
-    transform: translateY(1px);
+    transform: translateY(1px); /* تأثير الضغط */
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
 #reveal-answer-btn:disabled {
-    background-color: #adb5bd;
+    background-color: #adb5bd; /* لون رمادي للمعطل */
     color: var(--white-color);
     cursor: not-allowed;
     box-shadow: none;
@@ -575,21 +481,21 @@ footer .container {
 }
 
 #answer-reveal-section {
-    background-color: #e8f0fe; /* تحديث اللون ليتناسب مع الخلفية الجديدة */
+    background-color: #e9f7fd; /* خلفية فاتحة مميزة */
     border: 1px solid var(--primary-color);
     border-radius: 8px;
     padding: 20px 25px;
     margin-top: 15px;
     text-align: center;
-    box-shadow: 0 3px 12px rgba(26,115,232,0.08); /* تحديث اللون مع --primary-color */
+    box-shadow: 0 3px 12px rgba(23,162,184,0.08);
     transition: opacity 0.5s ease, transform 0.3s ease;
-    transform: translateY(10px);
-    opacity: 0;
+    transform: translateY(10px); /* يبدأ من أسفل قليلاً */
+    opacity: 0; /* يبدأ مخفيًا */
 }
 
 #answer-reveal-section:not(.hidden) {
-    transform: translateY(0);
-    opacity: 1;
+    transform: translateY(0); /* يعود لمكانه الأصلي */
+    opacity: 1; /* يظهر */
 }
 
 #answer-reveal-section h4 {
@@ -603,10 +509,10 @@ footer .container {
 .correct-answer-display {
     font-size: 1.3em;
     font-weight: 700;
-    color: var(--success-color);
+    color: var(--success-color); /* لون أخضر للإجابة الصحيحة */
     margin-bottom: 15px;
     padding: 8px;
-    background-color: #d1e7dd;
+    background-color: #d1e7dd; /* خلفية خضراء فاتحة */
     border-radius: 5px;
     border: 1px solid #badbcc;
 }
@@ -630,22 +536,22 @@ footer .container {
     display: flex;
     justify-content: center;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* للسماح بانتقال الأزرار لسطر جديد إذا ضاقت المساحة */
 }
 
 .btn-assign-points {
-    padding: 12px 25px; /* زيادة الحشو */
-    font-size: 1.1em; /* زيادة حجم الخط */
+    padding: 10px 20px;
+    font-size: 1em;
     border: none;
-    border-radius: 8px; /* زيادة التقريب */
+    border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
     font-weight: 700;
-    min-width: 130px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1); /* ظل أكثر وضوحًا */
-    white-space: nowrap;
+    min-width: 130px; /* لضمان عرض اسم الفريق بشكل جيد */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    white-space: nowrap; /* لمنع التفاف اسم الفريق الطويل */
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis; /* عرض "..." إذا كان الاسم طويلاً جدًا */
 }
 
 .btn-assign-points:hover {
@@ -654,42 +560,22 @@ footer .container {
 }
 
 .btn-assign-points:active {
-    transform: translateY(0px);
+    transform: translateY(0px); /* إزالة تأثير الارتفاع عند الضغط المستمر */
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.btn-assign-points.team1-btn {
-    background-color: var(--team1-color);
-    color: white;
-}
-
-.btn-assign-points.team1-btn:hover {
-    background-color: #0b5ed7;
-}
-
-.btn-assign-points.team2-btn {
-    background-color: var(--team2-color);
-    color: white;
-}
-
-.btn-assign-points.team2-btn:hover {
-    background-color: #d96a05;
-}
-
-.btn-assign-points.none-btn {
-    background-color: var(--secondary-color);
-    color: white;
-}
-
-.btn-assign-points.none-btn:hover {
-    background-color: #5a6268;
-}
+.btn-assign-points.team1-btn { background-color: var(--team1-color); color: white; }
+.btn-assign-points.team1-btn:hover { background-color: #0b5ed7; } /* درجة أغمق */
+.btn-assign-points.team2-btn { background-color: var(--team2-color); color: white; }
+.btn-assign-points.team2-btn:hover { background-color: #d96a05; } /* درجة أغمق */
+.btn-assign-points.none-btn { background-color: var(--secondary-color); color: white; }
+.btn-assign-points.none-btn:hover { background-color: #5a6268; } /* درجة أغمق */
 
 #previous-correct-answer-display {
     margin-top: 15px;
     padding: 12px 18px;
     background-color: var(--grey-color-light);
-    border: 1px dashed var(--secondary-color);
+    border: 1px dashed var(--secondary-color); /* خط متقطع للتمييز */
     border-radius: 6px;
     text-align: center;
 }
@@ -712,8 +598,8 @@ footer .container {
 #previous-question-image {
     max-width: 80px;
     max-height: 80px;
-    display: none;
-    margin: 8px auto;
+    display: none; /* مخفية بشكل افتراضي وتظهر عند الحاجة */
+    margin: 8px auto; /* مسافة حول الصورة */
     border-radius: 4px;
     border: 1px solid var(--grey-color-medium);
     background-color: var(--white-color);
@@ -725,7 +611,7 @@ footer .container {
     margin-top: 12px;
     padding: 10px;
     font-size: 1.1em;
-    min-height: 50px;
+    min-height: 50px; /* لضمان ثبات الارتفاع حتى لو كانت الرسالة قصيرة */
     border-radius: 6px;
     font-weight: bold;
     text-align: center;
@@ -733,21 +619,21 @@ footer .container {
 }
 
 #feedback-message.points-assigned {
-    background-color: #e9f7ec;
-    color: #1c7430;
+    background-color: #e9f7ec; /* أخضر فاتح */
+    color: #1c7430; /* أخضر داكن */
     border: 1px solid #c3e6cb;
 }
 
 #feedback-message.no-points {
-    background-color: #fff3cd;
-    color: #664d03;
+    background-color: #fff3cd; /* أصفر فاتح */
+    color: #664d03; /* بني مائل للصفرة */
     border: 1px solid #ffecb5;
 }
 
 .question-navigation-btns {
     margin-top: 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* توزيع الأزرار على الأطراف */
     align-items: center;
 }
 
@@ -761,48 +647,34 @@ footer .container {
 }
 
 .question-navigation-btns .btn i {
-    margin-left: 4px;
-    margin-right: 4px;
+    margin-left: 4px; /* مسافة بين الأيقونة والنص في RTL */
+    margin-right: 4px; /* مسافة للجهة الأخرى إذا كان LTR */
 }
 
-#view-previous-btn {
-    background-color: var(--secondary-color);
-    color: white;
-}
+#view-previous-btn { background-color: var(--secondary-color); color: white; }
+#view-previous-btn:hover { background-color: #5a6268; }
 
-#view-previous-btn:hover {
-    background-color: #5a6268;
-}
-
-#return-to-current-btn {
-    background-color: var(--primary-color);
-    color: white;
-}
-
-#return-to-current-btn:hover {
-    background-color: #1557b0; /* تحديث اللون مع --primary-color الجديد */
-}
+#return-to-current-btn { background-color: var(--primary-color); color: white; }
+#return-to-current-btn:hover { background-color: #138496; }
 
 #game-over-section {
     padding: 20px 25px;
-    display: none;
-    position: fixed;
+    display: none; /* مخفية بشكل افتراضي */
+    position: fixed; /* لتظهر فوق كل شيء */
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 500px;
-    z-index: 100;
+    width: 90%; /* عرض مرن */
+    max-width: 500px; /* حد أقصى للعرض */
+    z-index: 100; /* فوق عناصر اللعب الأخرى */
     text-align: center;
     background-color: var(--white-color);
     border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2); /* ظل واضح */
     border: 1px solid var(--grey-color-medium);
 }
 
-#game-over-section.visible {
-    display: block;
-}
+#game-over-section.visible { display: block; } /* لإظهارها عند الحاجة */
 
 #game-over-section h2 {
     font-size: 1.5em;
@@ -810,30 +682,14 @@ footer .container {
     margin-bottom: 20px;
 }
 
-#final-results p {
-    font-size: 1em;
-    margin-bottom: 10px;
-}
-
-#final-results hr {
-    margin: 20px auto;
-    width: 50%;
-    border: 0;
-    height: 1px;
-    background-color: var(--grey-color-medium);
-}
-
-#final-results .winner {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: var(--success-color);
-    margin-top: 15px;
-}
+#final-results p { font-size: 1em; margin-bottom: 10px; }
+#final-results hr { margin: 20px auto; width: 50%; border: 0; height: 1px; background-color: var(--grey-color-medium); }
+#final-results .winner { font-size: 1.2em; font-weight: bold; color: var(--success-color); margin-top: 15px; }
 
 #play-again-btn {
     margin-top: 20px;
-    padding: 7px 20px;
-    font-size: 0.9em;
+    padding: 7px 20px; /* تصغير الحشو قليلاً */
+    font-size: 0.9em; /* تصغير الخط قليلاً */
     background-color: var(--primary-color);
     color: var(--white-color);
     border: none;
@@ -842,51 +698,49 @@ footer .container {
     transition: background-color 0.3s ease;
 }
 
-#play-again-btn:hover {
-    background-color: #1557b0; /* تحديث اللون مع --primary-color الجديد */
-}
+#play-again-btn:hover { background-color: #117a8b; }
 
 .team-info-card .score {
     padding-top: 4px;
     padding-bottom: 4px;
     margin-bottom: 6px;
     position: relative;
-    overflow: visible;
+    overflow: visible; /* لضمان ظهور أزرار تعديل النقاط */
     text-align: center;
-    border-top: none;
+    border-top: none; /* إزالة الخط العلوي إذا كان موجودًا */
 }
 
-.team-info-card .score > span:first-child {
+.team-info-card .score > span:first-child { /* كلمة "النقاط:" */
     font-size: 0.75em;
     display: inline-block;
-    margin-left: 8px;
+    margin-left: 8px; /* مسافة بينها وبين قيمة النقاط في RTL */
     vertical-align: middle;
     color: var(--grey-color-dark);
 }
 
 .score-value-container {
-    padding: 4px 8px;
-    min-width: 70px;
-    display: inline-flex;
+    padding: 4px 8px; /* زيادة الحشو */
+    min-width: 70px; /* زيادة العرض */
+    display: inline-flex; /* لتوسيط المحتوى الداخلي */
     align-items: center;
-    justify-content: center;
-    position: relative;
+    justify-content: center; /* لتوسيط الأزرار والنقاط */
+    position: relative; /* لتموضع أزرار التعديل */
     background-color: var(--grey-color-light);
-    border-radius: 18px;
+    border-radius: 18px; /* حواف دائرية */
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     vertical-align: middle;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* ظل داخلي خفيف */
 }
 
 .score-value-container #team1-score, .score-value-container #team2-score {
     font-size: 1em;
-    margin: 0 12px;
-    min-width: 30px;
+    margin: 0 12px; /* زيادة الهوامش لضمان الوضوح */
+    min-width: 30px; /* زيادة العرض الأدنى */
     display: inline-block;
     font-weight: 700;
     color: var(--black-color);
     text-align: center;
-    z-index: 2;
+    z-index: 2; /* فوق أي خلفية قد تتداخل */
     position: relative;
 }
 
@@ -896,213 +750,148 @@ footer .container {
     font-size: 0.8em;
     position: absolute;
     top: 50%;
-    transform: translateY(-50%) scale(0.8);
+    transform: translateY(-50%) scale(0.8); /* يبدأ أصغر قليلاً */
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    border-radius: 50%;
+    border-radius: 50%; /* دائري تمامًا */
     border: none;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.5); /* لون داكن شفاف */
     color: var(--white-color);
     cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
-    opacity: 0;
-    z-index: 3;
+    transition: all 0.25s cubic-bezier(0.4,0,0.2,1); /* حركة سلسة */
+    opacity: 0; /* مخفي بشكل افتراضي */
+    z-index: 3; /* فوق قيمة النقاط */
     box-shadow: 0 2px 5px rgba(0,0,0,0.15);
 }
 
-.btn-adjust-score.btn-decrement {
-    right: 5px;
-}
-
-.btn-adjust-score.btn-increment {
-    left: 5px;
-}
+.btn-adjust-score.btn-decrement { right: 5px; } /* في RTL، اليمين هو الإنقاص */
+.btn-adjust-score.btn-increment { left: 5px; } /* في RTL، اليسار هو الزيادة */
 
 .score-value-container:hover {
-    background-color: var(--grey-color-medium);
+    background-color: var(--grey-color-medium); /* تغيير الخلفية عند المرور */
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .score-value-container:hover .btn-adjust-score {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
+    opacity: 1; /* إظهار الأزرار عند المرور */
+    transform: translateY(-50%) scale(1); /* تكبير للحجم الطبيعي */
 }
 
 .btn-adjust-score:hover {
-    background-color: rgba(0,0,0,0.7);
-    transform: translateY(-50%) scale(1.08);
+    background-color: rgba(0,0,0,0.7); /* أغمق قليلاً عند المرور فوق الزر نفسه */
+    transform: translateY(-50%) scale(1.08); /* تكبير إضافي طفيف */
     box-shadow: 0 3px 7px rgba(0,0,0,0.2);
 }
 
-.btn-adjust-score.btn-increment:hover {
-    background-color: var(--success-color);
-}
-
-.btn-adjust-score.btn-decrement:hover {
-    background-color: var(--danger-color);
-}
-
+.btn-adjust-score.btn-increment:hover { background-color: var(--success-color); }
+.btn-adjust-score.btn-decrement:hover { background-color: var(--danger-color); }
 .btn-adjust-score:active {
-    transform: translateY(-50%) scale(0.95);
+    transform: translateY(-50%) scale(0.95); /* تأثير الضغط */
     transition-duration: 0.1s;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* === Media Queries للتجاوبية === */
 
-/* الوضع الرأسي للهواتف (والشاشات المشابهة) - التكديس (تم الاحتفاظ به كما هو لـ WebView) */
+/* الوضع الرأسي للهواتف (والشاشات المشابهة) - التكديس */
 @media (max-width: 991px) and (orientation: portrait) {
     body.game-active-page #game-play-area {
-        display: block;
+        display: block; /* تكديس الأعمدة */
         padding: 10px;
     }
     #game-sidebar {
-        position: static;
+        position: static; /* إلغاء التثبيت */
         height: auto;
-        overflow-y: visible;
-        margin-top: 15px;
-        width: 100%;
-        padding: 10px;
-        box-shadow: none;
+        overflow-y: visible; /* لا حاجة للتمرير الداخلي إذا كان مكدسًا */
+        margin-top: 15px; /* مسافة بين منطقة السؤال والشريط الجانبي */
+        width: 100%; /* يأخذ كامل العرض */
+        padding: 10px; /* تقليل الحشو */
+        box-shadow: none; /* إزالة الظل */
     }
     .teams-dashboard {
-        flex-direction: row;
-        flex-wrap: nowrap;
+        flex-direction: row; /* عرض الفريقين جنبًا إلى جنب */
+        flex-wrap: nowrap; /* منع التفاف العناصر */
         gap: 8px;
-        justify-content: space-between;
+        justify-content: space-between; /* توزيع الفريقين بشكل متساوٍ */
     }
     .team-info-card {
-        flex-basis: calc(50% - 4px);
-        min-width: 0;
-        max-width: calc(50% - 4px);
+        flex-basis: calc(50% - 4px); /* كل فريق يأخذ نصف المساحة تقريبًا */
+        min-width: 0; /* منع التوسع الزائد */
+        max-width: calc(50% - 4px); /* تحديد العرض الأقصى */
         padding: 10px;
         max-height: 300px;
         overflow-y: auto;
     }
-    .team-info-card h2 {
-        font-size: 1em;
-        margin-bottom: 6px;
-    }
-    .team-info-card .current-station {
-        font-size: 0.8em;
-        margin-bottom: 6px;
-        padding-top: 6px;
-    }
-    .team-info-card .current-station span {
-        font-size: 0.9em;
-    }
-    .path-display h4 {
-        font-size: 0.7em;
-        margin-bottom: 4px;
-    }
-    .path-display li {
-        font-size: 0.75em;
-        padding: 5px 8px;
-        margin-bottom: 4px;
-    }
-    .path-display li::before {
-        min-width: 16px;
-        height: 16px;
-        line-height: 16px;
-        font-size: 0.65em;
-        margin-left: 5px;
-    }
-    .team-info-card .score > span:first-child {
-        font-size: 0.8em;
-    }
-    .score-value-container {
-        padding: 4px 8px;
-        min-width: 60px;
-    }
-    .score-value-container span[id*="-score"] {
-        font-size: 1em;
-        margin: 0 6px;
-    }
+    .team-info-card h2 { font-size: 1em; margin-bottom: 6px; }
+    .team-info-card .current-station { font-size: 0.8em; margin-bottom: 6px; padding-top: 6px; }
+    .team-info-card .current-station span { font-size: 0.9em; }
+    .path-display h4 { font-size: 0.7em; margin-bottom: 4px; }
+    .path-display li { font-size: 0.75em; padding: 5px 8px; margin-bottom: 4px; }
+    .path-display li::before { min-width: 16px; height: 16px; line-height: 16px; font-size: 0.65em; margin-left: 5px; }
+    .team-info-card .score > span:first-child { font-size: 0.8em; }
+    .score-value-container { padding: 4px 8px; min-width: 60px; }
+    .score-value-container span[id*="-score"] { font-size: 1em; margin: 0 6px; }
+    
+    /* منطقة السؤال في الوضع الرأسي للهاتف */
     #question-interaction-area {
-        min-height: 250px;
-        max-height: 350px;
-        padding: 10px;
-        margin-bottom: 0;
-        max-width: 100%;
+        min-height: 250px; /* تقليل الارتفاع الأدنى */
+        max-height: 350px; /* تقليل الارتفاع الأقصى */
+        padding: 10px; /* تقليل الحشو */
+        margin-bottom: 0; /* إذا كان الشريط الجانبي أسفله */
+        max-width: 100%; /* تأخذ كامل العرض المتاح */
     }
+    
     /* إعدادات اللعبة */
     .team-setup {
-        flex-basis: 100%;
-        max-width: 300px;
+        flex-basis: 100%; /* كل فريق يأخذ كامل العرض في سطر جديد */
+        max-width: 300px; /* حد أقصى للعرض لضمان عدم التمدد المفرط */
         padding: 15px;
-        margin: 0 auto;
+        margin: 0 auto 15px auto; /* توسيط وإضافة مسافة سفلية */
     }
-    .team-setup h2 {
-        font-size: 1.1em;
-        margin-bottom: 15px;
-    }
-    .input-group label {
-        font-size: 0.85em;
-    }
-    .input-group input[type="text"] {
-        padding: 10px 12px;
-        font-size: 0.95em;
-    }
-    #game-setup-form {
-        padding: 20px;
-    }
-    .btn-start-game {
-        width: 80%;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    #current-turn-info {
-        font-size: 1em;
-        padding: 8px;
-        padding-left: 30px;
-    }
-    #question-interaction-area h3 {
-        font-size: 1.2em;
-    }
-    #question-text {
-        font-size: 1.1em;
-    }
-    .option-btn {
-        font-size: 0.9em;
-        padding: 8px 10px;
-    }
-    #reveal-answer-btn {
-        width: 50%;
-        font-size: 0.95em;
-        padding: 8px 12px;
-    }
-    #question-image {
-        max-height: 120px;
-    }
+    .team-setup h2 { font-size: 1.1em; margin-bottom: 15px; }
+    .input-group label { font-size: 0.85em; }
+    .input-group input[type="text"] { padding: 10px 12px; font-size: 0.95em; }
+    #game-setup-form { padding: 20px; }
+    .btn-start-game { width: 80%; margin-left:auto; margin-right:auto; }
+    
+    /* تصغيرات إضافية للخطوط والعناصر في الوضع الرأسي للهاتف */
+    #current-turn-info { font-size: 1em; padding: 8px; padding-left: 30px; } /* مساحة لأيقونة العودة */
+    #question-interaction-area h3 { font-size: 1.2em; }
+    #question-text { font-size: 1.1em; }
+    .option-btn { font-size: 0.9em; padding: 8px 10px; }
+    #reveal-answer-btn { width: 50%; font-size: 0.95em; padding: 8px 12px; }
+    #question-image { max-height: 120px; } /* تصغير الصورة */
 }
 
-/* الوضع الأفقي للهواتف (والشاشات المشابهة) - عمودان (تم الاحتفاظ به كما هو لـ WebView) */
+/* 
+   الوضع الأفقي للهواتف (والشاشات المشابهة) - عمودان
+   تم استخدام max-height و max-width لتغطية أغلب الهواتف في الوضع الأفقي.
+*/
 @media (max-height: 550px) and (orientation: landscape),
-(max-width: 991px) and (orientation: landscape) {
+       (max-width: 991px) and (orientation: landscape) {
+
     body.game-active-page main.game-content {
-        padding: 5px;
+        padding: 5px; /* تقليل الحشو العام للمحتوى */
     }
     body.game-active-page #game-play-area {
-        grid-template-columns: 1fr var(--sidebar-width-landscape-mobile);
-        gap: 8px;
-        padding: 5px;
-        overflow-y: auto;
+        grid-template-columns: 1fr var(--sidebar-width-landscape-mobile); /* عمودان، الشريط الجانبي أصغر */
+        gap: 8px; /* تقليل المسافة بين الأعمدة */
+        padding: 5px; /* تقليل الحشو لمنطقة اللعب */
+        overflow-y: auto; /* السماح بالتمرير إذا تجاوز المحتوى */
     }
     #game-sidebar {
-        margin-top: 0;
-        position: sticky;
-        top: 5px;
-        padding: 8px;
+        margin-top: 0; /* إزالة الهامش العلوي */
+        position: sticky; /* تثبيت الشريط الجانبي */
+        top: 5px; /* مسافة صغيرة من الأعلى */
+        padding: 8px; /* تقليل الحشو الداخلي */
     }
-    #current-turn-info {
-        font-size: 1em;
-        padding: 8px;
-        padding-left: 25px;
-    }
+    
+    /* تحسين أحجام الخطوط والعناصر للوضع الأفقي الضيق */
+    #current-turn-info { font-size: 1em; padding: 8px; padding-left: 25px; } /* مساحة لأيقونة العودة */
     .teams-dashboard {
-        flex-direction: row;
+        flex-direction: row; /* عرض الفريقين جنبًا إلى جنب أفقيًا */
         flex-wrap: nowrap;
         gap: 8px;
         justify-content: space-between;
@@ -1112,174 +901,42 @@ footer .container {
         min-width: 0;
         max-width: calc(50% - 4px);
         padding: 8px;
-        max-height: 240px;
+        max-height: 240px; /* ارتفاع مناسب للشاشات الأفقية الصغيرة */
         overflow-y: auto;
     }
-    .team-info-card h2 {
-        font-size: 0.9em;
-        margin-bottom: 4px;
-    }
-    .team-info-card .current-station {
-        font-size: 0.65em;
-        margin-bottom: 4px;
-        padding-top: 4px;
-    }
-    .team-info-card .current-station span {
-        font-size: 0.8em;
-    }
-    .path-display h4 {
-        font-size: 0.6em;
-        margin-bottom: 3px;
-    }
-    .path-display li {
-        font-size: 0.65em;
-        padding: 4px 6px;
-        margin-bottom: 3px;
-    }
-    .path-display li::before {
-        min-width: 14px;
-        height: 14px;
-        line-height: 14px;
-        font-size: 0.6em;
-        margin-left: 4px;
-    }
-    .team-info-card .score > span:first-child {
-        font-size: 0.7em;
-    }
-    .score-value-container {
-        padding: 3px 6px;
-        min-width: 50px;
-    }
-    .score-value-container span[id*="-score"] {
-        font-size: 0.9em;
-        margin: 0 5px;
-    }
-    .btn-adjust-score {
-        width: 18px;
-        height: 18px;
-        font-size: 0.6em;
-    }
+    .team-info-card h2 { font-size: 0.9em; margin-bottom: 4px; }
+    .team-info-card .current-station { font-size: 0.65em; margin-bottom: 4px; padding-top: 4px; }
+    .team-info-card .current-station span { font-size: 0.8em; }
+    .path-display h4 { font-size: 0.6em; margin-bottom: 3px; }
+    .path-display li { font-size: 0.65em; padding: 4px 6px; margin-bottom: 3px; }
+    .path-display li::before { min-width: 14px; height: 14px; line-height: 14px; font-size: 0.6em; margin-left: 4px; }
+    .team-info-card .score > span:first-child { font-size: 0.7em; }
+    .score-value-container { padding: 3px 6px; min-width: 50px; }
+    .score-value-container span[id*="-score"] { font-size: 0.9em; margin: 0 5px; }
+    .btn-adjust-score { width: 18px; height: 18px; font-size: 0.6em; }
+
+    /* منطقة السؤال في الوضع الأفقي للهاتف */
     #question-interaction-area {
-        padding: 8px;
-        max-width: 100%;
-        min-height: 200px;
-        max-height: 300px;
+        padding: 8px; /* تقليل الحشو */
+        max-width: 100%; /* تأخذ كامل عرض عمودها في الشبكة */
+        min-height: 200px; /* ارتفاعات مناسبة للوضع الأفقي */
+        max-height: calc(100vh - 10px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); /* لتجنب تجاوز الشاشة */
     }
-    #question-timer {
-        top: 8px;
-        left: 8px;
-        font-size: 0.75em;
-        padding: 3px 6px;
-        min-width: 35px;
-    }
-    #question-interaction-area h3 {
-        font-size: 1.2em;
-        margin-bottom: 4px;
-        margin-top: 35px;
-    }
-    #question-details {
-        font-size: 0.7em;
-        margin-bottom: 5px;
-    }
-    #question-difficulty {
-        padding: 2px 4px;
-        font-size: 0.65em;
-    }
-    #question-image-container {
-        margin-top: 4px;
-        margin-bottom: 6px;
-    }
-    #question-image {
-        max-height: 80px;
-    }
-    #question-text {
-        font-size: 1em;
-        margin-bottom: 6px;
-        line-height: 1.2;
-    }
-    #answer-options {
-        grid-template-columns: 1fr 1fr;
-        gap: 4px;
-        margin-bottom: 6px;
-    }
-    .option-btn {
-        font-size: 0.85em;
-        padding: 6px 8px;
-    }
-    #reveal-answer-btn {
-        width: 50%;
-        padding: 5px 8px;
-        font-size: 0.95em;
-    }
-    #answer-reveal-section {
-        padding: 5px 8px;
-        margin-top: 6px;
-    }
-    .correct-answer-display {
-        font-size: 0.85em;
-        margin-bottom: 6px;
-        padding: 3px;
-    }
-    .assign-points-prompt {
-        font-size: 0.75em;
-        margin-bottom: 5px;
-    }
-    .btn-assign-points {
-        padding: 3px 6px;
-        font-size: 0.7em;
-        min-width: 70px;
-    }
+    #question-timer { top: 8px; left: 8px; font-size: 0.75em; padding: 3px 6px; min-width: 35px; }
+    #question-interaction-area h3 { font-size: 1.2em; margin-bottom: 4px; margin-top: 35px; } /* مسافة للوقت */
+    #question-details { font-size: 0.7em; margin-bottom: 5px; }
+    #question-difficulty { padding: 2px 4px; font-size: 0.65em; }
+    #question-image-container { margin-top: 4px; margin-bottom: 6px; }
+    #question-image { max-height: 80px; } /* تعديل ارتفاع الصورة للوضع الأفقي */
+    #question-text { font-size: 1em; margin-bottom: 6px; line-height: 1.2; }
+    #answer-options { grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 6px; } /* عمودان للأزرار */
+    .option-btn { font-size: 0.85em; padding: 6px 8px; }
+    #reveal-answer-btn { width: 50%; padding: 5px 8px; font-size: 0.95em; }
+    #answer-reveal-section { padding: 5px 8px; margin-top: 6px; }
+    .correct-answer-display { font-size: 0.85em; margin-bottom: 6px; padding: 3px; }
+    .assign-points-prompt { font-size: 0.75em; margin-bottom: 5px; }
+    .btn-assign-points { padding: 3px 6px; font-size: 0.7em; min-width: 70px; }
 }
 
-/* === Media Query للشاشات الكبيرة جدًا (جديد) === */
-@media (min-width: 1600px) {
-    body.game-active-page #game-play-area {
-        grid-template-columns: 1fr 650px; /* زيادة عرض الشريط الجانبي */
-        gap: 30px;
-        padding: 30px;
-    }
-    #question-interaction-area {
-        max-width: 65%;
-        min-height: 450px;
-        max-height: 600px;
-        padding: 25px;
-    }
-    #game-sidebar {
-        padding: 20px;
-    }
-    #question-interaction-area h3 {
-        font-size: 2em;
-    }
-    #question-text {
-        font-size: 1.7em;
-    }
-    .option-btn {
-        font-size: 1.4em;
-        padding: 18px 25px;
-    }
-    #reveal-answer-btn {
-        font-size: 1.5em;
-        padding: 18px 25px;
-    }
-    #question-image {
-        max-height: 300px;
-    }
-    .team-info-card h2 {
-        font-size: 1.5em;
-    }
-    .team-info-card .current-station {
-        font-size: 1em;
-    }
-    .team-info-card .current-station span {
-        font-size: 1.2em;
-    }
-    .path-display li {
-        font-size: 1em;
-        padding: 10px 12px;
-    }
-}
-
-#text-answer-input {
-    display: none !important;
-}
+#text-answer-input { display: none !important; } /* إذا كان هناك حقل نصي غير مستخدم */
 /* --- END OF FILE assets/css/game.css --- */
