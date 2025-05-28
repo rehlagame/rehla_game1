@@ -21,7 +21,7 @@
     /* عرض الشريط الجانبي الافتراضي للشاشات الكبيرة */
     --sidebar-width-default: 310px;
     /* عرض الشريط الجانبي المصغر للوضع الأفقي على الهواتف */
-    --sidebar-width-landscape-mobile: 255px;
+    --sidebar-width-landscape-mobile: 240px;
 }
 
 /* === أنماط خاصة بتطبيق WebView وملء الشاشة للعبة === */
@@ -869,10 +869,6 @@ footer .container {
    الوضع الأفقي للهواتف (والشاشات المشابهة) - عمودان
    تم استخدام max-height و max-width لتغطية أغلب الهواتف في الوضع الأفقي.
 */
-/*
-   الوضع الأفقي للهواتف (والشاشات المشابهة) - عمودان
-   تم استخدام max-height و max-width لتغطية أغلب الهواتف في الوضع الأفقي.
-*/
 @media (max-height: 550px) and (orientation: landscape),
 (max-width: 991px) and (orientation: landscape) {
 
@@ -885,11 +881,6 @@ footer .container {
         padding: 5px; /* تقليل الحشو لمنطقة اللعب */
         overflow-y: auto; /* السماح بالتمرير إذا تجاوز المحتوى */
     }
-
-    /* ... (أنماط أخرى لهذا الوضع) ... */
-}
-    /* ... */
-}
     #game-sidebar {
         margin-top: 0; /* إزالة الهامش العلوي */
         position: sticky; /* تثبيت الشريط الجانبي */
