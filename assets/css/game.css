@@ -19,7 +19,7 @@
     --team2-color: #fd7e14;
 
     /* عرض الشريط الجانبي الافتراضي للشاشات الكبيرة */
-    --sidebar-width-default: 300px;
+    --sidebar-width-default: 350px;
     /* عرض الشريط الجانبي المصغر للوضع الأفقي على الهواتف */
     --sidebar-width-landscape-mobile: 240px;
 }
