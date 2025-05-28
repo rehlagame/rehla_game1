@@ -967,4 +967,44 @@ footer .container {
 }
 
 #text-answer-input { display: none !important; }
+
+/* الهواتف المحمولة (أقل من 768px) */
+@media (max-width: 767px) {
+  .game-container {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .question-box,
+  .choices-container,
+  .score-area,
+  .team-info {
+    width: 100%;
+    margin: 10px 0;
+    font-size: 1rem;
+  }
+
+  .question-box {
+    padding: 12px;
+  }
+}
+
+/* الشاشات المتوسطة والكبيرة (أكبر من 768px) */
+@media (min-width: 768px) {
+  .game-container {
+    padding: 30px;
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .question-box {
+    font-size: 1.3rem;
+  }
+
+  .choices-container button {
+    padding: 15px 20px;
+    font-size: 1.2rem;
+  }
+}
+
 /* --- END OF FILE assets/css/game.css --- */
