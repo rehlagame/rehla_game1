@@ -14,525 +14,12 @@
     --grey-color-medium: #dee2e6; /* رمادي متوسط */
     --grey-color-dark: #495057; /* رمادي غامق */
     --black-color: #212529; /* أسود ناعم */
-    -- kropp-font: 'Cairo', sans-serif; /* الخط الأساسي */
-    --team1-color: #0d6efd; /* أزرق للفريق الأول (مثال) */
-    --team2-color: #fd7e14; /* برتقالي للفريق الثاني (مثال) */
-
-    /* عرض الشريط الجانبي (تم تقليله قليلاً ~5%) */
-    --sidebar-width: 455px; /* كانت 480px */
-}
-
-/* --- إعدادات اللعبة (Setup Section) --- */
-#game-setup-section {
-    padding: 40px 0;
-    text-align: center;
-}
-#game-setup-section h1 {
-    font-size: 2.5em;
-    margin-bottom: 15px;
-    color: var(--primary-color);
-}
-#game-setup-section .intro-text {
-    font-size: 1.1em;
-    color: var(--grey-color-dark);
-    max-width: 700px;
-    margin: 0 auto 30px auto;
-    line-height: 1.7;
-}
-#game-setup-form {
-    background-color: var(--white-color);
-    padding: 30px 40px;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: right;
-}
-.team-setup-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 30px;
-    margin-bottom: 30px;
-    flex-wrap: wrap; /* Added flex-wrap */
-}
-.team-setup {
-    flex-basis: calc(50% - 15px); /* Adjusted basis */
-    border: 1px solid var(--grey-color-medium);
-    padding: 20px;
-    border-radius: 8px;
-    background-color: var(--grey-color-light);
-    min-width: 280px; /* Added min-width */
-}
-.team-setup h2 {
-    text-align: center;
-    color: var(--secondary-color);
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.3em;
-}
-.input-group {
-    margin-bottom: 20px;
-    text-align: right;
-}
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--grey-color-dark);
-    font-weight: bold;
-    font-size: 0.9em;
-}
-.input-group input[type="text"] {
-    width: 100%;
-    padding: 12px 15px;
-    border: 1px solid var(--grey-color-medium);
-    border-radius: 8px;
-    font-size: 1em;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    font-family: var(--kropp-font);
-    box-sizing: border-box; /* التأكيد على box-sizing */
-}
-.input-group input[type="text"]:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(23, 162, 184, 0.2);
-    outline: none;
-}
-.btn-start-game {
-    width: auto;
-    padding: 12px 40px;
-    font-size: 1.2em;
-    display: block;
-    margin: 20px auto 0 auto;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    border-radius: 8px;
-    background-color: var(--primary-color);
-    color: var(--white-color);
-}
-.btn-start-game:hover {
-    background-color: #117a8b;
-    color: var(--white-color);
-}
-
-/* --- منطقة اللعب الفعلية (Game Play Area) --- */
-.hidden {
-    display: none !important; /* !important لضمان الإخفاء */
-}
-
-#game-play-area {
-    margin-top: 30px;
-    display: grid;
-    /* العمود الأول (يسار) للسؤال، العمود الثاني (يمين) للشريط الجانبي */
-    grid-template-columns: 1fr var(--sidebar-width);
-    gap: 30px;
-    align-items: start;
-}
-
-/* --- العمود الثاني (يمين): الشريط الجانبي --- */
-#game-sidebar {
-    display: flex;
-    flex-direction: column; /* الترتيب عمودي: الدور ثم لوحة الفرق */
-    gap: 20px;
-    position: sticky;
-    top: 20px;
-    height: calc(100vh - 40px); /* السماح بالارتفاع الكامل للشاشة تقريباً */
-    overflow-y: auto; /* تمرير إذا لزم الأمر */
-    padding-bottom: 20px;
-    /* لا يوجد padding-left هنا */
-}
-
-/* معلومات الدور الحالي */
-#current-turn-info {
-    text-align: center;
-    font-size: 1.25em;
-    font-weight: 700;
-    padding: 15px;
-    background-color: var(--white-color);
-    color: var(--black-color);
-    border-radius: 10px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.07);
-    border: 1px solid var(--grey-color-medium);
-    flex-shrink: 0;
-}
-.team-name-highlight {
-    color: var(--primary-color);
-}
-
-/* لوحة معلومات الفريقين */
-.teams-dashboard {
-    display: flex;
-    flex-direction: row;
-    gap: 15px; /* مسافة بين البطاقتين */
-    align-items: stretch; /* محاولة جعل البطاقات بنفس الارتفاع */
-    flex-shrink: 0;
-    box-sizing: border-box;
-    flex-wrap: wrap; /* Allow wrapping if sidebar is too narrow */
-}
-
-/* بطاقة معلومات الفريق */
-.team-info-card {
-    flex-basis: calc(50% - 7.5px); /* كل بطاقة تأخذ نصف المساحة مع طرح نصف الفجوة */
-    background-color: var(--white-color);
-    border: 1px solid var(--grey-color-medium);
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column; /* المحتويات الداخلية تترتب عمودياً */
-    box-sizing: border-box;
-    min-width: 200px; /* Ensure cards don't get too small */
-}
-
-/* اسم الفريق */
-.team-info-card h2 {
-    color: var(--primary-color);
-    margin-top: 0;
-    margin-bottom: 10px;
-    text-align: center;
-    font-size: 1.3em;
-    font-weight: 700;
-    border-bottom: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-bottom: 0;
-}
-
-/* تنسيق تسمية النقاط والمحطة مباشرة */
-/* .team-info-card .score, *//* Removed redundant rules here, handled below */
-.team-info-card .current-station {
-    font-size: 0.85em;
-    color: var(--grey-color-dark);
-    margin-bottom: 8px;
-    text-align: center;
-    border-top: 1px solid var(--grey-color-light);
-    padding-top: 8px;
-}
-/* .team-info-card .score { border-top: none; padding-top: 0; } *//* Removed redundant rule */
-
-.team-info-card .current-station span { /* Span للمحطة الحالية فقط */
-    display: block;
-    font-weight: 700;
-    color: var(--black-color);
-    font-size: 1.15em;
-    margin-top: 3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* تمييز الفريق النشط */
-.team-info-card.active-team {
-    border-color: var(--primary-color);
-    background-color: #f0fbff; /* خلفية مميزة */
-    box-shadow: 0 6px 16px rgba(23, 162, 184, 0.15); /* ظل أوضح */
-}
-#team1-info.active-team { border-color: var(--team1-color); box-shadow: 0 6px 16px rgba(13, 110, 253, 0.15); }
-#team2-info.active-team { border-color: var(--team2-color); box-shadow: 0 6px 16px rgba(253, 126, 20, 0.15); }
-#team1-info.active-team h2 { color: var(--team1-color); }
-#team2-info.active-team h2 { color: var(--team2-color); }
-
-/* تنسيق مسار الرحلة */
-.path-display { margin-top: 10px; flex-grow: 1; }
-.path-display h4 { margin-bottom: 8px; color: var(--secondary-color); font-size: 0.8em; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-.path-display ol { list-style: none; padding-right: 0; margin: 0; counter-reset: path-counter; }
-.path-display li { display: flex; align-items: center; background-color: var(--grey-color-light); margin-bottom: 6px; padding: 8px 10px; border-radius: 6px; position: relative; font-size: 0.85em; counter-increment: path-counter; border: 1px solid var(--grey-color-medium); transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.2s ease; overflow: hidden; white-space: nowrap; }
-.path-display li::before { content: counter(path-counter); min-width: 20px; height: 20px; line-height: 20px; border-radius: 50%; background-color: var(--secondary-color); color: white; text-align: center; font-size: 0.8em; font-weight: bold; margin-left: 8px; flex-shrink: 0; transition: background-color 0.3s ease; }
-.path-display li.completed-path-station { background-color: #e9ecef; color: var(--grey-color-dark); opacity: 0.75; border-color: #ced4da; }
-.path-display li.completed-path-station::before { background-color: var(--success-color); }
-.path-display li.current-path-station { background-color: var(--accent-color); color: var(--black-color); font-weight: 700; border-color: #e0a800; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); opacity: 1; }
-.path-display li.current-path-station::before { background-color: var(--primary-color); color: white; }
-
-/* --- العمود الأول (يسار): منطقة السؤال والتفاعل --- */
-#question-interaction-area {
-    background-color: var(--white-color);
-    padding: 30px 35px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    text-align: right;
-    min-height: 500px;
-    display: flex;
-    flex-direction: column;
-    position: relative; /* ضروري لموضع العداد */
-}
-
-/* تنسيق عداد السؤال */
-#question-timer {
-    position: absolute;
-    top: 20px;
-    left: 25px;
-    background-color: var(--black-color);
-    color: var(--white-color);
-    padding: 8px 15px;
-    border-radius: 15px;
-    font-size: 1.1em;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-    min-width: 60px;
-    text-align: center;
-    transition: background-color 0. Chien ease; /* انتقال اللون */
-}
-
-/* تنسيق منطقة السؤال */
-#question-interaction-area h3 { margin-top: 0; margin-bottom: 10px; color: var(--primary-color); font-size: 1.7em; text-align: center; padding-top: 10px; }
-#question-details { text-align: center; margin-bottom: 15px; /* تقليل المسافة قليلاً */ font-size: 1.1em; color: var(--grey-color-dark); }
-#question-difficulty { font-weight: bold; padding: 5px 12px; border-radius: 6px; color: white; display: inline-block; vertical-align: middle; font-size: 0.9em; }
-#question-difficulty.easy { backgroun-color: var(--success-color); }
-#question-difficulty.medium { background-color: var(--warning-color); color: var(--black-color); }
-#question-difficulty.hard { background-color: var(--danger-color); }
-#question-points { font-weight: bold; vertical-align: middle; margin-right: 5px; }
-
-/* ======================= تنسيقات الصورة المضافة ======================= */
-#question-image-container {
-    margin-top: 10px; /* مسافة فوق الصورة */
-    margin-bottom: 20px; /* مسافة تحت الصورة */
-    text-align: center; /* لتوسيط الصورة إذا كانت أصغر من الحاوية */
-}
-#question-image {
-    display: block; /* لإزالة أي مسافات إضافية تحت الصورة */
-    max-width: 100%; /* أهم خاصية: الصورة لا تتجاوز عرض الحاوية */
-    max-height: 220px; /* تحديد أقصى ارتفاع للصورة (عدّل حسب الحاجة) */
-    margin: 0 auto; /* توسيط الصورة أفقياً */
-    border-radius: 8px; /* حواف دائرية */
-    border: 1px solid var(--grey-color-medium); /* حدود بسيطة */
-    background-color: var(--white-color); /* خلفية بيضاء إذا كانت الصورة شفافة */
-    object-fit: contain; /* للحفاظ على أبعاد الصورة دون قص أو تشويه */
-    object-position: center; /* توسيط محتوى الصورة داخل الإطار */
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08); /* ظل بسيط */
-}
-/* ====================================================================== */
-
-/* ===> حجم ووزن خط السؤال <=== */
-#question-text {
-    font-size: 1.5em;
-    font-weight: 600;
-    margin-bottom: 30px;
-    line-height: 1.7;
-    text-align: center;
-    color: var(--black-color);
-    flex-grow: 1;
-}
-
-/* حاوية خيارات الإجابة وزر العرض */
-#answer-options-wrapper {
-    margin-bottom: 30px;
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-#answer-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 25px;
-    flex-grow: 1;
-}
-
-/* ===> حجم ووزن خط أزرار الخيارات <=== */
-.option-btn {
-    padding: 16px 22px;
-    font-size: 1.25em;
-    font-weight: 600;
-    background-color: var(--grey-color-light);
-    border: 1px solid var(--grey-color-medium);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: center;
-    font-family: var(--kropp-font);
-}
-.option-btn:hover:not(:disabled) { background-color: var(--grey-color-medium); border-color: var(--secondary-color); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
-.option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; background-color: var(--grey-color-light); border-color: var(--grey-color-medium);}
-
-/* زر عرض الإجابة */
-#reveal-answer-btn {
-    display: block;
-    width: 60%;
-    margin: 0 auto;
-    padding: 15px 20px;
-    font-size: 1.3em;
-    background-color: var(--accent-color);
-    color: var(--black-color);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease;
-    font-weight: 700;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-}
-#reveal-answer-btn:hover:not(:disabled) {
-    background-color: #e0a800;
-    transform: translateY(-1px);
-}
-#reveal-answer-btn:active:not(:disabled) {
-    transform: translateY(1px);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
-#reveal-answer-btn:disabled {
-    background-color: #adb5bd;
-    color: var(--white-color);
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
-}
-
-/* قسم عرض الإجابة الصحيحة وتحديد النقاط */
-#answer-reveal-section {
-    background-color: #e9f7fd;
-    border: 1px solid var(--primary-color);
-    border-radius: 10px;
-    padding: 25px 30px;
-    margin-top: 20px;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(23, 162, 184, 0.1);
-    transition: opacity 0.5s ease, transform 0.3s ease;
-    transform: translateY(10px);
-    opacity: 0;
-}
-#answer-reveal-section:not(.hidden) {
-    transform: translateY(0);
-    opacity: 1;
-}
-#answer-reveal-section h4 {
-    color: var(--secondary-color);
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-size: 1.1em;
-    font-weight: 600;
-}
-.correct-answer-display {
-    font-size: 1.5em;
-    font-weight: 700;
-    color: var(--success-color);
-    margin-bottom: 20px;
-    padding: 10px;
-    background-color: #d1e7dd;
-    border-radius: 6px;
-    border: 1px solid #badbcc;
-}
-#answer-reveal-section hr {
-    border: 0;
-    height: 1px;
-    background-color: var(--grey-color-medium);
-    margin: 25px auto;
-    width: 70%;
-}
-.assign-points-prompt {
-    font-size: 1.2em;
-    color: var(--black-color);
-    margin-bottom: 20px;
-    font-weight: 600;
-}
-#point-assignment-options {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-}
-.btn-assign-points {
-    padding: 12px 25px;
-    font-size: 1.1em;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.2s ease;
-    font-weight: 700;
-    min-width: 150px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.btn-assign-points:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-.btn-assign-points:active {
-    transform: translateY(0px);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-.btn-assign-points.team1-btn { background-color: var(--team1-color); color: white; }
-.btn-assign-points.team1-btn:hover { background-color: #0b5ed7; }
-.btn-assign-points.team2-btn { background-color: var(--team2-color); color: white; }
-.btn-assign-points.team2-btn:hover { background-color: #d96a05; }
-.btn-assign-points.none-btn { background-color: var(--secondary-color); color: white; }
-.btn-assign-points.none-btn:hover { background-color: #5a6268; }
-
-/* *** تنسيق قسم إجابة السؤال السابق *** */
-#previous-correct-answer-display {
-    margin-top: 20px;
-    padding: 15px 20px;
-    background-color: var(--grey-color-light);
-    border: 1px dashed var(--secondary-color);
-    border-radius: 8px;
-    text-align: center;
-}
-#previous-correct-answer-display h4 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    color: var(--secondary-color);
-    font-size: 1em;
-    font-weight: 600;
-}
-#previous-correct-answer-display p {
-    margin-bottom: 0;
-    font-size: 1.2em;
-    font-weight: bold;
-    color: var(--grey-color-dark);
-}
-#previous-question-image {
-     max-width: 100px;
-     max-height: 100px;
-     display: none; /* Controlled by JS */
-     margin: 10px auto;
-     border-radius: 4px;
-     border: 1px solid var(--grey-color-medium);
-     background-color: var(--white-color);
-     object-fit: contain;
-     object-position: center;
-}
-
-/* رسالة التغذية الراجعة */
-#feedback-message {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 8px;
-    font-weight: bold;
-    text-align: center;
-    font-size: 1.2em;
-    min-height: 55px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-#feedback-message.points-assigned { background-color: #e9f7ec; color: #1c7430; border: 1px solid #c3e6cb```
-
-filepath: game.css
-
-/* --- START OF FILE assets/css/game.css --- */
-
-:root {
-    /* تعريف متغيرات الألوان لتسهيل التعديل */
-    --primary-color: #17a2b8; /* سماوي */
-    --secondary-color: #6c757d; /* رمادي */
-    --accent-color: #ffc107; /* أصفر */
-    --success-color: #28a745; /* أخضر */
-    --danger-color: #dc3545; /* أحمر */
-    --warning-color: #ffc107; /* أصفر تحذير */
-    --info-color: #17a2b8; /* سماوي معلومات */
-    --white-color: #fff;
-    --grey-color-light: #f8f9fa; /* رمادي فاتح جدا */
-    --grey-color-medium: #dee2e6; /* رمادي متوسط */
-    --grey-color-dark: #495057; /* رمادي غامق */
-    --black-color: #212529; /* أسود ناعم */
     --kropp-font: 'Cairo', sans-serif; /* الخط الأساسي */
     --team1-color: #0d6efd; /* أزرق للفريق الأول (مثال) */
     --team2-color: #fd7e14; /* برتقالي للفريق الثاني (مثال) */
 
-    /* عرض الشريط الجانبي (تم تقليله قليلاً ~5%) */
-    --sidebar-width: 455px; /* كانت 480px */
+    /* عرض الشريط الجانبي (القيمة الأصلية) */
+    --sidebar-width: 455px; /* القيمة الأصلية لضمان عمل الـ WebView بشكل صحيح */
 }
 
 /* --- إعدادات اللعبة (Setup Section) --- */
@@ -859,7 +346,7 @@ filepath: game.css
     font-family: var(--kropp-font);
 }
 .option-btn:hover:not(:disabled) { background-color: var(--grey-color-medium); border-color: var(--secondary-color); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
-.option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; background-color: var(--grey-color-light); border-color: var(--grey-color-rate-medium);}
+.option-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; background-color: var(--grey-color-light); border-color: var(--grey-color-medium);}
 
 /* زر عرض الإجابة */
 #reveal-answer-btn {
@@ -1207,29 +694,38 @@ filepath: game.css
 
 /* --- END: Styles for Modern Manual Score Adjustment Buttons --- */
 
-/* --- الاستجابة للشاشات الصغيرة --- */
+/* --- الاستجابة للشاشات الصغيرة (لضمان عمل الـ WebView بشكل صحيح) --- */
 @media (max-width: 992px) {
     #game-play-area {
-        display: block;
-        grid-template-columns: 1fr;
+        display: flex; /* تغيير من block إلى flex للتحكم بشكل أفضل في التخطيط */
+        flex-direction: column-reverse; /* الشريط الجانبي أسفل منطقة السؤال */
+        grid-template-columns: unset; /* إلغاء الشبكة */
     }
     #game-sidebar {
         position: static;
         height: auto;
         overflow-y: visible;
-        margin-top: 30px;
+        margin-top: 20px; /* تقليل المسافة قليلاً */
         width: 100%;
         padding-bottom: 0;
     }
-     .teams-dashboard {
-         flex-direction: column;
-     }
-      .team-info-card {
-         flex-basis: auto;
-         min-width: unset;
-     }
-    #question-interaction-area { min-height: auto; }
-     .team-setup {
+    .teams-dashboard {
+        flex-direction: row; /* إعادة الفرق إلى الترتيب الأفقي */
+        gap: 10px;
+    }
+    .team-info-card {
+        flex-basis: calc(50% - 5px); /* إعادة ضبط العرض الأصلي */
+        min-width: 200px;
+    }
+    #question-interaction-area {
+        min-height: auto;
+        width: 100%; /* التأكد من أن منطقة السؤال تأخذ العرض الكامل */
+        padding: 20px 25px; /* تقليل الحشوة لتوفير مساحة */
+    }
+    #question-text {
+        font-size: 1.4em; /* زيادة طفيفة لحجم السؤال لتحسين القراءة */
+    }
+    .team-setup {
         flex-basis: 100%;
     }
 }
@@ -1241,15 +737,15 @@ filepath: game.css
     .btn-start-game { width: 100%; }
 
     /* منطقة اللعب */
-    :root { --sidebar-width: 100%; }
-     #game-play-area { gap: 20px; }
+    :root { --sidebar-width: 100%; } /* للتأكد من أن الشريط الجانبي يأخذ العرض الكامل */
+    #game-play-area { gap: 15px; }
     #current-turn-info { font-size: 1.15em; padding: 12px; }
     .team-info-card { padding: 15px; }
     .team-info-card h2 { font-size: 1.2em; }
     .team-info-card .current-station { font-size: 0.8em; padding-top: 6px; }
     .team-info-card .current-station span { font-size: 1.05em; margin-top: 2px; }
     .path-display li { font-size: 0.8em; }
-     .path-display li::before { min-width: 18px; height: 18px; line-height: 18px; font-size: 0.75em; }
+    .path-display li::before { min-width: 18px; height: 18px; line-height: 18px; font-size: 0.75em; }
 
     /* منطقة السؤال */
     #question-interaction-area { padding: 20px; margin-top: 25px; }
@@ -1257,8 +753,8 @@ filepath: game.css
     #question-timer { top: 15px; left: 15px; font-size: 1em; padding: 6px 12px; min-width: 50px; }
     #question-text { font-size: 1.3em; }
     #answer-options { grid-template-columns: 1fr; gap: 10px; }
-    .option-btn { font-size: 1.1em; padding: 14px 18px;}
-    #reveal-answer-btn { width: 80%; padding: 12px 18px; font-size: 1.15em;}
+    .option-btn { font-size: 1.1em; padding: 14px 18px; }
+    #reveal-answer-btn { width: 80%; padding: 12px 18px; font-size: 1.15em; }
     #point-assignment-options { flex-direction: column; align-items: center; }
     .btn-assign-points { width: 80%; }
     #game-sidebar { margin-top: 25px; }
@@ -1268,7 +764,7 @@ filepath: game.css
     #question-image { max-height: 180px; }
 
     /* تعديل أزرار النقاط للشاشات المتوسطة */
-     .btn-adjust-score {
+    .btn-adjust-score {
         width: 26px;
         height: 26px;
         font-size: 0.8em;
@@ -1286,23 +782,23 @@ filepath: game.css
 
 @media (max-width: 576px) {
     #reveal-answer-btn { width: 95%; }
-    .btn-assign-points { width: 95%; min-width: unset;}
+    .btn-assign-points { width: 95%; min-width: unset; }
     .question-navigation-btns .btn { width: 95%; }
     #current-turn-info { font-size: 1.1em; }
-    .team-info-card { padding: 12px; border-radius: 10px;}
+    .team-info-card { padding: 12px; border-radius: 10px; }
     .team-info-card h2 { font-size: 1.1em; }
     .team-info-card .current-station { font-size: 0.75em; padding-top: 5px; margin-bottom: 6px; }
     .team-info-card .current-station span { font-size: 1em; margin-top: 2px; }
-    .path-display li { font-size: 0.75em; padding: 6px 8px; margin-bottom: 5px;}
-     .path-display li::before { min-width: 16px; height: 16px; line-height: 16px; font-size: 0.7em; margin-left: 6px;}
-     #question-interaction-area h3 { font-size: 1.4em; padding-top: 0; }
-     #question-timer { top: 10px; left: 10px; font-size: 0.9em; padding: 5px 10px; min-width: 45px; }
-     #question-text { font-size: 1.2em; }
-     .option-btn { font-size: 1em; padding: 12px 15px; }
-     .correct-answer-display { font-size: 1.3em; }
-     .assign-points-prompt { font-size: 1.1em; }
-     #previous-correct-answer-display p { font-size: 1em; }
-     #question-image { max-height: 150px; }
+    .path-display li { font-size: 0.75em; padding: 6px 8px; margin-bottom: 5px; }
+    .path-display li::before { min-width: 16px; height: 16px; line-height: 16px; font-size: 0.7em; margin-left: 6px; }
+    #question-interaction-area h3 { font-size: 1.4em; padding-top: 0; }
+    #question-timer { top: 10px; left: 10px; font-size: 0.9em; padding: 5px 10px; min-width: 45px; }
+    #question-text { font-size: 1.2em; }
+    .option-btn { font-size: 1em; padding: 12px 15px; }
+    .correct-answer-display { font-size: 1.3em; }
+    .assign-points-prompt { font-size: 1.1em; }
+    #previous-correct-answer-display p { font-size: 1em; }
+    #question-image { max-height: 150px; }
 
     /* تعديل أزرار النقاط للشاشات الصغيرة */
     .btn-adjust-score {
@@ -1310,19 +806,16 @@ filepath: game.css
         height: 24px;
         font-size: 0.75em;
     }
-     .score-value-container #team1-score,
+    .score-value-container #team1-score,
     .score-value-container #team2-score {
         margin: 0 6px;
         font-size: 1.05em; /* تصغير حجم خط النقاط قليلاً */
     }
-     .score-value-container {
+    .score-value-container {
         min-width: 70px;
         padding: 2px 5px;
     }
 }
-
-/* إزالة حقل الإجابة النصية غير المستخدم */
-#text-answer-input { display: none !important; }
 
 /* --- التعديلات للشاشات الكبيرة (نسخة الويب العادية) --- */
 @media (min-width: 1200px) {
@@ -1370,23 +863,26 @@ filepath: game.css
         font-size: 0.75em; /* كان 0.8em */
     }
 
-    /* ضبط حجم أزرار تعديل النقاط */
+    /* إعادة القيم الأصلية للسكور لضمان المظهر الاحترافي */
     .score-value-container {
-        min-width: 80px; /* كان 90px */
-        padding: 3px 6px; /* تقليص طفيف */
+        min-width: 90px; /* القيمة الأصلية */
+        padding: 4px 8px; /* القيمة الأصلية */
     }
 
     .score-value-container #team1-score,
     .score-value-container #team2-score {
-        margin: 0 10px; /* كان 12px */
-        font-size: 1.05em; /* كان 1.15em */
+        margin: 0 12px; /* القيمة الأصلية */
+        font-size: 1.15em; /* القيمة الأصلية */
     }
 
     .btn-adjust-score {
-        width: 26px; /* كان 28px */
-        height: 26px;
-        font-size: 0.85em; /* كان 0.9em */
+        width: 28px; /* القيمة الأصلية */
+        height: 28px;
+        font-size: 0.9em; /* القيمة الأصلية */
     }
 }
+
+/* إزالة حقل الإجابة النصية غير المستخدم */
+#text-answer-input { display: none !important; }
 
 /* --- END OF FILE assets/css/game.css --- */
