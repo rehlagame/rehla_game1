@@ -868,19 +868,22 @@ footer .container {
 /*
    الوضع الأفقي للهواتف (والشاشات المشابهة) - عمودان
    تم استخدام max-height و max-width لتغطية أغلب الهواتف في الوضع الأفقي.
-*/
-@media (max-height: 550px) and (orientation: landscape),
-(max-width: 991px) and (orientation: landscape) {
+*/@media (max-height: 550px) and (orientation: landscape),
+       (max-width: 991px) and (orientation: landscape) {
 
-    body.game-active-page main.game-content {
-        padding: 5px; /* تقليل الحشو العام للمحتوى */
+    /* ... */
+
+    .team-info-card {
+        flex-basis: calc(50% - 4px);
+        min-width: 0;
+        max-width: calc(50% - 4px);
+        padding: 8px;
+        max-height: 280px; /* تم التعديل هنا من 240px */
+        overflow-y: auto;
     }
-    body.game-active-page #game-play-area {
-        grid-template-columns: 1fr var(--sidebar-width-landscape-mobile); /* عمودان، الشريط الجانبي أصغر */
-        gap: 8px; /* تقليل المسافة بين الأعمدة */
-        padding: 5px; /* تقليل الحشو لمنطقة اللعب */
-        overflow-y: auto; /* السماح بالتمرير إذا تجاوز المحتوى */
-    }
+
+    /* ... */
+}
     #game-sidebar {
         margin-top: 0; /* إزالة الهامش العلوي */
         position: sticky; /* تثبيت الشريط الجانبي */
