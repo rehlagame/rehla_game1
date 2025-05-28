@@ -19,9 +19,9 @@
     --team2-color: #fd7e14;
 
     /* عرض الشريط الجانبي الافتراضي للشاشات الكبيرة */
-    --sidebar-width-default: 350px;
+    --sidebar-width-default: 310px;
     /* عرض الشريط الجانبي المصغر للوضع الأفقي على الهواتف */
-    --sidebar-width-landscape-mobile: 240px;
+    --sidebar-width-landscape-mobile: 255px;
 }
 
 /* === أنماط خاصة بتطبيق WebView وملء الشاشة للعبة === */
