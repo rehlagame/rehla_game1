@@ -869,20 +869,26 @@ footer .container {
    الوضع الأفقي للهواتف (والشاشات المشابهة) - عمودان
    تم استخدام max-height و max-width لتغطية أغلب الهواتف في الوضع الأفقي.
 */
+/*
+   الوضع الأفقي للهواتف (والشاشات المشابهة) - عمودان
+   تم استخدام max-height و max-width لتغطية أغلب الهواتف في الوضع الأفقي.
+*/
 @media (max-height: 550px) and (orientation: landscape),
        (max-width: 991px) and (orientation: landscape) {
 
-    /* ... */
+    /* ... (أنماط أخرى لهذا الوضع) ... */
 
     .team-info-card {
         flex-basis: calc(50% - 4px);
         min-width: 0;
         max-width: calc(50% - 4px);
         padding: 8px;
-        max-height: 280px; /* تم التعديل هنا من 240px */
+        max-height: 240px; /* <--- هذا هو السطر المسؤول! */
         overflow-y: auto;
     }
 
+    /* ... (أنماط أخرى لهذا الوضع) ... */
+}
     /* ... */
 }
     #game-sidebar {
