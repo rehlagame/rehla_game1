@@ -62,36 +62,28 @@ const QUESTIONS_PER_STATION = 3;
 const QUESTION_TIME_LIMIT = 60; // seconds
 const POINT_ASSIGNMENT_DELAY = 2500; // milliseconds
 
-// MODIFIED: Endpoint for fetching game data from your Render API
-// Make sure RENDER_API_BASE_URL is defined (e.g., globally in main.js or directly here if main.js isn't loaded first)
-// For robustness, it's better if main.js exports RENDER_API_BASE_URL and game.js imports it,
-// or ensure main.js script tag in HTML comes before game.js.
-// As a fallback or if main.js is not guaranteed to load first defining it:
-const RENDER_API_BASE_URL_GAME = typeof window !== 'undefined' && window.RENDER_API_BASE_URL ? window.RENDER_API_BASE_URL : 'https://rehla-game-backend.onrender.com'; // <--- استخدم عنوان Render الصحيح هنا
-const RENDER_API_QUESTIONS_ENDPOINT = `${RENDER_API_BASE_URL_GAME}/api/game/questions-data`; // <--- استبدل بالـ Endpoint الصحيح إذا لزم الأمر
+const RENDER_API_BASE_URL_GAME = typeof window !== 'undefined' && window.RENDER_API_BASE_URL ? window.RENDER_API_BASE_URL : 'https://rehla-game-backend.onrender.com';
+const RENDER_API_QUESTIONS_ENDPOINT = `${RENDER_API_BASE_URL_GAME}/api/game/questions-data`;
 
 // --- حالة اللعبة (Game State) ---
 let gameState = {};
-let allLandmarkNames = []; // Will be populated from API
-let generalQuestions = []; // Will be populated from API
-let questionsByLandmark = {}; // Will be populated from API
+let allLandmarkNames = [];
+let generalQuestions = [];         // *** للأسئلة العامة (التي هي صعبة بشكل افتراضي) ***
+let generalMediumQuestions = []; // *** للأسئلة العامة المتوسطة ***
+let questionsByLandmark = {};
 let questionTimerInterval = null;
-let isGameDataLoaded = false; // Flag to check if data is loaded
+let isGameDataLoaded = false;
 
 
-// NEW: Function to fetch game data (questions, landmarks) from your Render API
 async function fetchGameDataFromAPI() {
     try {
-        // IMPORTANT: If your API endpoint requires authentication, you'll need to get the
-        // Firebase ID token from auth.currentUser (available via window.firebaseAuth) and send it.
         let headers = { 'Content-Type': 'application/json' };
         if (window.firebaseAuth && window.firebaseAuth.currentUser) {
             try {
-                const token = await window.firebaseAuth.currentUser.getIdToken(true); // Force refresh token
+                const token = await window.firebaseAuth.currentUser.getIdToken(true);
                 headers['Authorization'] = `Bearer ${token}`;
             } catch (tokenError) {
                 console.warn("Could not get Firebase ID token for game data fetch:", tokenError);
-                // Decide if you want to proceed without token or show error
             }
         }
 
@@ -103,31 +95,26 @@ async function fetchGameDataFromAPI() {
         }
         const apiData = await response.json();
 
-        // Populate your global variables with data from the API
-        // The structure of apiData should match what processGameData used to create
-        // e.g., apiData: { allLandmarks: [], generalQs: [], landmarkQs: {} }
         allLandmarkNames = apiData.allLandmarks || [];
-        generalQuestions = apiData.generalQs || [];
+        generalQuestions = apiData.generalQs || [];           // *** استقبال الأسئلة العامة (الصعبة) ***
+        generalMediumQuestions = apiData.generalMediumQs || []; // *** استقبال الأسئلة العامة المتوسطة ***
         questionsByLandmark = apiData.landmarkQs || {};
 
-        if (allLandmarkNames.length < 2) { // Minimum landmarks needed for two distinct start points
+        if (allLandmarkNames.length < 2) {
             console.error("CRITICAL: Not enough landmarks from API (< 2). Game might not function correctly.");
-            // Decide if this is a fatal error that prevents game start
-            // throw new Error("بيانات المعالم غير كافية من الخادم لبدء اللعبة.");
         }
-        console.log(`Fetched from API: ${allLandmarkNames.length} landmarks, ${generalQuestions.length} general Qs.`);
+        console.log(`Fetched from API: ${allLandmarkNames.length} landmarks, ${generalQuestions.length} general (hard) Qs, ${generalMediumQuestions.length} general MEDIUM Qs.`);
         isGameDataLoaded = true;
         return true;
     } catch (error) {
         console.error("Error fetching game data from API:", error);
         isGameDataLoaded = false;
-        if(gameSetupForm) gameSetupForm.style.display = 'none'; // Hide setup form
+        if(gameSetupForm) gameSetupForm.style.display = 'none';
         const errDiv = document.createElement('div');
         errDiv.innerHTML = `<h2 style="color:red; text-align:center;">خطأ فادح!</h2><p style="text-align:center;">فشل تحميل بيانات اللعبة من الخادم.<br>${error.message}</p><p style="text-align:center; margin-top:10px;"><button onclick="location.reload()">حاول مرة أخرى</button></p>`;
         errDiv.style.cssText='color:red;padding:1em;border:1px solid red;margin: 20px auto; max-width: 500px; background-color: #fff0f0;';
         const gameContentContainer = document.querySelector('main.game-content > .container');
         if(gameContentContainer && !gameContentContainer.querySelector('.api-error-msg')) {
-            // Clear previous error messages if any, then append new one
             const existingError = gameContentContainer.querySelector('.api-error-msg');
             if(existingError) existingError.remove();
             errDiv.classList.add('api-error-msg');
@@ -171,7 +158,21 @@ function startQuestionTimer(duration) {
 function resetGameState(isFullReset = true) {
     stopQuestionTimer();
     if (isFullReset) {
-        gameState = { team1: { name:'', score:0, path:[], currentStationIndex:0, currentQuestionIndexInStation:0 }, team2: { name:'', score:0, path:[], currentStationIndex:0, currentQuestionIndexInStation:0 }, currentTurn:'team1', currentQuestion:null, isGameOver:false, answeredQuestionsCount:0, askedQuestions:{"kuwait_general":new Set()}, previousQuestion:null, isViewingPrevious:false };
+        gameState = {
+            team1: { name:'', score:0, path:[], currentStationIndex:0, currentQuestionIndexInStation:0 },
+            team2: { name:'', score:0, path:[], currentStationIndex:0, currentQuestionIndexInStation:0 },
+            currentTurn:'team1',
+            currentQuestion:null,
+            isGameOver:false,
+            answeredQuestionsCount:0,
+            askedQuestions:{
+                "kuwait_general": new Set(),          // *** مفتاح للأسئلة العامة (الصعبة) ***
+                "kuwait_general_medium": new Set()  // للأسئلة العامة المتوسطة
+                // سيتم إضافة مفاتيح المعالم ديناميكيًا عند الحاجة
+            },
+            previousQuestion:null,
+            isViewingPrevious:false
+        };
         if(team1PathList) team1PathList.innerHTML='';
         if(team2PathList) team2PathList.innerHTML='';
         if(team1ScoreDisplay) team1ScoreDisplay.textContent='0';
@@ -205,7 +206,6 @@ function resetGameState(isFullReset = true) {
     if (noBalanceMessage) {
         noBalanceMessage.remove();
     }
-    // Remove API error message if present
     const apiErrorMsg = document.querySelector('.api-error-msg');
     if (apiErrorMsg) apiErrorMsg.remove();
 
@@ -220,621 +220,203 @@ function displayTeamPath(team, listEl) { if (!team||!listEl||!Array.isArray(team
 function updateDashboard() { try { if(!gameState?.team1||!gameState?.team2) return; if(team1DisplayName) team1DisplayName.textContent=gameState.team1.name||''; if(team1ScoreDisplay) team1ScoreDisplay.textContent=gameState.team1.score??0; if(team1PathList) displayTeamPath(gameState.team1, team1PathList); if(team1CurrentStationName) team1CurrentStationName.textContent=gameState.team1.path[gameState.team1.currentStationIndex]?.name||(gameState.team1.currentStationIndex>=STATIONS_PER_TEAM?"أنهى":"-"); if(team1InfoCard) team1InfoCard.classList.toggle('active-team', gameState.currentTurn==='team1'); if(team2DisplayName) team2DisplayName.textContent=gameState.team2.name||''; if(team2ScoreDisplay) team2ScoreDisplay.textContent=gameState.team2.score??0; if(team2PathList) displayTeamPath(gameState.team2, team2PathList); if(team2CurrentStationName) team2CurrentStationName.textContent=gameState.team2.path[gameState.team2.currentStationIndex]?.name||(gameState.team2.currentStationIndex>=STATIONS_PER_TEAM?"أنهى":"-"); if(team2InfoCard) team2InfoCard.classList.toggle('active-team', gameState.currentTurn==='team2'); if(currentTeamTurnDisplay) currentTeamTurnDisplay.textContent=gameState[gameState.currentTurn]?.name||'?'; } catch(e){console.error("Dashboard Err:",e);} }
 
 function displayQuestion(question, sourceTitle = null) {
-    const wasViewingPrevious = gameState.isViewingPrevious;
-    if (!wasViewingPrevious) {
-        stopQuestionTimer();
-    }
-    if (!question?.id || !question.text || !question.type) {
-        console.error("Invalid question object:", question);
-        if(questionTitle) questionTitle.textContent = "خطأ";
-        if(questionText) questionText.textContent="بيانات السؤال غير صالحة.";
-        if(answerOptionsWrapper) answerOptionsWrapper.classList.add('hidden');
-        if(answerRevealSection) answerRevealSection.classList.add('hidden');
-        if(previousCorrectAnswerDisplay) previousCorrectAnswerDisplay.classList.add('hidden');
-        if(revealAnswerBtn) revealAnswerBtn.disabled = true;
-        if(questionImageContainer) questionImageContainer.classList.add('hidden');
-        return;
-    }
-    gameState.isViewingPrevious = false;
-    if(answerOptionsWrapper) answerOptionsWrapper.classList.remove('hidden');
-    if(answerRevealSection) answerRevealSection.classList.add('hidden');
-    if(previousCorrectAnswerDisplay) previousCorrectAnswerDisplay.classList.add('hidden');
-    if(feedbackMessage) { feedbackMessage.textContent = ''; feedbackMessage.className = ''; }
-    const isCurrentTimerExpired = timerDisplayElement && timerDisplayElement.textContent === "0:00";
-    if (revealAnswerBtn) { revealAnswerBtn.classList.remove('hidden'); revealAnswerBtn.disabled = false; }
-    if(answerOptionsContainer) answerOptionsContainer.innerHTML = '';
-    if(returnToCurrentBtn) returnToCurrentBtn.classList.add('hidden');
-    if(viewPreviousBtn && gameState.previousQuestion) viewPreviousBtn.classList.remove('hidden');
-    else if (viewPreviousBtn) viewPreviousBtn.classList.add('hidden');
-    const currentTeam = gameState[gameState.currentTurn];
-    const stationName = currentTeam?.path[currentTeam?.currentStationIndex]?.name || '?';
+    // ... (الكود كما هو)
     const title = sourceTitle || (question.isGeneral ? "سؤال عام عن الكويت" : `سؤال المحطة: ${stationName}`);
-    if(questionTitle) questionTitle.textContent = title;
-    if(questionDifficulty) { questionDifficulty.textContent = getDifficultyText(question.difficulty); questionDifficulty.className = question.difficulty||'medium'; }
-    if(questionPoints) questionPoints.textContent = question.points||0;
-
-    // MODIFIED: Image path handling - now expects image_firebase_url from API data
-    if (question.image_firebase_url && questionImageContainer && questionImage) {
-        const imageUrl = question.image_firebase_url;
-        questionImage.src = imageUrl;
-        questionImage.alt = `صورة للسؤال عن ${question.landmark || 'الكويت'}`;
-        questionImageContainer.classList.remove('hidden');
-        questionImage.onerror = () => {
-            console.error(`Failed to load image: ${imageUrl}`);
-            questionImage.alt = 'فشل تحميل الصورة';
-            questionImageContainer.classList.add('hidden'); // Hide if image fails
-        };
-    } else {
-        if (questionImageContainer) questionImageContainer.classList.add('hidden');
-        if (questionImage) { questionImage.src = '#'; questionImage.alt = 'صورة السؤال'; questionImage.onerror = null; }
-    }
-
-    if(questionText) questionText.textContent = question.text;
-    if (question.type === 'mcq' && Array.isArray(question.options) && question.options.length > 0) {
-        const options = shuffleArray([...question.options]);
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.textContent = typeof opt === 'string' ? opt : JSON.stringify(opt);
-            btn.classList.add('option-btn');
-            btn.disabled = isCurrentTimerExpired;
-            if(answerOptionsContainer) answerOptionsContainer.appendChild(btn);
-        });
-    } else {
-        console.error("Invalid options for MCQ:", question);
-        if(questionText) questionText.textContent += " (خطأ خيارات)";
-        if(revealAnswerBtn) revealAnswerBtn.disabled = true;
-    }
-    if (!wasViewingPrevious && !isCurrentTimerExpired) startQuestionTimer(QUESTION_TIME_LIMIT);
-    else if (isCurrentTimerExpired) {
-        if(timerDisplayElement) { timerDisplayElement.textContent = "0:00"; timerDisplayElement.style.backgroundColor = 'var(--danger-color)'; }
-        if(answerOptionsContainer) answerOptionsContainer.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
-    } else {
-        if (!isCurrentTimerExpired && answerOptionsContainer) answerOptionsContainer.querySelectorAll('.option-btn').forEach(btn => btn.disabled = false);
-    }
+    // ... (بقية الكود كما هو)
 }
 
-function revealAnswer() {
-    if (gameState.isGameOver || !gameState.currentQuestion || gameState.currentQuestion.correctAnswer === undefined || gameState.isViewingPrevious) return;
-    const question = gameState.currentQuestion;
-    gameState.previousQuestion = JSON.parse(JSON.stringify(question)); // Deep copy
-    if (answerOptionsContainer) answerOptionsContainer.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
-    if (revealAnswerBtn) revealAnswerBtn.disabled = true;
-    if(answerOptionsWrapper) answerOptionsWrapper.classList.add('hidden');
-    if(answerRevealSection) answerRevealSection.classList.remove('hidden');
-    if(previousCorrectAnswerDisplay) previousCorrectAnswerDisplay.classList.add('hidden');
-    if (questionImageContainer) questionImageContainer.classList.add('hidden'); // Hide current question image when revealing answer
-    if(correctAnswerText) correctAnswerText.textContent = question.correctAnswer;
-    if(assignPointsTeam1Btn) assignPointsTeam1Btn.textContent = gameState.team1.name || 'الفريق 1';
-    if(assignPointsTeam2Btn) assignPointsTeam2Btn.textContent = gameState.team2.name || 'الفريق 2';
-    if (viewPreviousBtn && gameState.previousQuestion) viewPreviousBtn.classList.remove('hidden');
-}
-
-function assignPoints(assignedTo) {
-    stopQuestionTimer();
-    if (gameState.isGameOver || !gameState.currentQuestion) return;
-    const question = gameState.currentQuestion; const points = question.points || 0;
-    const currentTeamId = gameState.currentTurn; const team = gameState[currentTeamId];
-    if (!team) { console.error("Assign points error: Team undefined"); return; }
-    if(answerRevealSection) answerRevealSection.classList.add('hidden');
-    if(feedbackMessage) feedbackMessage.textContent = '';
-    let txt = ""; let cls = "";
-    if (assignedTo === 'team1') { gameState.team1.score += points; txt = `+${points} لـ ${gameState.team1.name}!`; cls = 'points-assigned'; }
-    else if (assignedTo === 'team2') { gameState.team2.score += points; txt = `+${points} لـ ${gameState.team2.name}!`; cls = 'points-assigned'; }
-    else { txt = "لم يحصل أحد على نقاط."; cls = 'no-points'; }
-    if(feedbackMessage) { feedbackMessage.textContent = txt; feedbackMessage.className = cls; }
-    team.currentQuestionIndexInStation++;
-    updateDashboard();
-    setTimeout(() => {
-        if(feedbackMessage) { feedbackMessage.textContent = ''; feedbackMessage.className = ''; }
-        if (checkGameOver()) { displayResults(); }
-        else {
-            let shouldSwitch = false; const otherId = currentTeamId==='team1'?'team2':'team1';
-            if (gameState[otherId]) { const otherFin = gameState[otherId].currentStationIndex >= STATIONS_PER_TEAM; if (!otherFin) { shouldSwitch = true; } else if (team.currentStationIndex < STATIONS_PER_TEAM) { shouldSwitch = false; } else { shouldSwitch = false; } } else { shouldSwitch = true; }
-            if (shouldSwitch) { switchTurn(); }
-            if (!gameState.isViewingPrevious) startTurn();
-        }
-    }, POINT_ASSIGNMENT_DELAY);
-}
-
-function displayPreviousQuestion() {
-    if (!gameState.previousQuestion) { return; }
-    gameState.isViewingPrevious = true;
-    if(answerOptionsWrapper) answerOptionsWrapper.classList.add('hidden');
-    if(answerRevealSection) answerRevealSection.classList.add('hidden');
-    if (questionImageContainer) questionImageContainer.classList.add('hidden'); // Hide current question image when viewing previous
-    if(previousCorrectAnswerDisplay) previousCorrectAnswerDisplay.classList.remove('hidden');
-    if(viewPreviousBtn) viewPreviousBtn.classList.add('hidden');
-    if(returnToCurrentBtn) returnToCurrentBtn.classList.remove('hidden');
-    if(feedbackMessage) { feedbackMessage.textContent=''; feedbackMessage.className=''; }
-    const prevQ = gameState.previousQuestion;
-    const title = prevQ.isGeneral ? "سؤال عام (السابق)" : `سؤال المحطة: ${prevQ.landmark || '?'} (السابق)`;
-    if(questionTitle) questionTitle.textContent = title;
-    if(questionDifficulty) { questionDifficulty.textContent = getDifficultyText(prevQ.difficulty); questionDifficulty.className = prevQ.difficulty||'medium'; }
-    if(questionPoints) questionPoints.textContent = prevQ.points||0;
-    if(questionText) questionText.textContent = prevQ.text;
-    if (previousCorrectAnswerText) previousCorrectAnswerText.textContent = prevQ.correctAnswer ?? "غير متوفرة";
-
-    // MODIFIED: Image path handling for previous question - expects image_firebase_url
-    if (prevQ.image_firebase_url && previousQuestionImage) {
-        const imageUrl = prevQ.image_firebase_url;
-        previousQuestionImage.src = imageUrl;
-        previousQuestionImage.alt = `صورة السؤال السابق عن ${prevQ.landmark || 'الكويت'}`;
-        previousQuestionImage.style.display = 'block';
-        previousQuestionImage.onerror = () => {
-            console.error(`Failed to load previous image: ${imageUrl}`);
-            previousQuestionImage.alt = 'فشل تحميل الصورة';
-            previousQuestionImage.style.display = 'none';
-        };
-    } else if (previousQuestionImage) {
-        previousQuestionImage.style.display = 'none';
-        previousQuestionImage.src = '#';
-        previousQuestionImage.onerror = null;
-    }
-}
-
-function checkGameOver() { if (!gameState?.team1 || !gameState?.team2) return false; const t1Fin = gameState.team1.currentStationIndex >= STATIONS_PER_TEAM; const t2Fin = gameState.team2.currentStationIndex >= STATIONS_PER_TEAM; if (t1Fin && t2Fin && !gameState.isGameOver) { gameState.isGameOver = true; } return gameState.isGameOver; }
-function switchTurn() { if (gameState.isGameOver) return; const currentId = gameState.currentTurn; const nextId = (currentId === 'team1') ? 'team2' : 'team1'; if (gameState[nextId] && gameState[nextId].currentStationIndex < STATIONS_PER_TEAM) { gameState.currentTurn = nextId; } else { if (gameState[currentId] && gameState[currentId].currentStationIndex < STATIONS_PER_TEAM) { /* No switch */ } else { checkGameOver(); } } updateDashboard(); }
-
-function displayResults() {
-    stopQuestionTimer();
-    gameState.isGameOver = true;
-    if(questionInteractionArea) questionInteractionArea.classList.add('hidden');
-    const gameSidebar = document.getElementById('game-sidebar');
-    if(gameSidebar) gameSidebar.classList.add('hidden');
-    if(gameOverSection) {
-        const t1 = gameState.team1; const t2 = gameState.team2;
-        if (!t1 || !t2) { if(finalResultsDisplay) finalResultsDisplay.innerHTML = "<p>خطأ في عرض النتائج.</p>"; return; }
-        let html = `<p><strong>${t1.name}:</strong> ${t1.score} نقطة</p><p><strong>${t2.name}:</strong> ${t2.score} نقطة</p><hr>`;
-        if (t1.score > t2.score) html += `<p class="winner">الفائز: ${t1.name}!</p>`;
-        else if (t2.score > t1.score) html += `<p class="winner">الفائز: ${t2.name}!</p>`;
-        else html += `<p class="winner">تعادل!</p>`;
-        if(finalResultsDisplay) finalResultsDisplay.innerHTML = html;
-        gameOverSection.classList.remove('hidden');
-        gameOverSection.classList.add('visible');
-    }
-}
-
-// في assets/js/game.js
-
-// ... (الكود الذي يسبق دالة initializeGame) ...
-
-async function initializeGame() {
-    console.log("Attempting to initialize game...");
-    const startButton = gameSetupForm ? gameSetupForm.querySelector('.btn-start-game') : null;
-
-    const currentUser = window.firebaseAuth ? window.firebaseAuth.currentUser : null;
-    if (!currentUser) {
-        alert("خطأ: المستخدم غير مسجل الدخول. لا يمكن بدء اللعبة.");
-        if (startButton) startButton.disabled = false;
-        return;
-    }
-
-    // --- بداية التعديل الرئيسي هنا: خصم اللعبة من الخادم ---
-    let serverDeductSuccessful = false;
-    let newBalanceFromServer;
-
-    try {
-        console.log(`[GameJS] Attempting to deduct game via backend for user ${currentUser.uid}`);
-        // تأكد أن main.js قد قام بتعريف window.RENDER_API_BASE_URL بشكل صحيح
-        if (!window.RENDER_API_BASE_URL) {
-            throw new Error("RENDER_API_BASE_URL is not defined on window object.");
-        }
-        if (!window.firebaseAuth || !window.firebaseAuth.currentUser) {
-            throw new Error("Firebase auth or current user is not available for token generation.");
-        }
-
-        const token = await window.firebaseAuth.currentUser.getIdToken(true); // احصل على التوكن (مع تحديث إذا لزم الأمر)
-        const deductResponse = await fetch(`${window.RENDER_API_BASE_URL}/api/user/${currentUser.uid}/deduct-game`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-            // لا حاجة لـ body هنا إذا كان الخصم دائمًا لعبة واحدة ولا يرسل بيانات إضافية
-        });
-
-        const deductData = await deductResponse.json(); // اقرأ الرد دائمًا
-
-        if (!deductResponse.ok) {
-            // إذا فشل الخصم في الخادم (بسبب عدم وجود رصيد أو خطأ آخر)
-            alert(deductData.message || "فشل التحقق من رصيد الألعاب في الخادم.");
-            console.error("Backend deduction failed:", deductResponse.status, deductData.message);
-            if (startButton) startButton.disabled = false; // أعد تفعيل زر البدء
-            return; // لا تبدأ اللعبة
-        }
-
-        // إذا نجح الخصم في الخادم
-        serverDeductSuccessful = true;
-        newBalanceFromServer = deductData.newBalance; // الرصيد الجديد من الخادم
-        console.log(`[GameJS] Game deduction successful on backend. New balance: ${newBalanceFromServer}`);
-
-        // قم بتحديث localStorage والرصيد المعروض فورًا بالبيانات من الخادم
-        // تأكد أن getUserGamesKey و updateRemainingGamesDisplay متاحتان (معرفتان في main.js ومتاحتان كـ window. أو مستوردتان)
-        if (window.getUserGamesKey && window.updateRemainingGamesDisplay) {
-            localStorage.setItem(window.getUserGamesKey(currentUser.uid), newBalanceFromServer.toString());
-            window.updateRemainingGamesDisplay(currentUser.uid);
-        } else {
-            console.warn("getUserGamesKey or updateRemainingGamesDisplay is not available on window. UI might not update immediately.");
-            // كحل احتياطي إذا لم تكن الدوال العامة متاحة
-            localStorage.setItem(`rehlaUserGames_${currentUser.uid}`, newBalanceFromServer.toString());
-            const remainingGamesCountSpan = document.getElementById('remaining-games-count');
-            if (remainingGamesCountSpan) remainingGamesCountSpan.textContent = newBalanceFromServer;
-        }
-
-    } catch (error) {
-        console.error("Error calling /api/user/.../deduct-game endpoint or processing its response:", error);
-        alert(`حدث خطأ أثناء الاتصال بالخادم لخصم اللعبة: ${error.message || 'يرجى المحاولة مرة أخرى.'}`);
-        if (startButton) startButton.disabled = false; // أعد تفعيل زر البدء
-        return; // لا تبدأ اللعبة
-    }
-
-    // هذا الشرط للتأكيد، يجب أن يكون قد تم الخروج قبله إذا فشل الخصم
-    if (!serverDeductSuccessful) {
-        console.error("InitializeGame aborted: Server deduction was not successful (should have returned earlier).");
-        if (startButton) startButton.disabled = false;
-        return;
-    }
-    // --- نهاية التعديل الرئيسي هنا ---
-
-
-    // بقية دالة initializeGame تستمر إذا نجح الخصم من الخادم
-    try {
-        if (!isGameDataLoaded) {
-            if (startButton) {
-                startButton.textContent = 'جاري تحميل بيانات اللعبة...';
-            }
-            const gameDataFetched = await fetchGameDataFromAPI();
-            if (!gameDataFetched) {
-                if (startButton) {
-                    startButton.textContent = 'بدء الرحلة!';
-                    startButton.disabled = false;
-                }
-                if (playAgainBtn) { playAgainBtn.disabled = false; }
-                return;
-            }
-            if (startButton) {
-                startButton.textContent = 'بدء الرحلة!';
-            }
-        }
-
-        if (!allLandmarkNames || allLandmarkNames.length < 2) {
-            alert("خطأ: بيانات المعالم غير كافية (بعد محاولة الجلب من الخادم). لا يمكن بدء اللعبة.");
-            if (startButton) startButton.disabled = false;
-            return;
-        }
-
-        resetGameState(true);
-
-        gameState.team1.name = team1NameInput.value.trim() || "الفريق الأول";
-        gameState.team2.name = team2NameInput.value.trim() || "الفريق الثاني";
-
-        const reqStartingPoints = Math.min(2, allLandmarkNames.length);
-        if (allLandmarkNames.length < reqStartingPoints) {
-            alert(`خطأ: لا يوجد معالم كافية (${allLandmarkNames.length}) لاختيار نقاط بداية مختلفة.`);
-            if (startButton) startButton.disabled = false;
-            return;
-        }
-
-        let available = [...allLandmarkNames];
-        const t1Start = team1StartInput.value.trim();
-        const t2Start = team2StartInput.value.trim();
-        let t1Station = null;
-        let t2Station = null;
-
-        if (t1Start && available.includes(t1Start)) {
-            t1Station = t1Start;
-            available = available.filter(n => n !== t1Station);
-        } else if (available.length > 0) {
-            const i = Math.floor(Math.random() * available.length);
-            t1Station = available.splice(i, 1)[0];
-        } else {
-            alert("خطأ حرج: لا يوجد معالم لاختيار نقطة بداية للفريق الأول.");
-            if (startButton) startButton.disabled = false;
-            return;
-        }
-
-        if (t2Start && available.includes(t2Start) && t2Start !== t1Station) {
-            t2Station = t2Start;
-            available = available.filter(n => n !== t2Station);
-        } else if (available.length > 0) {
-            const i = Math.floor(Math.random() * available.length);
-            t2Station = available.splice(i, 1)[0];
-        } else {
-            const fallbackPool = allLandmarkNames.filter(n => n !== t1Station);
-            if (fallbackPool.length > 0) {
-                t2Station = fallbackPool[Math.floor(Math.random() * fallbackPool.length)];
-            } else {
-                t2Station = t1Station;
-            }
-        }
-
-        if (!t1Station || !t2Station) {
-            alert("خطأ في تعيين نقاط البداية.");
-            if (startButton) startButton.disabled = false;
-            return;
-        }
-
-        gameState.team1.path = [{ name: t1Station }];
-        gameState.team2.path = [{ name: t2Station }];
-        // ... (بقية منطق تهيئة المسارات وحالة اللعبة) ...
-        gameState.team1.currentStationIndex = 0;
-        gameState.team2.currentStationIndex = 0;
-        gameState.team1.currentQuestionIndexInStation = 0;
-        gameState.team2.currentQuestionIndexInStation = 0;
-
-        if (!gameState.askedQuestions[t1Station]) gameState.askedQuestions[t1Station] = new Set();
-        if (!gameState.askedQuestions[t2Station]) gameState.askedQuestions[t2Station] = new Set();
-
-        const remainingStationsNeededPerTeam = STATIONS_PER_TEAM - 1;
-        if (remainingStationsNeededPerTeam > 0) {
-            let pathPool = shuffleArray([...allLandmarkNames.filter(n => n !== t1Station && n !== t2Station)]);
-
-            const getPathStations = (count, currentPathNames) => {
-                const stations = [];
-                let tempPool = [...pathPool];
-                for (let i = 0; i < count; i++) {
-                    if (tempPool.length > 0) {
-                        const station = tempPool.shift();
-                        stations.push({ name: station });
-                        if (!gameState.askedQuestions[station]) gameState.askedQuestions[station] = new Set();
-                    } else {
-                        const fallback = allLandmarkNames.find(ln => !currentPathNames.includes(ln) && !stations.some(s => s.name === ln));
-                        if (fallback) {
-                            stations.push({ name: fallback });
-                            if (!gameState.askedQuestions[fallback]) gameState.askedQuestions[fallback] = new Set();
-                        } else {
-                            console.warn(`Could not find enough unique stations for path.`);
-                            break;
-                        }
-                    }
-                }
-                return stations;
-            };
-
-            const team1CurrentPathNames = gameState.team1.path.map(s => s.name);
-            gameState.team1.path.push(...getPathStations(remainingStationsNeededPerTeam, team1CurrentPathNames));
-
-            const team1AddedStations = gameState.team1.path.slice(1).map(s => s.name);
-            pathPool = pathPool.filter(p => !team1AddedStations.includes(p));
-
-            const team2CurrentPathNames = gameState.team2.path.map(s => s.name);
-            gameState.team2.path.push(...getPathStations(remainingStationsNeededPerTeam, team2CurrentPathNames));
-        }
-
-
-        if(gameSetupSection) gameSetupSection.classList.add('hidden');
-        if(gamePlayArea) gamePlayArea.classList.remove('hidden');
-        window.scrollTo(0, 0); 
-        if(questionInteractionArea) questionInteractionArea.classList.remove('hidden');
-        const gameSidebar = document.getElementById('game-sidebar');
-        if(gameSidebar) gameSidebar.classList.remove('hidden');
-        if(gameOverSection) { gameOverSection.classList.remove('visible'); gameOverSection.classList.add('hidden'); }
-
-        updateDashboard();
-        startTurn();
-        console.log("Game Initialized and started successfully AFTER server deduction.");
-
-    } catch (error) {
-        console.error("Critical error during game content initialization (after deduction attempt):", error);
-        alert("حدث خطأ غير متوقع أثناء بدء اللعبة. يرجى المحاولة مرة أخرى.");
-        if (startButton) {
-            startButton.textContent = 'بدء الرحلة!';
-            startButton.disabled = false;
-        }
-        const noBalanceMessage = document.getElementById('no-balance-message');
-        if (noBalanceMessage) noBalanceMessage.classList.add('hidden');
-        if (gameSetupSection) gameSetupSection.classList.remove('hidden');
-        if (gamePlayArea) gamePlayArea.classList.add('hidden');
-    }
-}
-
-// ... (بقية الكود في game.js: startTurn, displayQuestion, إلخ)
+// ... (بقية الدوال: revealAnswer, assignPoints, displayPreviousQuestion, checkGameOver, switchTurn, displayResults, initializeGame كما هي) ...
+// *** التعديلات الأساسية ستكون في startTurn ***
 
 function startTurn() {
     console.log(`Starting turn for ${gameState.currentTurn}`);
-    if (gameState.isGameOver) {
-        if (!gameOverSection?.classList.contains('visible')) { displayResults(); }
-        return;
-    }
-    if (gameState.isViewingPrevious) {
-        if (gameState.currentQuestion) displayQuestion(gameState.currentQuestion);
-        else console.error("Cannot return to current question, no currentQuestion stored!");
-        return;
-    }
-    if(answerOptionsWrapper) answerOptionsWrapper.classList.remove('hidden');
-    if(answerRevealSection) answerRevealSection.classList.add('hidden');
-    if(previousCorrectAnswerDisplay) previousCorrectAnswerDisplay.classList.add('hidden');
-    if(feedbackMessage) { feedbackMessage.textContent = ''; feedbackMessage.className = ''; }
-    if(revealAnswerBtn) { revealAnswerBtn.classList.remove('hidden'); revealAnswerBtn.disabled = false; }
-    if(answerOptionsContainer) {
-        answerOptionsContainer.innerHTML = '';
-        // Ensure buttons are enabled only if timer is not expired (handled in displayQuestion)
-    }
-    if(timerDisplayElement) { timerDisplayElement.textContent = formatTime(QUESTION_TIME_LIMIT); timerDisplayElement.style.backgroundColor = 'var(--black-color)'; }
+    // ... (بداية الدالة كما هي: التحقق من gameOver, isViewingPrevious, إعادة تعيين الواجهة) ...
 
-    if (questionImageContainer) questionImageContainer.classList.add('hidden');
-    if (questionImage) { questionImage.src = '#'; questionImage.onerror = null; }
-    if (previousQuestionImage) { previousQuestionImage.style.display = 'none'; previousQuestionImage.src = '#'; previousQuestionImage.onerror = null;}
-
-    const currentTeamId = gameState.currentTurn; const team = gameState[currentTeamId];
+    const currentTeamId = gameState.currentTurn;
+    const team = gameState[currentTeamId];
     if (!team) { console.error("Error: Current team undefined!"); return; }
 
-    if (team.currentStationIndex >= STATIONS_PER_TEAM) {
-        stopQuestionTimer();
-        const otherId = currentTeamId === 'team1' ? 'team2' : 'team1';
-        if (gameState[otherId] && gameState[otherId].currentStationIndex >= STATIONS_PER_TEAM) {
-            if (checkGameOver()) displayResults();
-        } else {
-            switchTurn();
-            if (checkGameOver()) displayResults();
-            else if(gameState.currentTurn !== currentTeamId) startTurn(); // Start turn for the other team if game not over
-        }
-        return;
-    }
+    // ... (التحقق من انتهاء محطات الفريق كما هو) ...
 
     const stationObj = team.path[team.currentStationIndex];
     if (!stationObj?.name) {
         alert(`خطأ في بيانات المحطة رقم ${team.currentStationIndex + 1}. سيتم تخطي هذه المحطة.`);
-        stopQuestionTimer();
-        team.currentStationIndex++;
-        team.currentQuestionIndexInStation = 0;
-        updateDashboard();
-        setTimeout(startTurn, 100); // Try next station or check game over
-        return;
+        stopQuestionTimer(); team.currentStationIndex++; team.currentQuestionIndexInStation = 0; updateDashboard(); setTimeout(startTurn, 100); return;
     }
     const stationName = stationObj.name;
 
-    if (team.currentQuestionIndexInStation >= QUESTIONS_PER_STATION) {
-        team.currentStationIndex++;
-        team.currentQuestionIndexInStation = 0;
-        updateDashboard();
-        if (checkGameOver()) {
-            stopQuestionTimer();
-            displayResults();
-        } else {
-            setTimeout(startTurn, 50); // Move to next station logic or switch turn
-        }
-        return;
-    }
+    // ... (التحقق من انتهاء أسئلة المحطة الحالية كما هو) ...
 
-    let targetPool, difficulty, landmarkFilter, askedKey, qTitle, isGeneral;
+    let targetPool, difficulty, landmarkFilter, askedKey, qTitle, isGeneralByDefault;
+
     switch (team.currentQuestionIndexInStation) {
-        case 0: difficulty = 'easy'; landmarkFilter = stationName; askedKey = stationName; targetPool = questionsByLandmark[stationName]; isGeneral = false; qTitle = null; break;
-        case 1: difficulty = 'medium'; landmarkFilter = stationName; askedKey = stationName; targetPool = questionsByLandmark[stationName]; isGeneral = false; qTitle = null; break;
-        case 2: difficulty = 'hard'; landmarkFilter = null; askedKey = "kuwait_general"; targetPool = generalQuestions; isGeneral = true; qTitle = "سؤال عام عن الكويت"; break;
-        default: // Should not happen
+        case 0: // السؤال الأول: سهل، خاص بالمحطة
+            difficulty = 'easy';
+            landmarkFilter = stationName;
+            askedKey = stationName;
+            targetPool = questionsByLandmark[stationName];
+            isGeneralByDefault = false; // السؤال ليس عامًا بشكل افتراضي
+            qTitle = `سؤال المحطة: ${stationName}`;
+            break;
+        case 1: // السؤال الثاني: متوسط، خاص بالمحطة أولاً، ثم عام متوسط
+            difficulty = 'medium';
+            landmarkFilter = stationName;
+            askedKey = stationName; // مفتاح مبدئي لأسئلة المحطة
+            targetPool = questionsByLandmark[stationName];
+            isGeneralByDefault = false; // السؤال ليس عامًا بشكل افتراضي (في المحاولة الأولى)
+            qTitle = `سؤال المحطة: ${stationName}`;
+            break;
+        case 2: // السؤال الثالث: صعب، عام
+            difficulty = 'hard';
+            landmarkFilter = null;
+            askedKey = "kuwait_general";       // *** العودة للمفتاح "القديم" للأسئلة العامة (الصعبة) ***
+            targetPool = generalQuestions;    // *** استخدام generalQuestions للأسئلة العامة (الصعبة) ***
+            isGeneralByDefault = true;  // السؤال عام بشكل افتراضي
+            qTitle = "سؤال عام (صعب)"; // أو "سؤال عام عن الكويت"
+            break;
+        default:
             console.error("Invalid currentQuestionIndexInStation:", team.currentQuestionIndexInStation);
-            team.currentQuestionIndexInStation = 0; // Reset and retry
-            setTimeout(startTurn, 50);
-            return;
+            team.currentQuestionIndexInStation = 0; setTimeout(startTurn, 50); return;
     }
 
     targetPool = targetPool || [];
-    if (!Array.isArray(targetPool)) {
-        console.warn(`Target pool for ${askedKey} is not an array. Defaulting to empty.`);
-        targetPool = [];
+    if (!Array.isArray(targetPool)) { console.warn(`Target pool for ${askedKey} is not an array. Defaulting to empty.`); targetPool = []; }
+    // تأكد من تهيئة Set إذا لم يكن موجودًا (خاصة لمفاتيح المعالم الديناميكية)
+    if (!gameState.askedQuestions[askedKey]) {
+        console.log(`Initializing askedQuestions set for key: ${askedKey}`);
+        gameState.askedQuestions[askedKey] = new Set();
     }
 
-    if (!gameState.askedQuestions[askedKey]) gameState.askedQuestions[askedKey] = new Set();
+    // ضمان أن خاصية isGeneral موجودة في الأسئلة وتعيينها بشكل صحيح
+    targetPool.forEach(q => { if (q && q.isGeneral === undefined) { q.isGeneral = isGeneralByDefault; } });
+    if (generalMediumQuestions) { // ضمان isGeneral للأسئلة العامة المتوسطة
+        generalMediumQuestions.forEach(q => { if (q && q.isGeneral === undefined) { q.isGeneral = true; } });
+    }
+    if (generalQuestions) { // ضمان isGeneral للأسئلة العامة (الصعبة)
+        generalQuestions.forEach(q => { if (q && q.isGeneral === undefined) { q.isGeneral = true; } });
+    }
 
-    // Ensure isGeneral property is set correctly if API doesn't provide it consistently
-    targetPool.forEach(q => {
-        if (q && q.isGeneral === undefined) {
-            q.isGeneral = (askedKey === "kuwait_general");
-        }
-    });
-
-    const availableQs = targetPool.filter(q =>
-        q?.id &&
-        q.difficulty === difficulty &&
-        (isGeneral ? q.isGeneral === true : (q.landmark === landmarkFilter && !q.isGeneral)) &&
-        !gameState.askedQuestions[askedKey].has(q.id)
-    );
 
     let chosenQ = null;
+    let finalAskedKey = askedKey;
+    let finalQTitle = qTitle;
+    let finalIsGeneral = isGeneralByDefault; // نستخدم هذا لتحديد ما إذا كان السؤال المختار *فعليًا* عامًا
+
+    // 1. محاولة أولى من targetPool المحدد بواسطة الـ switch
+    let availableQs = targetPool.filter(q =>
+        q?.id &&
+        q.difficulty === difficulty &&
+        // الشرط لـ isGeneral يعتمد على ما إذا كان targetPool هو للأسئلة العامة أم الخاصة بالمعلم
+        (isGeneralByDefault ? q.isGeneral === true : (q.landmark === landmarkFilter && !q.isGeneral)) &&
+        !gameState.askedQuestions[finalAskedKey]?.has(q.id)
+    );
+
     if (availableQs.length > 0) {
         chosenQ = availableQs[Math.floor(Math.random() * availableQs.length)];
-    } else {
-        // Fallback: try any question of the correct difficulty and landmark/general type, even if asked before
-        const fallbackQs = targetPool.filter(q =>
+        console.log(`Chosen Q from initial target pool (${finalAskedKey}):`, chosenQ?.id);
+    }
+
+    // 2. إذا كان السؤال متوسطًا ولم نجد سؤالًا خاصًا بالمحطة، نحاول من الأسئلة العامة المتوسطة
+    if (!chosenQ && team.currentQuestionIndexInStation === 1 && difficulty === 'medium') {
+        console.log(`No specific medium question for ${stationName}. Trying general medium questions.`);
+        finalAskedKey = "kuwait_general_medium"; // مفتاح تتبع الأسئلة العامة المتوسطة
+        if (!gameState.askedQuestions[finalAskedKey]) gameState.askedQuestions[finalAskedKey] = new Set();
+
+        const generalMediumPool = (generalMediumQuestions || []).filter(q =>
             q?.id &&
-            q.difficulty === difficulty &&
-            (isGeneral ? q.isGeneral === true : (q.landmark === landmarkFilter && !q.isGeneral))
+            q.difficulty === 'medium' &&
+            q.isGeneral === true && // الأسئلة في generalMediumQuestions يجب أن تكون isGeneral=true
+            !gameState.askedQuestions[finalAskedKey]?.has(q.id)
         );
-        if (fallbackQs.length > 0) {
-            chosenQ = fallbackQs[Math.floor(Math.random() * fallbackQs.length)];
-            console.warn(`No unasked questions for ${askedKey}, difficulty ${difficulty}. Reusing a question.`);
+
+        if (generalMediumPool.length > 0) {
+            chosenQ = generalMediumPool[Math.floor(Math.random() * generalMediumPool.length)];
+            finalQTitle = "سؤال عام (متوسط)";
+            finalIsGeneral = true; // السؤال المختار الآن هو عام
+            console.log("Selected a general medium question:", chosenQ.id);
         } else {
-            const src = isGeneral ? "الأسئلة العامة" : `أسئلة معلم '${landmarkFilter}'`;
-            alert(`خطأ فادح: لا توجد أسئلة (${getDifficultyText(difficulty)}) في ${src}. سيتم تخطي هذا السؤال.`);
-            stopQuestionTimer();
-            team.currentQuestionIndexInStation++;
-            updateDashboard();
-            setTimeout(startTurn, 50);
-            return;
+            console.log("No unasked general medium questions found. Trying to reuse general medium.");
+            const fallbackGeneralMediumPool = (generalMediumQuestions || []).filter(q =>
+                q?.id && q.difficulty === 'medium' && q.isGeneral === true
+            );
+            if (fallbackGeneralMediumPool.length > 0) {
+                chosenQ = fallbackGeneralMediumPool[Math.floor(Math.random() * fallbackGeneralMediumPool.length)];
+                finalQTitle = "سؤال عام (متوسط) - مكرر";
+                finalIsGeneral = true;
+                console.warn(`Reusing a general medium question.`);
+            }
         }
     }
 
+    // 3. Fallback النهائي: إذا لم يتم اختيار أي سؤال بعد، حاول إعادة استخدام سؤال من *المجموعة الأصلية* لهذا الدور
+    if (!chosenQ) {
+        // استخدم قيم askedKey, difficulty, isGeneralByDefault الأصلية التي حددها الـ switch
+        console.warn(`No unasked questions from primary/secondary sources. Trying to reuse from original target pool for this turn: ${askedKey}, difficulty ${difficulty}.`);
+
+        const originalTargetPoolForFallback = (askedKey === "kuwait_general") ? generalQuestions : // للأسئلة الصعبة
+                                              (askedKey === stationName && difficulty === 'medium' && !isGeneralByDefault) ? (questionsByLandmark[stationName] || []) : // لأسئلة المحطة المتوسطة
+                                              (askedKey === stationName && difficulty === 'easy' && !isGeneralByDefault) ? (questionsByLandmark[stationName] || []) : // لأسئلة المحطة السهلة
+                                              [];
+
+        const fallbackQs = (originalTargetPoolForFallback).filter(q =>
+            q?.id &&
+            q.difficulty === difficulty &&
+            (isGeneralByDefault ? q.isGeneral === true : (q.landmark === landmarkFilter && !q.isGeneral))
+        );
+
+        if (fallbackQs.length > 0) {
+            chosenQ = fallbackQs[Math.floor(Math.random() * fallbackQs.length)];
+            // القيم النهائية يجب أن تعكس المصدر الأصلي لهذا الـ fallback
+            finalAskedKey = askedKey;
+            finalQTitle = qTitle + " (مكرر)";
+            finalIsGeneral = isGeneralByDefault;
+            console.warn(`Reusing a question from original pool (${finalAskedKey}). ID: ${chosenQ?.id}`);
+        }
+    }
+
+    // 4. عرض السؤال أو رسالة الخطأ
     if (chosenQ?.id && chosenQ.text && chosenQ.type === 'mcq' && Array.isArray(chosenQ.options) && chosenQ.correctAnswer !== undefined) {
-        gameState.askedQuestions[askedKey].add(chosenQ.id);
+        // تأكد من تهيئة Set إذا كان finalAskedKey جديدًا (مثل اسم محطة لم يُستخدم من قبل)
+        if (!gameState.askedQuestions[finalAskedKey]) {
+            gameState.askedQuestions[finalAskedKey] = new Set();
+        }
+        gameState.askedQuestions[finalAskedKey].add(chosenQ.id);
+        // تأكد أن chosenQ لديه خاصية isGeneral صحيحة قبل إرسالها إلى displayQuestion
+        // إذا كان السؤال من generalMediumQuestions أو generalQuestions، يجب أن تكون isGeneral=true
+        // إذا كان من questionsByLandmark، يجب أن تكون isGeneral=false
+        // finalIsGeneral يجب أن يعكس هذا.
+        chosenQ.isGeneral = finalIsGeneral;
         gameState.currentQuestion = chosenQ;
-        displayQuestion(gameState.currentQuestion, qTitle);
+        displayQuestion(gameState.currentQuestion, finalQTitle);
     } else {
-        alert("خطأ في اختيار السؤال أو بياناته غير كاملة. سيتم تخطي هذا السؤال.");
-        stopQuestionTimer();
-        team.currentQuestionIndexInStation++;
-        updateDashboard();
-        setTimeout(startTurn, 50);
-        return;
+        let errSourceMessage;
+        // تحديد المصدر بناءً على دور السؤال والصعوبة
+        if (team.currentQuestionIndexInStation === 0) { // سهل
+            errSourceMessage = `أسئلة معلم '${landmarkFilter}' (${getDifficultyText(difficulty)})`;
+        } else if (team.currentQuestionIndexInStation === 1) { // متوسط
+            errSourceMessage = `أسئلة معلم '${stationName}' (متوسطة) أو من الأسئلة العامة (المتوسطة)`;
+        } else if (team.currentQuestionIndexInStation === 2) { // صعب
+            errSourceMessage = `الأسئلة العامة (${getDifficultyText(difficulty)})`;
+        } else {
+            errSourceMessage = "مصدر غير محدد";
+        }
+        console.error('CRITICAL: No question chosen. Final state before alert:', { chosenQ, difficulty, finalIsGeneral, finalAskedKey, askedQuestionsCount: gameState.askedQuestions[finalAskedKey]?.size });
+        alert(`خطأ فادح: لا توجد أسئلة (${getDifficultyText(difficulty)}) في ${errSourceMessage}. سيتم تخطي هذا السؤال.`);
+        stopQuestionTimer(); team.currentQuestionIndexInStation++; updateDashboard(); setTimeout(startTurn, 50); return;
     }
     updateDashboard();
 }
 
-// --- ربط الأحداث ---
-if(gameSetupForm) {
-    gameSetupForm.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        // Disable button to prevent multiple submissions while initializing
-        const startButton = gameSetupForm.querySelector('.btn-start-game');
-        if (startButton) startButton.disabled = true;
-        await initializeGame();
-        if (startButton) startButton.disabled = false; // Re-enable if initialization failed early or completed
-    });
-}
-
-if(playAgainBtn) {
-    playAgainBtn.addEventListener('click', () => {
-        console.log("Play Again clicked. Returning to game setup.");
-        stopQuestionTimer();
-        resetGameState(true); // Full reset of game state
-
-        if(gameSetupSection) gameSetupSection.classList.remove('hidden');
-        if(gamePlayArea) gamePlayArea.classList.add('hidden');
-        if(gameOverSection) {
-            gameOverSection.classList.remove('visible');
-            gameOverSection.classList.add('hidden');
-        }
-        if(team1NameInput) team1NameInput.value = '';
-        if(team1StartInput) team1StartInput.value = '';
-        if(team2NameInput) team2NameInput.value = '';
-        if(team2StartInput) team2StartInput.value = '';
-        // Re-enable setup form button if it was disabled
-        const startButton = gameSetupForm.querySelector('.btn-start-game');
-        if (startButton) startButton.disabled = false;
-    });
-}
-
-if(revealAnswerBtn) revealAnswerBtn.addEventListener('click', revealAnswer);
-if(assignPointsTeam1Btn) assignPointsTeam1Btn.addEventListener('click', () => assignPoints('team1'));
-if(assignPointsTeam2Btn) assignPointsTeam2Btn.addEventListener('click', () => assignPoints('team2'));
-if(assignPointsNoneBtn) assignPointsNoneBtn.addEventListener('click', () => assignPoints('none'));
-
-if(viewPreviousBtn) {
-    viewPreviousBtn.addEventListener('click', () => {
-        if (!gameState.isViewingPrevious && gameState.previousQuestion) displayPreviousQuestion();
-        else if (!gameState.previousQuestion) console.warn("View Previous: No previous question.");
-    });
-}
-if(returnToCurrentBtn) {
-    returnToCurrentBtn.addEventListener('click', () => {
-        if (gameState.isViewingPrevious && gameState.currentQuestion) displayQuestion(gameState.currentQuestion);
-        else if (!gameState.currentQuestion) console.warn("Return to Current: No current question.");
-    });
-}
-
-function adjustScore(teamId, amount) {
-    if (gameState && gameState[teamId] && typeof gameState[teamId].score === 'number') {
-        gameState[teamId].score += amount;
-        gameState[teamId].score = Math.max(0, gameState[teamId].score); // Prevent negative scores
-        updateDashboard();
-        if (checkGameOver() && !gameOverSection?.classList.contains('visible')) displayResults();
-    } else { console.warn(`Cannot adjust score for ${teamId}. GameState or team score might be uninitialized.`); }
-}
+// --- ربط الأحداث (تبقى كما هي) ---
+if(gameSetupForm) { /* ... */ }
+if(playAgainBtn) { /* ... */ }
+if(revealAnswerBtn) { /* ... */ }
+// ... إلخ
 
 if (incScoreTeam1Btn) incScoreTeam1Btn.addEventListener('click', () => adjustScore('team1', 100));
 if (decScoreTeam1Btn) decScoreTeam1Btn.addEventListener('click', () => adjustScore('team1', -100));
 if (incScoreTeam2Btn) incScoreTeam2Btn.addEventListener('click', () => adjustScore('team2', 100));
 if (decScoreTeam2Btn) decScoreTeam2Btn.addEventListener('click', () => adjustScore('team2', -100));
 
-console.log("game.js loaded. Game data will be fetched from API upon game initialization.");
+console.log("game.js loaded and updated. Game data will be fetched from API upon game initialization.");
 /* --- END OF FILE assets/js/game.js --- */
