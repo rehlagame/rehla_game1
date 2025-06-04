@@ -3,12 +3,10 @@ const express = require('express');
 const pool    = require('../database/database'); // تأكد أن المسار إلى ملف قاعدة البيانات صحيح
 const router  = express.Router();
 
-// دالة مساعدة لتنسيق صف السؤال (يمكنك نقلها إلى ملف helpers مشترك إذا أردت)
+// دالة مساعدة لتنسيق صف السؤال
 const safeJsonParse = (jsonString, defaultValue = []) => {
     try {
         if (!jsonString) return defaultValue;
-        // إذا كان الكائن المُمرر هو بالفعل كائن JavaScript (وليس سلسلة JSON)
-        // وهو ما قد يحدث إذا قام pool.query بتحويل JSONB إلى كائن تلقائيًا.
         if (typeof jsonString === 'object' && jsonString !== null) {
             return Array.isArray(jsonString) ? jsonString : defaultValue;
         }
@@ -19,48 +17,38 @@ const safeJsonParse = (jsonString, defaultValue = []) => {
     }
 };
 
-// --- Configuration for Image URLs (مهم إذا كنت لا تزال تستخدم image_filename) ---
-const backendBaseUrlForImages = process.env.BACKEND_URL || `https://rehla-game-backend.onrender.com`;
-const baseImageUrl   = `${backendBaseUrlForImages}/uploads/`;
-
+// لم نعد بحاجة إلى baseImageUrl هنا لأننا سنعتمد كليًا على image_firebase_url
+// const backendBaseUrlForImages = process.env.BACKEND_URL || `https://rehla-game-backend.onrender.com`;
+// const baseImageUrl   = `${backendBaseUrlForImages}/uploads/`;
 
 const formatQuestionRowForResponse = (dbRow) => {
     if (!dbRow) return null;
     return {
-        id: dbRow.q_id, // الواجهة الأمامية قد تتوقع 'id' بدلاً من 'q_id'
+        id: dbRow.q_id,
         q_id: dbRow.q_id,
         text: dbRow.text,
         options: safeJsonParse(dbRow.options_json, []),
         correctAnswer: dbRow.correctanswer,
         difficulty: dbRow.difficulty,
         points: dbRow.points,
-        landmark: dbRow.landmark_name, // الواجهة الأمامية قد تتوقع 'landmark'
+        landmark: dbRow.landmark_name,
         landmark_name: dbRow.landmark_name,
-        isGeneral: Boolean(dbRow.is_general), // الواجهة الأمامية قد تتوقع 'isGeneral'
-        is_general: Boolean(dbRow.is_general), // إبقاء is_general للاستخدام الداخلي إذا لزم الأمر
+        isGeneral: Boolean(dbRow.is_general),
+        is_general: Boolean(dbRow.is_general),
         type: dbRow.type,
-        image_filename: dbRow.image_filename,
+        image_filename: dbRow.image_filename, // يبقى كمرجع إذا أردت
         image_firebase_url: dbRow.image_firebase_url
-        // لا نعتمد على image_filename لإنشاء رابط firebase بعد الآن
-        // image_firebase_url يجب أن يكون هو المصدر الوحيد لرابط firebase
-        // هذا السطر كان للـ fallback, ولكن مع Firebase يجب أن يكون الرابط كاملًا
-        // ? dbRow.image_firebase_url
-        // : (dbRow.image_filename ? `${baseImageUrl}${dbRow.image_filename}` : null)
     };
 };
 
 
 // ===== GET /api/game/questions-data =====
-// هذا المسار يجمع كل بيانات اللعبة اللازمة للواجهة الأمامية
 router.get('/questions-data', async (req, res, next) => {
-    console.log('[GameDataRoutes] Request received for /questions-data');
-    // (اختياري) يمكنك إضافة middleware للمصادقة هنا إذا أردت أن يكون هذا المسار محميًا
-    // const user = req.user; // (يتطلب middleware مصادقة مثل verifyFirebaseToken)
-
+    console.log('[GameDataRoutes] Request received for /questions-data (Simplified General Qs)');
     try {
         const client = await pool.connect();
         try {
-            await client.query('BEGIN'); // بدء معاملة
+            await client.query('BEGIN');
 
             // 1. جلب جميع أسماء المعالم الفريدة (غير العامة)
             const landmarksResult = await client.query(
@@ -69,21 +57,21 @@ router.get('/questions-data', async (req, res, next) => {
             const allLandmarks = landmarksResult.rows.map(row => row.landmark_name);
             console.log(`[GameDataRoutes] Fetched ${allLandmarks.length} unique landmarks.`);
 
-            // 2. جلب جميع الأسئلة العامة الصعبة
-            // (التي تم إدخالها كـ "سؤال عام" في admin.html، والتي يجب أن تكون difficulty='hard' و points=600)
-            const generalHardQuestionsResult = await client.query(
+            // 2. *** تعديل: جلب الأسئلة العامة التي هي "صعبة" تحت مسمى generalQs ***
+            // هذا يفترض أن "سؤال عام" في admin.html ينتج عنه difficulty = 'hard'
+            const generalQuestionsResult = await client.query(
                 "SELECT * FROM questions WHERE is_general = TRUE AND difficulty = 'hard' ORDER BY RANDOM()"
             );
-            const generalHardQs = generalHardQuestionsResult.rows.map(formatQuestionRowForResponse);
-            console.log(`[GameDataRoutes] Fetched ${generalHardQs.length} general HARD questions.`);
+            const generalQs = generalQuestionsResult.rows.map(formatQuestionRowForResponse);
+            console.log(`[GameDataRoutes] Fetched ${generalQs.length} general (hard) questions for 'generalQs'. Sample:`, generalQs.slice(0,1));
 
-            // 3. جلب جميع الأسئلة العامة المتوسطة
-            // (التي تم إدخالها كـ "سؤال عام متوسط" في admin.html، والتي يجب أن تكون difficulty='medium' و points=300)
+            // 3. جلب جميع الأسئلة العامة المتوسطة بشكل منفصل
+            // هذا يفترض أن "سؤال عام متوسط" في admin.html ينتج عنه difficulty = 'medium'
             const generalMediumQuestionsResult = await client.query(
                 "SELECT * FROM questions WHERE is_general = TRUE AND difficulty = 'medium' ORDER BY RANDOM()"
             );
             const generalMediumQs = generalMediumQuestionsResult.rows.map(formatQuestionRowForResponse);
-            console.log(`[GameDataRoutes] Fetched ${generalMediumQs.length} general MEDIUM questions.`);
+            console.log(`[GameDataRoutes] Fetched ${generalMediumQs.length} general MEDIUM questions for 'generalMediumQs'. Sample:`, generalMediumQs.slice(0,1));
 
             // 4. جلب جميع الأسئلة المرتبطة بالمعالم وتنظيمها (غير العامة)
             const landmarkQuestionsResult = await client.query(
@@ -101,17 +89,17 @@ router.get('/questions-data', async (req, res, next) => {
             });
             console.log(`[GameDataRoutes] Processed landmark questions into ${Object.keys(landmarkQs).length} landmark categories.`);
 
-            await client.query('COMMIT'); // إنهاء المعاملة بنجاح
+            await client.query('COMMIT');
 
             res.json({
                 allLandmarks: allLandmarks,
-                generalHardQs: generalHardQs,     // أسئلة عامة صعبة
-                generalMediumQs: generalMediumQs, // أسئلة عامة متوسطة
-                landmarkQs: landmarkQs            // أسئلة خاصة بالمعالم
+                generalQs: generalQs,             // الأسئلة العامة (الصعبة)
+                generalMediumQs: generalMediumQs, // الأسئلة العامة المتوسطة
+                landmarkQs: landmarkQs
             });
 
         } catch (txError) {
-            if (client) await client.query('ROLLBACK'); // التراجع عند حدوث خطأ في المعاملة
+            if (client) await client.query('ROLLBACK');
             console.error('[GameDataRoutes] Error during transaction for /questions-data:', txError.stack);
             next(new Error('Database transaction error while fetching game data.'));
         } finally {
