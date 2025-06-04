@@ -7,6 +7,8 @@ const router  = express.Router();
 const safeJsonParse = (jsonString, defaultValue = []) => {
     try {
         if (!jsonString) return defaultValue;
+        // إذا كان الكائن المُمرر هو بالفعل كائن JavaScript (وليس سلسلة JSON)
+        // وهو ما قد يحدث إذا قام pool.query بتحويل JSONB إلى كائن تلقائيًا.
         if (typeof jsonString === 'object' && jsonString !== null) {
             return Array.isArray(jsonString) ? jsonString : defaultValue;
         }
@@ -18,9 +20,7 @@ const safeJsonParse = (jsonString, defaultValue = []) => {
 };
 
 // --- Configuration for Image URLs (مهم إذا كنت لا تزال تستخدم image_filename) ---
-// افترض أن BACKEND_URL معرف في .env ويتم استخدامه في مكان آخر إذا لزم الأمر
-// أو يمكنك كتابته هنا مباشرة إذا كان ثابتًا لـ Render
-const backendBaseUrlForImages = process.env.BACKEND_URL || `https://rehla-game-backend.onrender.com`; // <--- تأكد من هذا الرابط
+const backendBaseUrlForImages = process.env.BACKEND_URL || `https://rehla-game-backend.onrender.com`;
 const baseImageUrl   = `${backendBaseUrlForImages}/uploads/`;
 
 
@@ -37,12 +37,15 @@ const formatQuestionRowForResponse = (dbRow) => {
         landmark: dbRow.landmark_name, // الواجهة الأمامية قد تتوقع 'landmark'
         landmark_name: dbRow.landmark_name,
         isGeneral: Boolean(dbRow.is_general), // الواجهة الأمامية قد تتوقع 'isGeneral'
-        is_general: Boolean(dbRow.is_general),
+        is_general: Boolean(dbRow.is_general), // إبقاء is_general للاستخدام الداخلي إذا لزم الأمر
         type: dbRow.type,
         image_filename: dbRow.image_filename,
         image_firebase_url: dbRow.image_firebase_url
-            ? dbRow.image_firebase_url
-            : (dbRow.image_filename ? `${baseImageUrl}${dbRow.image_filename}` : null)
+        // لا نعتمد على image_filename لإنشاء رابط firebase بعد الآن
+        // image_firebase_url يجب أن يكون هو المصدر الوحيد لرابط firebase
+        // هذا السطر كان للـ fallback, ولكن مع Firebase يجب أن يكون الرابط كاملًا
+        // ? dbRow.image_firebase_url
+        // : (dbRow.image_filename ? `${baseImageUrl}${dbRow.image_filename}` : null)
     };
 };
 
@@ -57,7 +60,7 @@ router.get('/questions-data', async (req, res, next) => {
     try {
         const client = await pool.connect();
         try {
-            await client.query('BEGIN'); // بدء معاملة (اختياري ولكن جيد للعمليات المتعددة)
+            await client.query('BEGIN'); // بدء معاملة
 
             // 1. جلب جميع أسماء المعالم الفريدة (غير العامة)
             const landmarksResult = await client.query(
@@ -66,21 +69,30 @@ router.get('/questions-data', async (req, res, next) => {
             const allLandmarks = landmarksResult.rows.map(row => row.landmark_name);
             console.log(`[GameDataRoutes] Fetched ${allLandmarks.length} unique landmarks.`);
 
-            // 2. جلب جميع الأسئلة العامة
-            const generalQuestionsResult = await client.query(
-                "SELECT * FROM questions WHERE is_general = TRUE ORDER BY RANDOM()" // إضافة ORDER BY RANDOM() لتنويع الأسئلة العامة
+            // 2. جلب جميع الأسئلة العامة الصعبة
+            // (التي تم إدخالها كـ "سؤال عام" في admin.html، والتي يجب أن تكون difficulty='hard' و points=600)
+            const generalHardQuestionsResult = await client.query(
+                "SELECT * FROM questions WHERE is_general = TRUE AND difficulty = 'hard' ORDER BY RANDOM()"
             );
-            const generalQs = generalQuestionsResult.rows.map(formatQuestionRowForResponse);
-            console.log(`[GameDataRoutes] Fetched ${generalQs.length} general questions.`);
+            const generalHardQs = generalHardQuestionsResult.rows.map(formatQuestionRowForResponse);
+            console.log(`[GameDataRoutes] Fetched ${generalHardQs.length} general HARD questions.`);
 
-            // 3. جلب جميع الأسئلة المرتبطة بالمعالم وتنظيمها
+            // 3. جلب جميع الأسئلة العامة المتوسطة
+            // (التي تم إدخالها كـ "سؤال عام متوسط" في admin.html، والتي يجب أن تكون difficulty='medium' و points=300)
+            const generalMediumQuestionsResult = await client.query(
+                "SELECT * FROM questions WHERE is_general = TRUE AND difficulty = 'medium' ORDER BY RANDOM()"
+            );
+            const generalMediumQs = generalMediumQuestionsResult.rows.map(formatQuestionRowForResponse);
+            console.log(`[GameDataRoutes] Fetched ${generalMediumQs.length} general MEDIUM questions.`);
+
+            // 4. جلب جميع الأسئلة المرتبطة بالمعالم وتنظيمها (غير العامة)
             const landmarkQuestionsResult = await client.query(
                 "SELECT * FROM questions WHERE is_general = FALSE AND landmark_name IS NOT NULL AND landmark_name <> ''"
             );
             const landmarkQs = {};
             landmarkQuestionsResult.rows.forEach(row => {
                 const question = formatQuestionRowForResponse(row);
-                if (question.landmark_name) { // تأكد أن landmark_name موجود
+                if (question.landmark_name) {
                     if (!landmarkQs[question.landmark_name]) {
                         landmarkQs[question.landmark_name] = [];
                     }
@@ -93,8 +105,9 @@ router.get('/questions-data', async (req, res, next) => {
 
             res.json({
                 allLandmarks: allLandmarks,
-                generalQs: generalQs,
-                landmarkQs: landmarkQs
+                generalHardQs: generalHardQs,     // أسئلة عامة صعبة
+                generalMediumQs: generalMediumQs, // أسئلة عامة متوسطة
+                landmarkQs: landmarkQs            // أسئلة خاصة بالمعالم
             });
 
         } catch (txError) {
