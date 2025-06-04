@@ -3,60 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>شروط وأحكام استخدام لعبة رحلة</title>
-    <link rel="stylesheet" href="assets/css/style.css"> <!-- ملف الأنماط العام -->
+    <title>شروط وأحكام وسياسة الخصوصية - لعبة رحلة</title>
+    <link rel="stylesheet" href="assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- لا حاجة لـ <style> لإخفاء الهيدر أو تعديل padding هنا بشكل خاص لهذه الصفحة -->
-    <!-- style.css و script.js سيتوليان ذلك بشكل عام -->
-
     <style>
-        /* تنسيقات خاصة بصفحة الشروط والأحكام (باستثناء ما يتعلق بالهيدر العام) */
-        body {
-            /* background-color: var(--bg-color-light); <-- هذا يتم التحكم به بالفعل في style.css */
-        }
-
-        /* script.js سيضيف padding-top لـ .terms-main-content إذا كان الهيدر fixed وظاهر */
+        body { }
         .terms-main-content {
-            /* padding-top: 40px; <-- لا تضف هذا يدويًا، script.js سيتولاه */
             padding-bottom: 40px;
             background-color: var(--white-color);
-            margin-top: 20px; /* هذه يمكن أن تبقى إذا أردت مسافة إضافية تحت الهيدر (حتى بعد تطبيق padding-top) */
+            margin-top: 20px;
             margin-bottom: 40px;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
         }
-
         .terms-container {
             max-width: 900px;
             margin: 0 auto;
             padding: 0 25px;
         }
-
-        .terms-container h1 {
-            font-size: 2.5em;
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 10px;
-        }
-
-        .terms-container h2, .terms-container h3 {
+        .terms-container h1, .terms-container h2, .terms-container h3 {
             color: var(--secondary-color);
-            margin-top: 30px;
-            margin-bottom: 15px;
+            margin: 30px 0 15px;
             font-size: 1.8em;
             border-right: 4px solid var(--primary-color);
             padding-right: 10px;
         }
-        .terms-container h3 {
-            font-size: 1.5em;
+        .terms-container h1 {
+            font-size: 2.5em;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
         }
-
         .terms-container p, .terms-container ul li {
             font-size: 1.05em;
             line-height: 1.8;
@@ -64,58 +44,25 @@
             margin-bottom: 15px;
             text-align: justify;
         }
-
-        .terms-container strong {
-            color: var(--text-color);
-            font-weight: 700;
-        }
         .terms-container ul {
             list-style-type: disc;
             padding-right: 25px;
             margin-bottom: 20px;
         }
-        .terms-container ul li {
-            margin-bottom: 8px;
-        }
-
         .terms-container hr {
             border: 0;
             height: 1px;
             background-color: var(--grey-color-light);
             margin: 30px 0;
         }
-
-        .terms-container a {
-            color: var(--primary-color);
-            text-decoration: underline;
-        }
-        .terms-container a:hover {
-            color: var(--secondary-color);
-        }
-
-        .disclaimer {
-            background-color: var(--bg-color-alt);
-            padding: 15px;
-            border-radius: 8px;
-            border-right: 5px solid var(--danger-color);
-            margin-bottom: 25px;
-        }
-        .disclaimer strong {
-            color: var(--danger-color);
-        }
-
         @media (max-width: 768px) {
-            .terms-container h1 { font-size: 2em; }
-            .terms-container h2 { font-size: 1.6em; }
-            .terms-container h3 { font-size: 1.3em; }
-            .terms-main-content { margin-top: 10px; /* padding-top: 20px; <-- script.js سيتولاه */ padding-bottom: 20px; }
             .terms-container { padding: 0 15px; }
         }
     </style>
 </head>
 <body>
 
-<header> <!-- الهيدر القياسي -->
+<header>
     <div class="container">
         <div class="logo">
             <h1><a href="index.html">رحلة</a></h1>
@@ -127,73 +74,52 @@
                 <li><a href="contact.html">تواصل معنا</a></li>
             </ul>
         </nav>
-        <div class="user-actions"> <!-- سيتم ملؤه بواسطة main.js -->
+        <div class="user-actions">
             <a href="auth.html" class="btn btn-register">تسجيل / دخول</a>
         </div>
     </div>
 </header>
 
-<main class="terms-main-content"> <!-- هذا هو header.nextElementSibling -->
+<main class="terms-main-content">
     <div class="terms-container">
         <h1>شروط وأحكام استخدام لعبة "رحلة"</h1>
 
-        <p>مرحباً بك في <strong>"رحلة" – لعبة الأسئلة العامة</strong> على الموقع الإلكتروني <a href="https://rehlagame.com" target="_blank" rel="noopener noreferrer">www.rehlagame.com</a>. قبل استخدامك لهذه اللعبة، يُرجى قراءة الشروط والأحكام التالية بعناية، حيث تُعد موافقتك على الدخول واستخدام اللعبة بمثابة قبول كامل لهذه الشروط:</p>
+        <p>مرحباً بك في <strong>"رحلة" – لعبة الأسئلة العامة</strong> على الموقع الإلكتروني <a href="https://rehlagame.com" target="_blank" rel="noopener noreferrer">www.rehlagame.com</a>. استخدامك للعبة يعني قبولك الكامل للشروط والأحكام التالية:</p>
         <hr>
-        <h2>1. وصف اللعبة والغرض منها</h2>
-        <p>"رحلة" هي لعبة أسئلة عامة تهدف إلى توفير تجربة ترفيهية وتثقيفية للمستخدمين من خلال طرح أسئلة متنوعة حول دولة الكويت ومعلومات عامة أخرى.</p>
-        <div class="disclaimer">
-            <p><strong>إخلاء مسؤولية هام:</strong> تم تطوير جزء كبير من محتوى هذه اللعبة، بما في ذلك على سبيل المثال لا الحصر، الأسئلة، الإجابات، والمعلومات المقدمة، بمساعدة أدوات الذكاء الاصطناعي. على الرغم من بذل قصارى جهدنا لضمان دقة وموثوقية المعلومات، فإننا نقر بأن اللعبة قد تحتوي على أخطاء غير مقصودة، أو معلومات غير دقيقة، أو بيانات قديمة. نحن لا نقدم أي ضمانات صريحة أو ضمنية بشأن اكتمال أو دقة أو موثوقية أو ملاءمة أو توفر المعلومات والمحتوى الموجود في اللعبة لأي غرض كان.</p>
-        </div>
-        <hr>
-        <h2>2. الملكية الفكرية وحقوق النشر</h2>
+
+        <h2>سياسة الخصوصية</h2>
+        <p>نحن في <strong>رحلة</strong> نولي أهمية كبيرة لخصوصيتك. توضح هذه السياسة كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك:</p>
+
         <ul>
-            <li>جميع الحقوق محفوظة لصاحب الموقع والمطور الأصلي للعبة.</li>
-            <li>يمنع نسخ أو إعادة توزيع أو تعديل أي جزء من محتوى اللعبة، بما في ذلك الأسئلة والتصميم والبرمجة، دون إذن خطي مسبق.</li>
-            <li>شعار اللعبة، تصميم الواجهة، قواعد البيانات، وطريقة اللعب محمية بموجب قوانين حقوق الملكية الفكرية المحلية والدولية.</li>
+            <li><strong>المعلومات التي نجمعها:</strong> عند التسجيل في اللعبة، قد نطلب منك تزويدنا بمعلومات مثل البريد الإلكتروني أو اسم المستخدم.</li>
+            <li><strong>كيفية استخدام المعلومات:</strong> نستخدم المعلومات لتسهيل إنشاء الحساب، تخصيص تجربتك، وتقديم الدعم الفني.</li>
+            <li><strong>مشاركة المعلومات:</strong> لا نبيع أو نشارك معلوماتك الشخصية مع أي طرف ثالث لأغراض تجارية.</li>
+            <li><strong>تحليلات الاستخدام:</strong> قد نستخدم أدوات تحليلات لفهم كيفية استخدام اللاعبين للعبة وتحسين أدائها، دون ربط البيانات بهويتك الشخصية.</li>
+            <li><strong>أمان المعلومات:</strong> نتخذ الإجراءات المناسبة لحماية بياناتك الشخصية ضد الوصول غير المصرح به أو التعديل أو الكشف أو الإتلاف.</li>
+            <li><strong>ملفات تعريف الارتباط (Cookies):</strong> قد نستخدم ملفات تعريف الارتباط لتحسين تجربة المستخدم وتحليل الأداء.</li>
+            <li><strong>روابط الطرف الثالث:</strong> قد تحتوي اللعبة على روابط لمواقع خارجية لا نديرها. نحن لسنا مسؤولين عن سياسات الخصوصية لتلك المواقع.</li>
+            <li><strong>حقوق المستخدم:</strong> لك الحق في الوصول إلى معلوماتك الشخصية أو تحديثها أو طلب حذفها في أي وقت عبر التواصل معنا.</li>
         </ul>
+
         <hr>
-        <h2>3. الحساب والتسجيل</h2>
+
+        <h2>معلومات إضافية</h2>
         <ul>
-            <li>لاستخدام بعض ميزات اللعبة، قد يُطلب من المستخدم إنشاء حساب باستخدام البريد الإلكتروني أو طرق تسجيل الدخول عبر منصات الطرف الثالث (مثل Google أو Apple).</li>
-            <li>يلتزم المستخدمون بتقديم معلومات دقيقة وكاملة عند التسجيل، والحفاظ على سرية بيانات الدخول الخاصة بهم.</li>
-            <li>أي نشاط يتم عبر الحساب سيكون مسؤولية صاحب الحساب وحده، وتحتفظ إدارة اللعبة بالحق في إيقاف أو حذف الحسابات المخالفة دون إشعار مسبق.</li>
+            <li>قد تحتوي اللعبة على مشتريات داخل التطبيق لشراء محاولات لعب إضافية.</li>
+            <li>التطبيق لا يحتوي على إعلانات طرف ثالث حاليًا.</li>
+            <li>التطبيق لا يستخدم أساليب تتبع لغرض الإعلانات.</li>
         </ul>
+
         <hr>
-        <h2>4. الاستخدام المسموح</h2>
-        <ul>
-            <li>يُسمح باستخدام اللعبة فقط لأغراض شخصية وترفيهية.</li>
-            <li>يمنع استخدام اللعبة أو أي جزء منها لأغراض تجارية، تعليمية رسمية، أو في منصات أخرى دون تصريح رسمي من مالك اللعبة.</li>
-        </ul>
+
+        <h2>قبول سياسة الخصوصية</h2>
+        <p>باستخدامك للعبة "رحلة"، فإنك توافق على سياسة الخصوصية هذه وشروط الاستخدام الخاصة بنا. إذا كنت لا توافق على أي جزء من السياسة، يُرجى عدم استخدام اللعبة.</p>
+
         <hr>
-        <h2>5. التعديلات والتحديثات</h2>
-        <ul>
-            <li>يحتفظ مطور اللعبة بحق تعديل أو تحديث المحتوى، الأسئلة، أو طريقة اللعب دون إشعار مسبق.</li>
-            <li>يمكن أن تتغير الأسعار أو ميزات الاشتراكات أو طرق الدفع في أي وقت وفقاً لرؤية الإدارة.</li>
-        </ul>
-        <hr>
-        <h2>6. سياسة الاستخدام العادل والدفع</h2>
-        <ul>
-            <li>يمكن شراء محاولات اللعب أو الاشتراكات داخل اللعبة. يُحظر أي محاولة للتحايل على أنظمة الدفع أو استغلال الثغرات.</li>
-            <li>في حالة وجود عروض ترويجية أو أكواد خصم، تخضع هذه لاشتراطات صلاحية محددة ولا تضمن صلاحيتها بعد انتهاء المدة.</li>
-        </ul>
-        <hr>
-        <h2>7. حماية البيانات والخصوصية</h2>
-        <ul>
-            <li>يتم التعامل مع بيانات المستخدمين (مثل البريد الإلكتروني) بسرية، ولا يتم بيعها أو مشاركتها مع جهات خارجية.</li>
-            <li>يُنصح المستخدمون بعدم مشاركة بيانات دخولهم مع أي طرف ثالث.</li>
-        </ul>
-        <hr>
-        <h2>8. حدود المسؤولية</h2>
-        <ul>
-            <li>لا تضمن اللعبة توافر الخدمة بشكل دائم، وقد تكون هناك أوقات توقف مؤقت للصيانة أو التحديث.</li>
-            <li>لا تتحمل اللعبة أو مطورها أي خسائر مالية أو معنوية قد تنشأ نتيجة توقف الخدمة أو أخطاء فنية أو محتوى غير دقيق.</li>
-        </ul>
-        <hr>
-        <h2>9. القانون الواجب التطبيق</h2>
-        <p>تخضع هذه الشروط وتُفسر وفقاً لقوانين <strong>دولة الكويت</strong>، وفي حالة وجود أي نزاع، تكون <strong>الجهات القضائية الكويتية</strong> هي المختصة حصرياً.</p>
-        <hr>
-        <h2>10. قبول الشروط</h2>
-        <p>باستخدامك للعبة "رحلة"، فإنك تقر أنك قرأت وفهمت هذه الشروط وتوافق عليها بالكامل. إذا لم توافق على أي جزء من هذه الشروط، يرجى التوقف فوراً عن استخدام اللعبة.</p>
+
+        <h2>تواصل معنا</h2>
+        <p>لأي استفسارات أو ملاحظات متعلقة بسياسة الخصوصية أو الشروط والأحكام، يمكنك التواصل معنا عبر صفحة <a href="contact.html">تواصل معنا</a>.</p>
+
     </div>
 </main>
 
@@ -201,8 +127,8 @@
     <div class="container footer-container-modern">
         <div class="footer-icons-row">
             <div class="social-media-icons">
-                <a href="https://www.instagram.com/rehlagame?igsh=MW1haWtleXRqcWo0MA%3D%3D&utm_source=qr" class="social-icon-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
-                <a href="https://www.tiktok.com/@rehlagame" class="social-icon-link" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.instagram.com/rehlagame?igsh=MW1haWtleXRqcWo0MA%3D%3D&utm_source=qr" class="social-icon-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@rehlagame" class="social-icon-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
             </div>
             <div class="app-store-icons">
                 <a href="#" class="app-icon-link" aria-label="Get it on Google Play"><i class="fab fa-android"></i></a>
@@ -211,7 +137,7 @@
         </div>
         <div class="footer-links-row">
             <a href="terms.html" class="footer-text-link">Term and Conditions</a>
-             <span class="developer-credit-modern">
+            <span class="developer-credit-modern">
                 Created by <a href="https://olo-rehlas-projects.vercel.app/" target="_blank" rel="noopener noreferrer">OLO Tech Solutions</a>
             </span>
         </div>
@@ -222,6 +148,6 @@
 </footer>
 
 <script src="assets/js/main.js" type="module"></script>
-<script src="assets/js/script.js" defer></script> <!-- ملف script.js العام مهم هنا -->
+<script src="assets/js/script.js" defer></script>
 </body>
 </html>
