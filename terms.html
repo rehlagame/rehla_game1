@@ -3,19 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>شروط وأحكام وسياسة خصوصية لعبة رحلة</title> <!-- تم تعديل العنوان ليشمل الخصوصية -->
-    <link rel="stylesheet" href="assets/css/style.css"> <!-- ملف الأنماط العام -->
+    <title>شروط وأحكام وسياسة خصوصية لعبة رحلة</title>
+    <link rel="stylesheet" href="assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        /* تنسيقات خاصة بصفحة الشروط والأحكام (باستثناء ما يتعلق بالهيدر العام) */
-        body {
-            /* background-color: var(--bg-color-light); <-- هذا يتم التحكم به بالفعل في style.css */
-        }
-
+        /* ... (نفس أنماط CSS السابقة) ... */
         .terms-main-content {
             padding-bottom: 40px;
             background-color: var(--white-color);
@@ -69,9 +65,17 @@
             padding-right: 25px;
             margin-bottom: 20px;
         }
-        .terms-container ul li {
-            margin-bottom: 8px;
+        .terms-container ul.english-list { /* تنسيق خاص للقائمة الإنجليزية */
+            padding-right: 0; /* إزالة الحشوة اليمنى */
+            padding-left: 25px; /* إضافة حشوة يسرى */
+            direction: ltr; /* ضبط اتجاه النص لليسار */
+            text-align: left; /* ضبط محاذاة النص لليسار */
         }
+         .terms-container p.english-text, .terms-container ul.english-list li {
+            direction: ltr;
+            text-align: left;
+        }
+
 
         .terms-container hr {
             border: 0;
@@ -98,6 +102,12 @@
         .disclaimer strong {
             color: var(--danger-color);
         }
+        .language-separator { /* فاصل بين اللغتين */
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-top: 1px dashed var(--grey-color-medium);
+        }
+
 
         @media (max-width: 768px) {
             .terms-container h1 { font-size: 2em; }
@@ -110,7 +120,7 @@
 </head>
 <body>
 
-<header> <!-- الهيدر القياسي -->
+<header>
     <div class="container">
         <div class="logo">
             <h1><a href="index.html">رحلة</a></h1>
@@ -122,7 +132,7 @@
                 <li><a href="contact.html">تواصل معنا</a></li>
             </ul>
         </nav>
-        <div class="user-actions"> <!-- سيتم ملؤه بواسطة main.js -->
+        <div class="user-actions">
             <a href="auth.html" class="btn btn-register">تسجيل / دخول</a>
         </div>
     </div>
@@ -131,7 +141,7 @@
 <main class="terms-main-content">
     <div class="terms-container">
         <h1>شروط وأحكام استخدام لعبة "رحلة"</h1>
-
+        <!-- ... (كامل قسم الشروط والأحكام باللغة العربية كما كان) ... -->
         <p>مرحباً بك في <strong>"رحلة" – لعبة الأسئلة العامة</strong> على الموقع الإلكتروني <a href="https://rehlagame.com" target="_blank" rel="noopener noreferrer">www.rehlagame.com</a>. قبل استخدامك لهذه اللعبة، يُرجى قراءة الشروط والأحكام التالية بعناية، حيث تُعد موافقتك على الدخول واستخدام اللعبة بمثابة قبول كامل لهذه الشروط:</p>
         <hr>
         <h2>1. وصف اللعبة والغرض منها</h2>
@@ -174,7 +184,6 @@
         <hr>
         <h2>7. حماية البيانات والخصوصية</h2>
         <p>نحن نأخذ خصوصيتك على محمل الجد. لمزيد من التفاصيل حول كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك، يرجى الرجوع إلى <a href="#privacy-policy">سياسة الخصوصية</a> الخاصة بنا أدناه.</p>
-        <!-- تم تعديل هذا النص للإشارة إلى القسم الجديد أدناه -->
         <hr>
         <h2>8. حدود المسؤولية</h2>
         <ul>
@@ -188,22 +197,17 @@
         <h2>10. قبول الشروط</h2>
         <p>باستخدامك للعبة "رحلة"، فإنك تقر أنك قرأت وفهمت هذه الشروط وتوافق عليها بالكامل. إذا لم توافق على أي جزء من هذه الشروط، يرجى التوقف فوراً عن استخدام اللعبة.</p>
 
-        <hr style="margin-top: 50px; margin-bottom: 50px; border-style: dashed;"> <!-- فاصل أوضح قبل سياسة الخصوصية -->
+        <hr style="margin-top: 50px; margin-bottom: 50px; border-style: dashed;">
 
-        <!-- =========================================== -->
-        <!-- === Privacy Policy Section === -->
-        <!-- =========================================== -->
         <section id="privacy-policy">
             <h2>سياسة الخصوصية</h2>
             <p>نحن في "رحلة" نولي أهمية كبيرة لخصوصيتك. توضح هذه السياسة كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك الشخصية عند استخدامك للعبتنا وخدماتنا.</p>
-
             <h3>1. المعلومات التي نجمعها</h3>
             <ul>
                 <li><strong>معلومات التسجيل:</strong> عند إنشاء حساب، قد نجمع معلومات مثل اسمك (إذا قدمته)، عنوان بريدك الإلكتروني، وكلمة المرور (مشفرة). إذا قمت بالتسجيل عبر طرف ثالث (مثل Google أو Apple)، فقد نتلقى معلومات الملف الشخصي الأساسية التي وافقت على مشاركتها مع تلك الخدمة.</li>
                 <li><strong>معلومات الاستخدام:</strong> قد نجمع معلومات غير شخصية حول كيفية تفاعلك مع اللعبة، مثل الصفحات التي تزورها، الميزات التي تستخدمها، مدة اللعب، والأخطاء التي قد تحدث. يتم ذلك لتحسين تجربة اللعبة.</li>
                 <li><strong>معلومات الجهاز:</strong> قد نجمع معلومات أساسية حول جهازك ونظام التشغيل والمتصفح لأغراض التوافق والدعم الفني.</li>
             </ul>
-
             <h3>2. كيفية استخدام المعلومات</h3>
             <ul>
                 <li><strong>لتوفير وتشغيل اللعبة:</strong> لإنشاء وإدارة حسابك، تمكينك من اللعب، وتتبع تقدمك ونقاطك.</li>
@@ -212,26 +216,20 @@
                 <li><strong>لتقديم الدعم الفني:</strong> لمساعدتك في حل المشكلات التي قد تواجهها.</li>
                 <li><strong>لتحسين خدماتنا:</strong> لتحليل كيفية استخدام اللعبة، تحديد الاتجاهات، وإجراء تحسينات على الميزات والأداء.</li>
             </ul>
-
             <h3>3. مشاركة المعلومات</h3>
             <ul>
                 <li><strong>عدم البيع أو المشاركة لأغراض تجارية:</strong> نحن لا نبيع معلوماتك الشخصية أو نشاركها مع أطراف ثالثة لأغراضهم التسويقية المباشرة دون موافقتك الصريحة.</li>
                 <li><strong>مقدمو الخدمات:</strong> قد نشارك معلوماتك مع مقدمي خدمات من الباطن الذين يساعدوننا في تشغيل اللعبة (مثل خدمات الاستضافة، تحليلات البيانات، معالجة الدفع). هؤلاء ملزمون تعاقديًا بحماية معلوماتك واستخدامها فقط للخدمات التي يقدمونها لنا.</li>
                 <li><strong>المتطلبات القانونية:</strong> قد نكشف عن معلوماتك إذا طُلب منا ذلك بموجب القانون، أمر قضائي، أو استجابة لطلب حكومي مشروع.</li>
             </ul>
-
             <h3>4. تحليلات الاستخدام</h3>
             <p>قد نستخدم أدوات تحليلات داخلية أو من طرف ثالث (مثل Google Analytics) لجمع معلومات حول كيفية استخدام اللاعبين للعبة. يتم جمع هذه البيانات بشكل مجهول أو مجمع ولا يتم ربطها مباشرة بهويتك الشخصية، وتستخدم لأغراض تحسين اللعبة وفهم سلوك المستخدمين.</p>
-
             <h3>5. أمان المعلومات</h3>
             <p>نتخذ إجراءات أمنية تقنية وتنظيمية وإدارية معقولة لحماية معلوماتك الشخصية من الوصول غير المصرح به أو الاستخدام أو التعديل أو الكشف أو الإتلاف. ومع ذلك، لا توجد طريقة نقل عبر الإنترنت أو تخزين إلكتروني آمنة بنسبة 100%، لذا لا يمكننا ضمان الأمان المطلق.</p>
-
             <h3>6. ملفات تعريف الارتباط (Cookies) والتقنيات المشابهة</h3>
             <p>قد نستخدم ملفات تعريف الارتباط وتقنيات تتبع مشابهة لتحسين تجربة المستخدم، تذكر تفضيلاتك، تحليل كيفية استخدام الموقع، ولأغراض أمنية. يمكنك التحكم في ملفات تعريف الارتباط من خلال إعدادات متصفحك.</p>
-
             <h3>7. روابط الطرف الثالث</h3>
             <p>قد تحتوي اللعبة أو موقعنا على روابط لمواقع أو خدمات أخرى لا نديرها. إذا نقرت على رابط طرف ثالث، سيتم توجيهك إلى موقع ذلك الطرف الثالث. ننصحك بشدة بمراجعة سياسة الخصوصية لكل موقع تزوره. ليس لدينا أي سيطرة على، ولا نتحمل أي مسؤولية عن، محتوى أو سياسات الخصوصية أو ممارسات أي مواقع أو خدمات طرف ثالث.</p>
-
             <h3>8. حقوق المستخدم</h3>
             <p>لديك الحق في:
             <ul>
@@ -242,22 +240,85 @@
             </ul>
             لممارسة هذه الحقوق، يرجى التواصل معنا عبر معلومات الاتصال المتوفرة في صفحة "تواصل معنا".
             </p>
-
             <h3>9. معلومات إضافية</h3>
             <ul>
                 <li>قد تحتوي اللعبة على مشتريات داخل التطبيق لشراء محاولات لعب إضافية أو ميزات أخرى. تتم معالجة هذه المدفوعات عبر بوابات دفع آمنة.</li>
                 <li>التطبيق لا يحتوي على إعلانات طرف ثالث حاليًا.</li>
                 <li>التطبيق لا يستخدم أساليب تتبع متقدمة لغرض استهدافك بإعلانات مخصصة خارج نطاق خدماتنا المباشرة.</li>
             </ul>
-
             <h3>10. التغييرات على سياسة الخصوصية</h3>
             <p>قد نقوم بتحديث سياسة الخصوصية هذه من وقت لآخر. سنقوم بإخطارك بأي تغييرات جوهرية عن طريق نشر السياسة الجديدة على هذه الصفحة و/أو عبر وسائل اتصال أخرى. نشجعك على مراجعة هذه السياسة بشكل دوري للاطلاع على أي تحديثات.</p>
-
             <h3>11. قبول سياسة الخصوصية</h3>
             <p>باستخدامك للعبة "رحلة"، فإنك توافق على جمع واستخدام المعلومات وفقًا لهذه السياسة. إذا كنت لا توافق على أي جزء من هذه السياسة، يُرجى عدم استخدام اللعبة.</p>
-
-             <h3>12. معلومات الاتصال</h3>
+            <h3>12. معلومات الاتصال</h3>
             <p>إذا كان لديك أي أسئلة حول سياسة الخصوصية هذه، يرجى التواصل معنا عبر صفحة <a href="contact.html">"تواصل معنا"</a>.</p>
+
+            <!-- English Version -->
+            <div class="language-separator"></div>
+            <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">Privacy Policy</h2>
+            <p class="english-text">At "Rehla", we highly value your privacy. This policy explains how we collect, use, and protect your information when you use our game and services.</p>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">1. Information We Collect</h3>
+            <ul class="english-list">
+                <li><strong>Registration Information:</strong> When you create an account, we may collect information such as your name (if provided), email address, and password (hashed). If you register via a third-party service (like Google or Apple), we may receive basic profile information you've agreed to share with that service.</li>
+                <li><strong>Usage Information:</strong> We may collect non-personal information about how you interact with the game, such as pages visited, features used, game duration, and errors that may occur. This is done to improve the game experience.</li>
+                <li><strong>Device Information:</strong> We may collect basic information about your device, operating system, and browser for compatibility and technical support purposes.</li>
+            </ul>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">2. How We Use Information</h3>
+            <ul class="english-list">
+                <li><strong>To Provide and Operate the Game:</strong> To create and manage your account, enable you to play, and track your progress and scores.</li>
+                <li><strong>To Personalize Your Experience:</strong> We may use information to understand your preferences and offer content or promotions that may interest you (with your consent where required by law).</li>
+                <li><strong>To Communicate With You:</strong> To send important notifications about your account, game updates, or changes to terms and policies. We may also send marketing materials if you consent.</li>
+                <li><strong>To Provide Technical Support:</strong> To help you resolve issues you may encounter.</li>
+                <li><strong>To Improve Our Services:</strong> To analyze how the game is used, identify trends, and make improvements to features and performance.</li>
+            </ul>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">3. Information Sharing</h3>
+            <ul class="english-list">
+                <li><strong>No Sale or Sharing for Commercial Purposes:</strong> We do not sell or share your personal information with third parties for their direct marketing purposes without your explicit consent.</li>
+                <li><strong>Service Providers:</strong> We may share your information with third-party service providers who help us operate the game (e.g., hosting services, data analytics, payment processing). These are contractually obligated to protect your information and use it only for the services they provide to us.</li>
+                <li><strong>Legal Requirements:</strong> We may disclose your information if required by law, court order, or in response to a legitimate government request.</li>
+            </ul>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">4. Usage Analytics</h3>
+            <p class="english-text">We may use internal or third-party analytics tools (like Google Analytics) to collect information about how players use the game. This data is collected anonymously or in an aggregated form, is not directly linked to your personal identity, and is used for improving the game and understanding user behavior.</p>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">5. Information Security</h3>
+            <p class="english-text">We take reasonable technical, organizational, and administrative security measures to protect your personal information from unauthorized access, use, modification, disclosure, or destruction. However, no method of transmission over the Internet or electronic storage is 100% secure, so we cannot guarantee absolute security.</p>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">6. Cookies and Similar Technologies</h3>
+            <p class="english-text">We may use cookies and similar tracking technologies to enhance user experience, remember your preferences, analyze site usage, and for security purposes. You can control cookies through your browser settings.</p>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">7. Third-Party Links</h3>
+            <p class="english-text">The game or our website may contain links to other sites or services that we do not operate. If you click on a third-party link, you will be directed to that third party's site. We strongly advise you to review the privacy policy of every site you visit. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</p>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">8. User Rights</h3>
+            <p class="english-text">You have the right to:
+            <ul class="english-list">
+                <li>Access the personal information we hold about you.</li>
+                <li>Request correction of any inaccurate or incomplete information.</li>
+                <li>Request deletion of your personal information (subject to certain legal or operational exceptions).</li>
+                <li>Object to or restrict certain processing of your information.</li>
+            </ul>
+            To exercise these rights, please contact us via the contact information provided on our "Contact Us" page.
+            </p>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">9. Additional Information</h3>
+            <ul class="english-list">
+                <li>The game may contain in-app purchases to buy additional play attempts or other features. These payments are processed through secure payment gateways.</li>
+                <li>The application does not currently contain third-party advertisements.</li>
+                <li>The application does not use advanced tracking methods for the purpose of targeting you with personalized ads outside of our direct services.</li>
+            </ul>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">10. Changes to This Privacy Policy</h3>
+            <p class="english-text">We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page and/or through other communication channels. We encourage you to review this policy periodically for any updates.</p>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">11. Acceptance of This Policy</h3>
+            <p class="english-text">By using the "Rehla" game, you consent to the collection and use of information in accordance with this policy. If you do not agree to any part of this policy, please do not use the game.</p>
+
+            <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">12. Contact Information</h3>
+            <p class="english-text">If you have any questions about this Privacy Policy, please contact us via our <a href="contact.html">"Contact Us"</a> page.</p>
         </section>
 
     </div>
@@ -276,7 +337,7 @@
             </div>
         </div>
         <div class="footer-links-row">
-            <a href="terms.html" class="footer-text-link">Term and Conditions</a>
+            <a href="terms.html" class="footer-text-link">Term and Conditions & Privacy Policy</a> <!-- تم تعديل الرابط هنا -->
              <span class="developer-credit-modern">
                 Created by <a href="https://olo-rehlas-projects.vercel.app/" target="_blank" rel="noopener noreferrer">OLO Tech Solutions</a>
             </span>
