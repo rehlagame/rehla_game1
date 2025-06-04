@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>حذف الحساب / Account Deletion - لعبة رحلة</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        main.page-content {
+            padding-top: 40px;
+            padding-bottom: 60px;
+            min-height: calc(100vh - 200px); /* Adjust based on header/footer height */
+            line-height: 1.8;
+        }
+        .page-content .container {
+            max-width: 800px;
+            background-color: var(--white-color);
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+        }
+        .page-content h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+        }
+        .page-content h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: var(--secondary-color);
+        }
+        .page-content ol, .page-content ul {
+            margin-bottom: 20px;
+            padding-right: 20px; /* For RTL */
+        }
+        .page-content[dir="ltr"] ol, .page-content[dir="ltr"] ul {
+            padding-right: 0;
+            padding-left: 20px; /* For LTR */
+        }
+        .page-content ol li, .page-content ul li {
+            margin-bottom: 10px;
+        }
+        .page-content .important-note {
+            background-color: #fff3cd;
+            border-inline-start: 5px solid #ffeeba; /* Use logical properties for LTR/RTL */
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            color: #856404;
+        }
+        .page-content .important-note strong {
+            color: #664d03;
+        }
+        .contact-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--grey-color-light);
+        }
+        .lang-sep {
+            margin-top: 40px;
+            margin-bottom: 40px;
+            border: 0;
+            border-top: 2px dashed var(--grey-color-light);
+        }
+        .lang-switch-note {
+            text-align: center;
+            margin-bottom: 20px;
+            font-style: italic;
+            color: var(--grey-color-dark);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="logo">
+            <h1><a href="index.html">رحلة</a></h1>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="game.html">العب</a></li>
+                <li><a href="how-to-play.html">طريقة اللعب</a></li>
+                <li><a href="contact.html">تواصل معنا</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions"> <!-- سيتم ملؤه بواسطة main.js -->
+            <a href="auth.html" class="btn btn-register">تسجيل / دخول</a>
+        </div>
+    </div>
+</header>
+
+<main class="page-content">
+    <div class="container">
+        <!-- Arabic Version -->
+        <div lang="ar" dir="rtl">
+            <h2>طلب حذف حسابك وبياناتك</h2>
+            <p class="lang-switch-note">(Scroll down for English version)</p>
+            <p>
+                نحن نتفهم رغبتك في التحكم ببياناتك الشخصية. يمكنك طلب حذف حسابك وجميع البيانات المرتبطة به في لعبة "رحلة".
+                يرجى اتباع الخطوات التالية:
+            </p>
+
+            <h3>الطريقة الموصى بها (إذا كان بإمكانك تسجيل الدخول):</h3>
+            <ol>
+                <li>قم بتسجيل الدخول إلى حسابك في لعبة "رحلة" عبر موقعنا الإلكتروني <a href="auth.html">من هنا</a>.</li>
+                <li>بعد تسجيل الدخول بنجاح، انتقل إلى صفحة "حسابي". عادةً ما يكون هناك رابط لصفحة حسابك في قائمة المستخدم أعلى الصفحة. (أو <a href="Logged.html">اضغط هنا إذا كنت مسجلاً للدخول بالفعل</a>)</li>
+                <li>في صفحة "حسابي"، ابحث عن قسم إدارة الحساب أو الإعدادات المتقدمة.</li>
+                <li>ستجد زرًا بعنوان "حذف الحساب نهائياً". اضغط عليه.</li>
+                <li>سيُطلب منك تأكيد رغبتك في الحذف وإعادة إدخال كلمة المرور الخاصة بك كإجراء أمني.</li>
+                <li>بمجرد التأكيد، سيتم حذف حسابك وبياناتك المرتبطة به نهائيًا.</li>
+            </ol>
+
+            <h3>إذا كنت لا تستطيع تسجيل الدخول:</h3>
+            <p>
+                إذا واجهتك مشكلة في تسجيل الدخول إلى حسابك (مثل نسيان كلمة المرور وعدم القدرة على استعادتها)، يمكنك طلب حذف حسابك عن طريق التواصل معنا مباشرة.
+            </p>
+            <div class="contact-info">
+                <p>
+                    يرجى إرسال بريد إلكتروني إلى: <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a>
+                </p>
+                <p>
+                    في بريدك الإلكتروني، يرجى تضمين المعلومات التالية لمساعدتنا في التحقق من هويتك وتحديد حسابك:
+                </p>
+                <ul>
+                    <li><strong>عنوان الموضوع:</strong> طلب حذف حساب لعبة رحلة</li>
+                    <li><strong>البريد الإلكتروني المستخدم في تسجيل الحساب.</strong></li>
+                    <li>أي معلومات أخرى قد تساعدنا في التعرف على حسابك (مثل اسم العرض التقريبي إذا كنت تتذكره).</li>
+                </ul>
+                <p>
+                    سنتواصل معك لتأكيد طلبك وقد نطلب معلومات إضافية للتحقق قبلดำเนินการ الحذف.
+                </p>
+            </div>
+
+            <div class="important-note">
+                <p><strong>ملاحظة هامة:</strong></p>
+                <ul>
+                    <li>عملية حذف الحساب <strong>نهائية ولا يمكن التراجع عنها</strong>.</li>
+                    <li>بمجرد حذف حسابك، ستفقد جميع بيانات اللعبة، التقدم المحرز، أي رصيد متبقي من الألعاب، وأي معلومات أخرى مرتبطة بحسابك.</li>
+                    <li>قد نحتفظ ببعض البيانات المجهولة المصدر لأغراض تحليلية أو بيانات مطلوبة بموجب القانون لفترة محدودة.</li>
+                </ul>
+            </div>
+        </div>
+
+        <hr class="lang-sep">
+
+        <!-- English Version -->
+        <div lang="en" dir="ltr">
+            <h2 style="font-family: 'Roboto', sans-serif;">Request to Delete Your Account and Data</h2>
+            <p class="lang-switch-note">(النسخة العربية في الأعلى / Arabic version above)</p>
+            <p style="font-family: 'Roboto', sans-serif;">
+                We understand your desire to control your personal data. You can request the deletion of your account and all associated data in the "Rehla" game.
+                Please follow the steps below:
+            </p>
+
+            <h3 style="font-family: 'Roboto', sans-serif;">Recommended Method (if you can log in):</h3>
+            <ol style="font-family: 'Roboto', sans-serif;">
+                <li>Log in to your "Rehla" game account via our website <a href="auth.html">from here</a>.</li>
+                <li>After successful login, navigate to the "My Account" page. There is usually a link to your account page in the user menu at the top of the page. (Or <a href="Logged.html">click here if you are already logged in</a>)</li>
+                <li>On the "My Account" page, look for the account management or advanced settings section.</li>
+                <li>You will find a button labeled "Delete Account Permanently" (or similar, e.g., "حذف الحساب نهائياً"). Click on it.</li>
+                <li>You will be asked to confirm your deletion request and re-enter your password as a security measure.</li>
+                <li>Once confirmed, your account and associated data will be permanently deleted.</li>
+            </ol>
+
+            <h3 style="font-family: 'Roboto', sans-serif;">If you cannot log in:</h3>
+            <p style="font-family: 'Roboto', sans-serif;">
+                If you encounter issues logging into your account (such as forgetting your password and being unable to recover it), you can request your account deletion by contacting us directly.
+            </p>
+            <div class="contact-info">
+                <p style="font-family: 'Roboto', sans-serif;">
+                    Please send an email to: <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a>
+                </p>
+                <p style="font-family: 'Roboto', sans-serif;">
+                    In your email, please include the following information to help us verify your identity and locate your account:
+                </p>
+                <ul style="font-family: 'Roboto', sans-serif;">
+                    <li><strong>Subject Line:</strong> Rehla Game Account Deletion Request</li>
+                    <li><strong>The email address used to register the account.</strong></li>
+                    <li>Any other information that might help us identify your account (such as your approximate display name if you remember it).</li>
+                </ul>
+                <p style="font-family: 'Roboto', sans-serif;">
+                    We will contact you to confirm your request and may ask for additional verification information before proceeding with the deletion.
+                </p>
+            </div>
+
+            <div class="important-note">
+                <p style="font-family: 'Roboto', sans-serif;"><strong>Important Note:</strong></p>
+                <ul style="font-family: 'Roboto', sans-serif;">
+                    <li>The account deletion process is <strong>final and irreversible</strong>.</li>
+                    <li>Once your account is deleted, you will lose all game data, progress, any remaining game balance, and any other information associated with your account.</li>
+                    <li>We may retain some anonymized data for analytical purposes or data required by law for a limited period.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container footer-container-modern">
+        <div class="footer-icons-row">
+            <div class="social-media-icons">
+                <a href="https://www.instagram.com/rehlagame?igsh=MW1haWtleXRqcWo0MA%3D%3D&utm_source=qr" class="social-icon-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@rehlagame" class="social-icon-link" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <div class="app-store-icons">
+                <a href="#" class="app-icon-link" aria-label="Get it on Google Play"><i class="fab fa-android"></i></a>
+                <a href="#" class="app-icon-link" aria-label="Download on the App Store"><i class="fab fa-apple"></i></a>
+            </div>
+        </div>
+        <div class="footer-links-row">
+            <a href="terms.html" class="footer-text-link">Term and Conditions</a>
+            <span class="developer-credit-modern">
+                Created by <a href="https://aistudio.google.com" target="_blank" rel="noopener noreferrer">Google Gemini pro 2.5</a>
+            </span>
+        </div>
+        <div class="footer-copyright-row">
+            <p>Copyright Rehla - All Rights Reserved 2025 <sup>®</sup></p>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/main.js" type="module"></script>
+<script src="assets/js/script.js"></script>
+</body>
+</html>
