@@ -12,7 +12,6 @@ function parseBool(val) {
 
 // ===== GET /api/promos =====
 // جلب جميع أكواد الخصم
-// ================== بداية التعديل: تعديل استعلام SQL هنا ==================
 router.get('/', async (req, res, next) => {
     // تم تحديث هذا الاستعلام ليشمل جميع الأعمدة اللازمة للوحة التحكم
     const sql = `
@@ -22,19 +21,18 @@ router.get('/', async (req, res, next) => {
     `;
     try {
         const result = await pool.query(sql);
-        // لا حاجة لتغيير هذا الجزء، فهو يرسل البيانات كما هي من قاعدة البيانات
+        // تم تصحيح هذا الجزء ليرسل جميع البيانات المسترجعة
         res.json({ promoCodes: result.rows });
     } catch (err) {
         console.error('Error fetching promo codes:', err.stack);
         next(new Error('Database error fetching promo codes. Details: ' + err.message));
     }
 });
-// ================== نهاية التعديل ==================
 
 // ===== POST /api/promos =====
 // إضافة كود خصم جديد
 router.post('/', async (req, res, next) => {
-    let { code, type, value, description, is_active, expiry_date, max_uses } = req.body;
+    let { code, type, value, description, expiry_date, max_uses } = req.body;
 
     if (!code || !type || value == null) {
         return res.status(400).json({ message: 'Missing required fields: code, type, value.' });
@@ -45,7 +43,6 @@ router.post('/', async (req, res, next) => {
 
     const codeUpper     = code.trim().toUpperCase();
     const valInt        = parseInt(value, 10);
-    const activeBool    = parseBool(is_active);
     const maxUsesInt    = (max_uses !== undefined && max_uses !== null) ? parseInt(max_uses, 10) : 0;
 
     if (isNaN(valInt) || valInt <= 0 || (type === 'percentage' && valInt > 100)) {
@@ -84,10 +81,7 @@ router.put('/:code/status', async (req, res, next) => {
     const codeUpper  = req.params.code.toUpperCase();
     const activeBool = parseBool(req.body.is_active);
 
-    const sql = `
-        UPDATE promo_codes SET is_active = $1
-        WHERE code = $2 RETURNING *
-    `;
+    const sql = `UPDATE promo_codes SET is_active = $1 WHERE code = $2 RETURNING *`;
     try {
         const result = await pool.query(sql, [activeBool, codeUpper]);
         if (result.rowCount === 0) {
@@ -125,7 +119,7 @@ router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
 
     try {
         const promoResult = await pool.query(
-            "SELECT code, type, value, is_active, expiry_date, max_uses, current_uses FROM promo_codes WHERE code = $1 AND is_active = TRUE",
+            "SELECT * FROM promo_codes WHERE code = $1 AND is_active = TRUE",
             [promoCodeFromRequest]
         );
         if (promoResult.rows.length === 0) {
