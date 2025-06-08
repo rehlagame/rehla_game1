@@ -78,7 +78,7 @@ async function initializeDatabase() {
         );
     `;
 
-    // --- Payment Logs Table (NEWLY ADDED) ---
+    // --- Payment Logs Table ---
     const createPaymentLogsTableSql = `
         CREATE TABLE IF NOT EXISTS payment_logs (
             id SERIAL PRIMARY KEY,
@@ -111,9 +111,23 @@ async function initializeDatabase() {
         CREATE INDEX IF NOT EXISTS idx_payment_logs_status ON payment_logs(status);
     `;
 
+    // =================================================================================
+    // === بداية التعديل: إضافة جدول تتبع استخدام أكواد الخصم ===
+    // =================================================================================
+    const createPromoUsageTableSql = `
+        CREATE TABLE IF NOT EXISTS promo_code_usage (
+            id SERIAL PRIMARY KEY,
+            promo_code_used VARCHAR(50) NOT NULL REFERENCES promo_codes(code) ON DELETE CASCADE,
+            user_firebase_uid VARCHAR(255) NOT NULL REFERENCES users(firebase_uid) ON DELETE CASCADE,
+            used_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE (promo_code_used, user_firebase_uid)
+        );
+    `;
+    // =================================================================================
+    // === نهاية التعديل ===
+    // =================================================================================
 
     // --- Trigger function to update 'updated_at' column ---
-    // This is a common pattern for PostgreSQL.
     const createUpdatedAtTriggerFunctionSql = `
       CREATE OR REPLACE FUNCTION trigger_set_timestamp()
       RETURNS TRIGGER AS $$
@@ -126,14 +140,14 @@ async function initializeDatabase() {
 
     // --- Apply trigger to 'users' table ---
     const createUsersUpdatedAtTriggerSql = `
-      DROP TRIGGER IF EXISTS set_timestamp_users ON users; -- Drop if exists to avoid errors on re-run
+      DROP TRIGGER IF EXISTS set_timestamp_users ON users;
       CREATE TRIGGER set_timestamp_users
       BEFORE UPDATE ON users
       FOR EACH ROW
       EXECUTE PROCEDURE trigger_set_timestamp();
     `;
 
-    // --- Apply trigger to 'payment_logs' table (NEWLY ADDED) ---
+    // --- Apply trigger to 'payment_logs' table ---
     const createPaymentLogsUpdatedAtTriggerSql = `
       DROP TRIGGER IF EXISTS set_timestamp_payment_logs ON payment_logs;
       CREATE TRIGGER set_timestamp_payment_logs
@@ -156,11 +170,16 @@ async function initializeDatabase() {
         await client.query(createUsersTableSql);
         console.log('Users table checked/created successfully in PostgreSQL.');
 
-        await client.query(createPaymentLogsTableSql); // إضافة إنشاء جدول سجلات الدفع
+        await client.query(createPaymentLogsTableSql);
         console.log('Payment Logs table checked/created successfully in PostgreSQL.');
 
-        await client.query(createPaymentLogsIndexesSql); // إضافة إنشاء فهارس لسجلات الدفع
+        await client.query(createPaymentLogsIndexesSql);
         console.log('Indexes for Payment Logs table checked/created successfully.');
+        
+        // --- (أضف هذا الاستدعاء الجديد) ---
+        await client.query(createPromoUsageTableSql);
+        console.log('Promo Code Usage table checked/created successfully.');
+        // ------------------------------------
 
         // Create the trigger function first
         await client.query(createUpdatedAtTriggerFunctionSql);
@@ -170,7 +189,7 @@ async function initializeDatabase() {
         await client.query(createUsersUpdatedAtTriggerSql);
         console.log('Updated_at trigger for Users table checked/created successfully.');
 
-        await client.query(createPaymentLogsUpdatedAtTriggerSql); // تطبيق التريجر لجدول سجلات الدفع
+        await client.query(createPaymentLogsUpdatedAtTriggerSql);
         console.log('Updated_at trigger for Payment Logs table checked/created successfully.');
 
         await client.query('COMMIT'); // Commit transaction
