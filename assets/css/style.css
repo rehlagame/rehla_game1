@@ -348,12 +348,7 @@ main.account-main-content.new-account-layout {
     text-align: center;
     border-left: 1px solid var(--grey-color-light);
 }
-.profile-summary .profile-picture-wrapper-logged {
-    position: relative;
-    width: 110px; /* تقليل الحجم */
-    height: 110px;
-    margin: 0 auto 15px auto; /* تقليل الهامش */
-}
+
 .profile-picture-logged {
     width: 100%;
     height: 100%;
@@ -362,28 +357,9 @@ main.account-main-content.new-account-layout {
     border: 4px solid var(--primary-color);
     background-color: var(--grey-color-light);
 }
-.photo-upload-label-logged {
-    position: absolute;
-    bottom: 5px;
-    left: 5px;
-    background-color: var(--profile-red-accent);
-    color: white;
-    width: 28px; /* تقليل الحجم */
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-.photo-upload-label-logged:hover {
-    background-color: #c0392b;
-}
-.photo-upload-label-logged i {
-    font-size: 13px; /* تقليل الحجم */
-}
+
+
+
 #profile-summary-name {
     font-size: 1.3em; /* تقليل حجم الخط */
     font-weight: 700;
