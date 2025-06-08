@@ -11,14 +11,10 @@ function parseBool(val) {
 }
 
 // ===== GET /api/promos =====
-// جلب جميع أكواد الخصم
 router.get('/', async (req, res, next) => {
-    // تم تبسيط الاستعلام للتركيز على البيانات الأساسية المطلوبة حاليًا
+    // تم التأكد من أن جميع أسماء الأعمدة هنا بأحرف صغيرة كما هي في قاعدة البيانات
     const sql = `
-        SELECT code, type, value, description, is_active,
-               COALESCE(max_uses, 0) as max_uses,
-               COALESCE(current_uses, 0) as current_uses,
-               expiry_date
+        SELECT code, type, value, description, is_active, expiry_date, max_uses, current_uses
         FROM promo_codes
         ORDER BY code
     `;
@@ -27,22 +23,22 @@ router.get('/', async (req, res, next) => {
         res.json({ promoCodes: result.rows });
     } catch (err) {
         console.error('Error fetching promo codes:', err.stack);
-        next(err); // تمرير الخطأ إلى معالج الأخطاء العام
+        next(err);
     }
 });
 
 // ===== POST /api/promos =====
-// إضافة كود خصم جديد
 router.post('/', async (req, res, next) => {
+    // الأسماء هنا (من req.body) لا تهم، المهم هو أسماء الأعمدة في جملة INSERT
     let { code, type, value, description, expiry_date, max_uses } = req.body;
 
     if (!code || !type || value == null) {
         return res.status(400).json({ message: 'Missing required fields: code, type, value.' });
     }
-
+    
     const codeUpper     = code.trim().toUpperCase();
     const valInt        = parseInt(value, 10);
-    const maxUsesInt    = parseInt(max_uses, 10) || 0; // القيمة الافتراضية 0 إذا كانت فارغة
+    const maxUsesInt    = parseInt(max_uses, 10) || 0;
 
     if (isNaN(valInt) || valInt <= 0) {
         return res.status(400).json({ message: 'Invalid value for discount.' });
@@ -58,10 +54,10 @@ router.post('/', async (req, res, next) => {
         type,
         valInt,
         description || null,
-        true, // فعال بشكل افتراضي
+        true,
         expiry_date || null,
-        maxUsesInt > 0 ? maxUsesInt : null, // استخدم null إذا كان 0
-        0 // يبدأ الاستخدام من 0
+        maxUsesInt > 0 ? maxUsesInt : null,
+        0
     ];
 
     try {
@@ -115,7 +111,6 @@ router.delete('/:code', async (req, res, next) => {
 
 // ===== GET /api/promos/validate/:code =====
 router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
-    // هذا المسار سليم ولا يحتاج تعديل الآن
     const promoCodeFromRequest = req.params.code.toUpperCase();
     const firebaseUid = req.user.uid;
 
