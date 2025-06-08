@@ -6,16 +6,19 @@ const router  = express.Router();
 const { verifyFirebaseToken } = require('../middleware/authMiddleware');
 
 function parseBool(val) {
-    const s = String(val).toLowerCase();
+    const s = String(val || '').toLowerCase();
     return (s === 'true' || s === '1' || s === 'on');
 }
 
 // ===== GET /api/promos =====
 // جلب جميع أكواد الخصم
 router.get('/', async (req, res, next) => {
-    // هذا الاستعلام سليم ويجلب جميع الأعمدة اللازمة
+    // تم تبسيط الاستعلام للتركيز على البيانات الأساسية المطلوبة حاليًا
     const sql = `
-        SELECT code, type, value, description, is_active, expiry_date, max_uses, current_uses
+        SELECT code, type, value, description, is_active,
+               COALESCE(max_uses, 0) as max_uses,
+               COALESCE(current_uses, 0) as current_uses,
+               expiry_date
         FROM promo_codes
         ORDER BY code
     `;
@@ -24,7 +27,7 @@ router.get('/', async (req, res, next) => {
         res.json({ promoCodes: result.rows });
     } catch (err) {
         console.error('Error fetching promo codes:', err.stack);
-        next(new Error('Database error fetching promo codes. Details: ' + err.message));
+        next(err); // تمرير الخطأ إلى معالج الأخطاء العام
     }
 });
 
@@ -36,37 +39,34 @@ router.post('/', async (req, res, next) => {
     if (!code || !type || value == null) {
         return res.status(400).json({ message: 'Missing required fields: code, type, value.' });
     }
-    if (!['percentage','free_games'].includes(type)) {
-        return res.status(400).json({ message: "Invalid type. Must be 'percentage' or 'free_games'." });
-    }
 
     const codeUpper     = code.trim().toUpperCase();
     const valInt        = parseInt(value, 10);
-    // current_uses يبدأ دائمًا من 0 عند الإنشاء، لا نحتاج لأخذه من الطلب
-    const maxUsesInt    = (max_uses !== undefined && max_uses !== null) ? parseInt(max_uses, 10) : 0;
+    const maxUsesInt    = parseInt(max_uses, 10) || 0; // القيمة الافتراضية 0 إذا كانت فارغة
 
-    if (isNaN(valInt) || valInt <= 0 || (type === 'percentage' && valInt > 100)) {
+    if (isNaN(valInt) || valInt <= 0) {
         return res.status(400).json({ message: 'Invalid value for discount.' });
     }
-    if (isNaN(maxUsesInt) || maxUsesInt < 0) {
-        return res.status(400).json({ message: 'Invalid value for max uses.' });
-    }
-    
-    // ================== بداية التصحيح: إضافة current_uses إلى جملة INSERT ==================
+
     const sql = `
-        INSERT INTO promo_codes
-            (code, type, value, description, is_active, expiry_date, max_uses, current_uses)
-        VALUES
-            ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO promo_codes (code, type, value, description, is_active, expiry_date, max_uses, current_uses)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
     `;
-    // تم إضافة 0 كقيمة لـ current_uses
-    const params = [codeUpper, type, valInt, description || null, true, expiry_date || null, maxUsesInt > 0 ? maxUsesInt : null, 0];
-    // ================== نهاية التصحيح ==================
+    const params = [
+        codeUpper,
+        type,
+        valInt,
+        description || null,
+        true, // فعال بشكل افتراضي
+        expiry_date || null,
+        maxUsesInt > 0 ? maxUsesInt : null, // استخدم null إذا كان 0
+        0 // يبدأ الاستخدام من 0
+    ];
 
     try {
         const result = await pool.query(sql, params);
-        return res.status(201).json({
+        res.status(201).json({
             message: 'Promo code created successfully.',
             promo:   result.rows[0]
         });
@@ -75,7 +75,7 @@ router.post('/', async (req, res, next) => {
             return res.status(409).json({ message: `Promo code '${codeUpper}' already exists.` });
         }
         console.error('Error inserting promo code:', err.stack);
-        next(new Error('Database error creating promo code. Details: ' + err.message));
+        next(err);
     }
 });
 
@@ -83,20 +83,18 @@ router.post('/', async (req, res, next) => {
 router.put('/:code/status', async (req, res, next) => {
     const codeUpper  = req.params.code.toUpperCase();
     const activeBool = parseBool(req.body.is_active);
-
-    const sql = `UPDATE promo_codes SET is_active = $1 WHERE code = $2 RETURNING *`;
     try {
-        const result = await pool.query(sql, [activeBool, codeUpper]);
+        const result = await pool.query(`UPDATE promo_codes SET is_active = $1 WHERE code = $2 RETURNING *`, [activeBool, codeUpper]);
         if (result.rowCount === 0) {
             return res.status(404).json({ message: `Promo code '${codeUpper}' not found.` });
         }
         res.json({
             message: `Promo code '${codeUpper}' ${activeBool ? 'activated' : 'deactivated'}.`,
-            promo:   result.rows[0]
+            promo: result.rows[0]
         });
     } catch (err) {
         console.error(`Error updating promo code status for ${codeUpper}:`, err.stack);
-        next(new Error('Database error updating promo code status. Details: ' + err.message));
+        next(err);
     }
 });
 
@@ -111,12 +109,13 @@ router.delete('/:code', async (req, res, next) => {
         res.json({ message: `Promo code '${codeUpper}' deleted successfully.`, code: result.rows[0].code });
     } catch (err) {
         console.error(`Error deleting promo code ${codeUpper}:`, err.stack);
-        next(new Error('Database error deleting promo code. Details: ' + err.message));
+        next(err);
     }
 });
 
 // ===== GET /api/promos/validate/:code =====
 router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
+    // هذا المسار سليم ولا يحتاج تعديل الآن
     const promoCodeFromRequest = req.params.code.toUpperCase();
     const firebaseUid = req.user.uid;
 
@@ -152,7 +151,7 @@ router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
         });
     } catch (err) {
         console.error(`Error validating promo code ${promoCodeFromRequest} for user ${firebaseUid}:`, err.stack);
-        next(new Error('حدث خطأ أثناء التحقق من كود الخصم.'));
+        next(err);
     }
 });
 
