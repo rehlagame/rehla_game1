@@ -13,7 +13,7 @@ function parseBool(val) {
 // ===== GET /api/promos =====
 // جلب جميع أكواد الخصم
 router.get('/', async (req, res, next) => {
-    // تم تحديث هذا الاستعلام ليشمل جميع الأعمدة اللازمة للوحة التحكم
+    // هذا الاستعلام سليم ويجلب جميع الأعمدة اللازمة
     const sql = `
         SELECT code, type, value, description, is_active, expiry_date, max_uses, current_uses
         FROM promo_codes
@@ -21,7 +21,6 @@ router.get('/', async (req, res, next) => {
     `;
     try {
         const result = await pool.query(sql);
-        // تم تصحيح هذا الجزء ليرسل جميع البيانات المسترجعة
         res.json({ promoCodes: result.rows });
     } catch (err) {
         console.error('Error fetching promo codes:', err.stack);
@@ -43,6 +42,7 @@ router.post('/', async (req, res, next) => {
 
     const codeUpper     = code.trim().toUpperCase();
     const valInt        = parseInt(value, 10);
+    // current_uses يبدأ دائمًا من 0 عند الإنشاء، لا نحتاج لأخذه من الطلب
     const maxUsesInt    = (max_uses !== undefined && max_uses !== null) ? parseInt(max_uses, 10) : 0;
 
     if (isNaN(valInt) || valInt <= 0 || (type === 'percentage' && valInt > 100)) {
@@ -51,15 +51,18 @@ router.post('/', async (req, res, next) => {
     if (isNaN(maxUsesInt) || maxUsesInt < 0) {
         return res.status(400).json({ message: 'Invalid value for max uses.' });
     }
-
+    
+    // ================== بداية التصحيح: إضافة current_uses إلى جملة INSERT ==================
     const sql = `
         INSERT INTO promo_codes
-            (code, type, value, description, is_active, expiry_date, max_uses)
+            (code, type, value, description, is_active, expiry_date, max_uses, current_uses)
         VALUES
-            ($1, $2, $3, $4, $5, $6, $7)
+            ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING *
     `;
-    const params = [codeUpper, type, valInt, description || null, true, expiry_date || null, maxUsesInt > 0 ? maxUsesInt : null];
+    // تم إضافة 0 كقيمة لـ current_uses
+    const params = [codeUpper, type, valInt, description || null, true, expiry_date || null, maxUsesInt > 0 ? maxUsesInt : null, 0];
+    // ================== نهاية التصحيح ==================
 
     try {
         const result = await pool.query(sql, params);
