@@ -62,7 +62,6 @@ const authErrorMessageDiv = document.getElementById('auth-error-message');
 const resetSuccessMessageDiv = document.getElementById('reset-success-message');
 const profilePageElements = {
     userPhoto: document.getElementById('user-photo-logged'),
-    photoUploadInput: document.getElementById('photo-upload-logged'),
     summaryName: document.getElementById('profile-summary-name'),
     summaryEmail: document.getElementById('profile-summary-email'),
     infoForm: document.getElementById('profile-info-form'),
@@ -410,20 +409,25 @@ onAuthStateChanged(auth, async (user) => {
 
 // --- Profile Page (Logged.html) Logic ---
 async function setupProfilePage(user) {
-    const els = profilePageElements;
-    if (!els.infoForm || !user) {
+    const els = profilePageElements; // profilePageElements يجب أن يكون معرّفًا وفيها photoUploadInput محذوف
+
+    if (!els.infoForm || !user) { // يمكنك إضافة els.userPhoto هنا إذا أردت التأكد من وجوده
         console.warn("setupProfilePage: Missing elements or user object.");
         return;
     }
 
-    // Set initial values from Firebase Auth object
-    if (els.userPhoto) els.userPhoto.src = user.photoURL || 'assets/images/default-avatar.png';
+    // 1. تعيين الصورة الرمزية الثابتة دائمًا
+    if (els.userPhoto) {
+        els.userPhoto.src = 'assets/images/default-avatar.png'; // الصورة الرمزية الثابتة
+    }
+
+    // 2. تعيين القيم الأولية من كائن Firebase Auth
     if (els.summaryName) els.summaryName.textContent = user.displayName || 'مستخدم رحلة';
     if (els.summaryEmail) els.summaryEmail.textContent = user.email;
-    if (els.emailInput) els.emailInput.value = user.email;
+    if (els.emailInput) els.emailInput.value = user.email; // البريد الإلكتروني للقراءة فقط
     if (els.displayNameInput) els.displayNameInput.value = user.displayName || '';
 
-    // Fetch more details from backend if profile is ready
+    // 3. جلب تفاصيل إضافية من الخادم الخلفي إذا كان الملف الشخصي جاهزًا
     if (isBackendProfileReady) {
         try {
             const token = await getIdToken(user);
@@ -434,6 +438,7 @@ async function setupProfilePage(user) {
             if (!response.ok && response.status !== 404) {
                 const errorText = await response.text().catch(() => `فشل جلب تفاصيل الملف الشخصي (Code: SPP-BE-${response.status})`);
                 console.error(`Failed to fetch profile from backend (setupProfilePage): ${response.status} - ${errorText}`);
+                // استخدام بيانات Firebase كاحتياطي إذا فشل جلب البيانات من الخادم
                 const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
                 if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
                 if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
@@ -444,7 +449,7 @@ async function setupProfilePage(user) {
                 if (els.lastNameInput) els.lastNameInput.value = profileData.last_name || '';
                 if (profileData.phone) {
                     let fullPhone = profileData.phone;
-                    let countryCode = "+965";
+                    let countryCode = "+965"; // الافتراضي
                     let phoneNum = fullPhone;
                     const knownCodes = ["+965", "+966", "+971", "+973", "+974", "+968"];
                     for (const code of knownCodes) {
@@ -458,16 +463,17 @@ async function setupProfilePage(user) {
                     if (els.phoneInput) els.phoneInput.value = phoneNum;
                 }
                 if (els.displayNameInput && profileData.display_name) els.displayNameInput.value = profileData.display_name;
-                if (els.userPhoto && profileData.photo_url) els.userPhoto.src = profileData.photo_url;
+                // لا يوجد تحديث لـ els.userPhoto.src من profileData.photo_url لأننا نريد صورة ثابتة
                 if (els.summaryName && profileData.display_name) els.summaryName.textContent = profileData.display_name;
             } else if (response.status === 404) {
-                console.warn(`[MainJS setupProfilePage] Profile for user ${user.uid} still not found in backend. This should have been created by ensureAndSync. Using Firebase data as fallback.`);
+                console.warn(`[MainJS setupProfilePage] Profile for user ${user.uid} still not found in backend. Using Firebase data as fallback.`);
                 const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
                 if (els.firstNameInput) els.firstNameInput.value = nameParts[0] || '';
                 if (els.lastNameInput) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
             }
         } catch (error) {
             console.error("Error in try-catch fetching/processing profile data (setupProfilePage):", error);
+            // استخدام بيانات Firebase كاحتياطي عند حدوث خطأ
             const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
             if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
             if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
@@ -479,40 +485,9 @@ async function setupProfilePage(user) {
         if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
     }
 
+    // 4. ربط مستمعي الأحداث (إذا لم يتم ربطهم من قبل)
 
-    if (els.photoUploadInput && els.userPhoto) {
-        if (!els.photoUploadInput.dataset.listenerAttached) {
-            els.photoUploadInput.addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                if (!file || !auth.currentUser) return;
-                const imageRef = storageRef(storage, `profile_pictures/${auth.currentUser.uid}/${file.name}`);
-                try {
-                    if (profilePageElements.userPhoto) profilePageElements.userPhoto.src = 'assets/images/loading-spinner.gif';
-                    await uploadBytes(imageRef, file);
-                    const downloadURL = await getDownloadURL(imageRef);
-                    await updateProfile(auth.currentUser, { photoURL: downloadURL });
-                    const token = await getIdToken(auth.currentUser);
-                    const updateResponse = await fetch(`${RENDER_API_BASE_URL}/api/user/${auth.currentUser.uid}/profile`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                        body: JSON.stringify({ photo_url: downloadURL })
-                    });
-                    if (!updateResponse.ok) {
-                        const errorData = await updateResponse.json().catch(() => ({message: "فشل تحديث الصورة في الخادم."}));
-                        throw new Error(errorData.message);
-                    }
-                    if (els.userPhoto) els.userPhoto.src = downloadURL;
-                    showSuccessMessage("تم تحديث صورة الملف الشخصي بنجاح!", els.updateSuccessDiv);
-                    setTimeout(() => { if (els.updateSuccessDiv) els.updateSuccessDiv.style.display = 'none'; }, 3000);
-                } catch (error) {
-                    console.error("Error uploading profile picture or updating backend:", error);
-                    showAuthError(error.message || getFriendlyErrorMessage(error.code || 'PROFILE_PIC_UPLOAD_ERROR'), els.updateErrorDiv);
-                    if (els.userPhoto && auth.currentUser) els.userPhoto.src = auth.currentUser.photoURL || 'assets/images/default-avatar.png';
-                }
-            });
-            els.photoUploadInput.dataset.listenerAttached = 'true';
-        }
-    }
+    // تم حذف الكود الخاص بـ els.photoUploadInput.addEventListener
 
     if (els.infoForm && !els.infoForm.dataset.listenerAttached) {
         els.infoForm.addEventListener('submit', async (e) => {
@@ -535,6 +510,7 @@ async function setupProfilePage(user) {
                 lastName: newLastName,
                 displayName: newDisplayName,
                 phone: newCountryCode && newPhone ? `${newCountryCode}${newPhone}` : null,
+                // لا نرسل photo_url لأننا لا نعدل الصورة
             };
 
             try {
