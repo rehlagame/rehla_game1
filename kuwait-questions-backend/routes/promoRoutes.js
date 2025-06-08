@@ -3,25 +3,18 @@
 const express = require('express');
 const pool    = require('../database/database');
 const router  = express.Router();
-// =================================================================================
-// === بداية التعديل: استيراد middleware المصادقة ===
-// =================================================================================
 const { verifyFirebaseToken } = require('../middleware/authMiddleware');
-// =================================================================================
-// === نهاية التعديل ===
-// =================================================================================
 
-
-// دالة مساعدة لتحويل body إلى boolean
 function parseBool(val) {
     const s = String(val).toLowerCase();
     return (s === 'true' || s === '1' || s === 'on');
 }
 
 // ===== GET /api/promos =====
-// جلب جميع أكواد الخصم، وإرجاعها تحت المفتاح promoCodes
-// هذا المسار يمكن أن يبقى عامًا أو يمكن حمايته لاحقًا إذا أردت أن يكون للمسؤولين فقط
+// جلب جميع أكواد الخصم
+// ================== بداية التعديل: تعديل استعلام SQL هنا ==================
 router.get('/', async (req, res, next) => {
+    // تم تحديث هذا الاستعلام ليشمل جميع الأعمدة اللازمة للوحة التحكم
     const sql = `
         SELECT code, type, value, description, is_active, expiry_date, max_uses, current_uses
         FROM promo_codes
@@ -29,26 +22,18 @@ router.get('/', async (req, res, next) => {
     `;
     try {
         const result = await pool.query(sql);
-        // تم ترك التنسيق كما هو، لوحة التحكم قد تحتاج للتحديث لعرض الأعمدة الجديدة
-        const promoCodes = result.rows.map(row => ({
-            code:        row.code,
-            type:        row.type,
-            value:       row.value,
-            description: row.description,
-            is_active:   row.is_active
-        }));
-        res.json({ promoCodes });
+        // لا حاجة لتغيير هذا الجزء، فهو يرسل البيانات كما هي من قاعدة البيانات
+        res.json({ promoCodes: result.rows });
     } catch (err) {
         console.error('Error fetching promo codes:', err.stack);
         next(new Error('Database error fetching promo codes. Details: ' + err.message));
     }
 });
+// ================== نهاية التعديل ==================
 
 // ===== POST /api/promos =====
-// إضافة كود خصم جديد (يفترض أن هذا المسار محمي بطريقة أخرى، ربما بكلمة سر للمسؤول)
+// إضافة كود خصم جديد
 router.post('/', async (req, res, next) => {
-    console.log('--- ADD PROMO CODE ---', req.body);
-    // إضافة المتغيرات الجديدة من الطلب
     let { code, type, value, description, is_active, expiry_date, max_uses } = req.body;
 
     if (!code || !type || value == null) {
@@ -75,19 +60,18 @@ router.post('/', async (req, res, next) => {
             (code, type, value, description, is_active, expiry_date, max_uses)
         VALUES
             ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING code, type, value, description, is_active, expiry_date, max_uses
+        RETURNING *
     `;
-    const params = [codeUpper, type, valInt, description || null, activeBool, expiry_date || null, maxUsesInt > 0 ? maxUsesInt : null];
+    const params = [codeUpper, type, valInt, description || null, true, expiry_date || null, maxUsesInt > 0 ? maxUsesInt : null];
 
     try {
         const result = await pool.query(sql, params);
         return res.status(201).json({
             message: 'Promo code created successfully.',
-            code:    result.rows[0].code,
             promo:   result.rows[0]
         });
     } catch (err) {
-        if (err.code === '23505') { // Unique violation
+        if (err.code === '23505') {
             return res.status(409).json({ message: `Promo code '${codeUpper}' already exists.` });
         }
         console.error('Error inserting promo code:', err.stack);
@@ -97,14 +81,12 @@ router.post('/', async (req, res, next) => {
 
 // ===== PUT /api/promos/:code/status =====
 router.put('/:code/status', async (req, res, next) => {
-    // ... (هذا المسار يبقى كما هو، لا حاجة لتعديله)
     const codeUpper  = req.params.code.toUpperCase();
     const activeBool = parseBool(req.body.is_active);
+
     const sql = `
-        UPDATE promo_codes
-        SET is_active = $1
-        WHERE code = $2
-            RETURNING code, type, value, description, is_active
+        UPDATE promo_codes SET is_active = $1
+        WHERE code = $2 RETURNING *
     `;
     try {
         const result = await pool.query(sql, [activeBool, codeUpper]);
@@ -123,13 +105,9 @@ router.put('/:code/status', async (req, res, next) => {
 
 // ===== DELETE /api/promos/:code =====
 router.delete('/:code', async (req, res, next) => {
-    // ... (هذا المسار يبقى كما هو، لا حاجة لتعديله)
     const codeUpper = req.params.code.toUpperCase();
     try {
-        const result = await pool.query(
-            `DELETE FROM promo_codes WHERE code = $1 RETURNING code`,
-            [codeUpper]
-        );
+        const result = await pool.query(`DELETE FROM promo_codes WHERE code = $1 RETURNING code`, [codeUpper]);
         if (result.rowCount === 0) {
             return res.status(404).json({ message: `Promo code '${codeUpper}' not found.` });
         }
@@ -140,31 +118,21 @@ router.delete('/:code', async (req, res, next) => {
     }
 });
 
-
 // ===== GET /api/promos/validate/:code =====
-// للتحقق من صحة كود الخصم وإرجاع تفاصيله
-// تم الآن حماية هذا المسار ويتطلب أن يكون المستخدم مسجلاً دخوله
-// =================================================================================
-// === بداية التعديل: تعديل مسار التحقق من الكود ===
-// =================================================================================
 router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
     const promoCodeFromRequest = req.params.code.toUpperCase();
-    const firebaseUid = req.user.uid; // نحصل على هوية المستخدم من التوكن الذي تم التحقق منه
+    const firebaseUid = req.user.uid;
 
     try {
-        // الخطوة 1: التحقق من وجود الكود وأنه فعال
         const promoResult = await pool.query(
             "SELECT code, type, value, is_active, expiry_date, max_uses, current_uses FROM promo_codes WHERE code = $1 AND is_active = TRUE",
             [promoCodeFromRequest]
         );
-
         if (promoResult.rows.length === 0) {
             return res.status(404).json({ message: "كود الخصم غير صالح أو منتهي الصلاحية." });
         }
-
         const promo = promoResult.rows[0];
 
-        // يمكنك إضافة شروط التحقق من تاريخ الانتهاء وعدد الاستخدامات هنا إذا أردت
         if (promo.expiry_date && new Date(promo.expiry_date) < new Date()) {
             return res.status(400).json({ message: "هذا الكود منتهي الصلاحية." });
         }
@@ -172,31 +140,23 @@ router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
             return res.status(400).json({ message: "تم الوصول للحد الأقصى لاستخدام هذا الكود." });
         }
 
-        // الخطوة 2: التحقق مما إذا كان المستخدم قد استخدم هذا الكود من قبل
         const usageCheckResult = await pool.query(
             "SELECT 1 FROM promo_code_usage WHERE promo_code_used = $1 AND user_firebase_uid = $2",
             [promo.code, firebaseUid]
         );
-
         if (usageCheckResult.rows.length > 0) {
-            // إذا وجدنا سجلًا، فهذا يعني أن المستخدم قد استخدم الكود بالفعل
-            return res.status(409).json({ message: "لقد استخدمت هذا الكود بالفعل." }); // 409 Conflict
+            return res.status(409).json({ message: "لقد استخدمت هذا الكود بالفعل." });
         }
 
-        // إذا وصل الكود إلى هنا، فهو صالح ولم يستخدمه المستخدم من قبل
         res.json({
             code: promo.code,
             type: promo.type,
             value: promo.value
         });
-
     } catch (err) {
         console.error(`Error validating promo code ${promoCodeFromRequest} for user ${firebaseUid}:`, err.stack);
         next(new Error('حدث خطأ أثناء التحقق من كود الخصم.'));
     }
 });
-// =================================================================================
-// === نهاية التعديل ===
-// =================================================================================
 
 module.exports = router;
