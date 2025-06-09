@@ -65,7 +65,7 @@ async function initializeDatabase() {
     // --- Users Table ---
     const createUsersTableSql = `
         CREATE TABLE IF NOT EXISTS users (
-            firebase_uid VARCHAR(255) PRIMARY KEY,
+                                             firebase_uid VARCHAR(255) PRIMARY KEY,
             email VARCHAR(255) UNIQUE,
             display_name VARCHAR(255),
             first_name VARCHAR(255),
@@ -75,10 +75,10 @@ async function initializeDatabase() {
             games_balance INTEGER DEFAULT 0 NOT NULL, -- Ensure games_balance is not null
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-        );
+                                     );
     `;
 
-    // --- Payment Logs Table ---
+    // --- Payment Logs Table (NEWLY ADDED) ---
     const createPaymentLogsTableSql = `
         CREATE TABLE IF NOT EXISTS payment_logs (
             id SERIAL PRIMARY KEY,
@@ -111,23 +111,9 @@ async function initializeDatabase() {
         CREATE INDEX IF NOT EXISTS idx_payment_logs_status ON payment_logs(status);
     `;
 
-    // =================================================================================
-    // === بداية التعديل: إضافة جدول تتبع استخدام أكواد الخصم ===
-    // =================================================================================
-    const createPromoUsageTableSql = `
-        CREATE TABLE IF NOT EXISTS promo_code_usage (
-            id SERIAL PRIMARY KEY,
-            promo_code_used VARCHAR(50) NOT NULL REFERENCES promo_codes(code) ON DELETE CASCADE,
-            user_firebase_uid VARCHAR(255) NOT NULL REFERENCES users(firebase_uid) ON DELETE CASCADE,
-            used_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE (promo_code_used, user_firebase_uid)
-        );
-    `;
-    // =================================================================================
-    // === نهاية التعديل ===
-    // =================================================================================
 
     // --- Trigger function to update 'updated_at' column ---
+    // This is a common pattern for PostgreSQL.
     const createUpdatedAtTriggerFunctionSql = `
       CREATE OR REPLACE FUNCTION trigger_set_timestamp()
       RETURNS TRIGGER AS $$
@@ -140,14 +126,14 @@ async function initializeDatabase() {
 
     // --- Apply trigger to 'users' table ---
     const createUsersUpdatedAtTriggerSql = `
-      DROP TRIGGER IF EXISTS set_timestamp_users ON users;
+      DROP TRIGGER IF EXISTS set_timestamp_users ON users; -- Drop if exists to avoid errors on re-run
       CREATE TRIGGER set_timestamp_users
       BEFORE UPDATE ON users
       FOR EACH ROW
       EXECUTE PROCEDURE trigger_set_timestamp();
     `;
 
-    // --- Apply trigger to 'payment_logs' table ---
+    // --- Apply trigger to 'payment_logs' table (NEWLY ADDED) ---
     const createPaymentLogsUpdatedAtTriggerSql = `
       DROP TRIGGER IF EXISTS set_timestamp_payment_logs ON payment_logs;
       CREATE TRIGGER set_timestamp_payment_logs
@@ -170,16 +156,11 @@ async function initializeDatabase() {
         await client.query(createUsersTableSql);
         console.log('Users table checked/created successfully in PostgreSQL.');
 
-        await client.query(createPaymentLogsTableSql);
+        await client.query(createPaymentLogsTableSql); // إضافة إنشاء جدول سجلات الدفع
         console.log('Payment Logs table checked/created successfully in PostgreSQL.');
 
-        await client.query(createPaymentLogsIndexesSql);
+        await client.query(createPaymentLogsIndexesSql); // إضافة إنشاء فهارس لسجلات الدفع
         console.log('Indexes for Payment Logs table checked/created successfully.');
-        
-        // --- (أضف هذا الاستدعاء الجديد) ---
-        await client.query(createPromoUsageTableSql);
-        console.log('Promo Code Usage table checked/created successfully.');
-        // ------------------------------------
 
         // Create the trigger function first
         await client.query(createUpdatedAtTriggerFunctionSql);
@@ -189,7 +170,7 @@ async function initializeDatabase() {
         await client.query(createUsersUpdatedAtTriggerSql);
         console.log('Updated_at trigger for Users table checked/created successfully.');
 
-        await client.query(createPaymentLogsUpdatedAtTriggerSql);
+        await client.query(createPaymentLogsUpdatedAtTriggerSql); // تطبيق التريجر لجدول سجلات الدفع
         console.log('Updated_at trigger for Payment Logs table checked/created successfully.');
 
         await client.query('COMMIT'); // Commit transaction
