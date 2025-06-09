@@ -1,5 +1,3 @@
-// routes/promoRoutes.js
-
 const express = require('express');
 const pool    = require('../database/database');
 const router  = express.Router();
@@ -12,9 +10,8 @@ function parseBool(val) {
 
 // ===== GET /api/promos =====
 router.get('/', async (req, res, next) => {
-    // تم التأكد من أن جميع أسماء الأعمدة هنا بأحرف صغيرة كما هي في قاعدة البيانات
     const sql = `
-        SELECT code, type, value, description, is_active, expiry_date, max_uses, current_uses
+        SELECT code, type, value, description, is_active, max_uses, current_uses, created_at
         FROM promo_codes
         ORDER BY code
     `;
@@ -29,24 +26,23 @@ router.get('/', async (req, res, next) => {
 
 // ===== POST /api/promos =====
 router.post('/', async (req, res, next) => {
-    // الأسماء هنا (من req.body) لا تهم، المهم هو أسماء الأعمدة في جملة INSERT
-    let { code, type, value, description, expiry_date, max_uses } = req.body;
+    let { code, type, value, description, max_uses } = req.body;
 
     if (!code || !type || value == null) {
         return res.status(400).json({ message: 'Missing required fields: code, type, value.' });
     }
-    
-    const codeUpper     = code.trim().toUpperCase();
-    const valInt        = parseInt(value, 10);
-    const maxUsesInt    = parseInt(max_uses, 10) || 0;
+
+    const codeUpper = code.trim().toUpperCase();
+    const valInt = parseInt(value, 10);
+    const maxUsesInt = parseInt(max_uses, 10) || 0;
 
     if (isNaN(valInt) || valInt <= 0) {
         return res.status(400).json({ message: 'Invalid value for discount.' });
     }
 
     const sql = `
-        INSERT INTO promo_codes (code, type, value, description, is_active, expiry_date, max_uses, current_uses)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO promo_codes (code, type, value, description, is_active, max_uses, current_uses)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *
     `;
     const params = [
@@ -55,7 +51,6 @@ router.post('/', async (req, res, next) => {
         valInt,
         description || null,
         true,
-        expiry_date || null,
         maxUsesInt > 0 ? maxUsesInt : null,
         0
     ];
@@ -64,7 +59,7 @@ router.post('/', async (req, res, next) => {
         const result = await pool.query(sql, params);
         res.status(201).json({
             message: 'Promo code created successfully.',
-            promo:   result.rows[0]
+            promo: result.rows[0]
         });
     } catch (err) {
         if (err.code === '23505') {
@@ -77,7 +72,7 @@ router.post('/', async (req, res, next) => {
 
 // ===== PUT /api/promos/:code/status =====
 router.put('/:code/status', async (req, res, next) => {
-    const codeUpper  = req.params.code.toUpperCase();
+    const codeUpper = req.params.code.toUpperCase();
     const activeBool = parseBool(req.body.is_active);
     try {
         const result = await pool.query(`UPDATE promo_codes SET is_active = $1 WHERE code = $2 RETURNING *`, [activeBool, codeUpper]);
@@ -116,7 +111,7 @@ router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
 
     try {
         const promoResult = await pool.query(
-            "SELECT * FROM promo_codes WHERE code = $1 AND is_active = TRUE",
+            "SELECT code, type, value, max_uses, current_uses, is_active, created_at FROM promo_codes WHERE code = $1 AND is_active = TRUE",
             [promoCodeFromRequest]
         );
         if (promoResult.rows.length === 0) {
@@ -124,9 +119,6 @@ router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
         }
         const promo = promoResult.rows[0];
 
-        if (promo.expiry_date && new Date(promo.expiry_date) < new Date()) {
-            return res.status(400).json({ message: "هذا الكود منتهي الصلاحية." });
-        }
         if (promo.max_uses > 0 && promo.current_uses >= promo.max_uses) {
             return res.status(400).json({ message: "تم الوصول للحد الأقصى لاستخدام هذا الكود." });
         }
