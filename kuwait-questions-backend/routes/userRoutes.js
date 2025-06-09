@@ -5,7 +5,12 @@ const router  = express.Router();
 const { verifyFirebaseToken } = require('../middleware/authMiddleware'); // استيراد middleware المصادقة
 
 // ===== POST /api/user/register-profile =====
-// لا تغييرات هنا، يبقى كما هو.
+// يتم استدعاؤه عند إنشاء حساب مستخدم جديد في الواجهة الأمامية
+// لا يتطلب verifyFirebaseToken هنا لأن التوكن قد لا يكون متاحًا بعد للمستخدم الجديد تمامًا،
+// أو أن الواجهة الأمامية سترسله إذا كان التسجيل يتم بعد المصادقة الأولية (مثل التسجيل عبر جوجل).
+// القرار يعتمد على تدفق المصادقة لديك. إذا كان يُفترض أن المستخدم *دائمًا* مصادق عليه
+// قبل أن يتمكن من استدعاء هذا، فيجب إضافة verifyFirebaseToken.
+// حاليًا، سأفترض أن الواجهة الأمامية قد ترسل firebaseUid مباشرة بعد إنشائه في Firebase.
 router.post('/register-profile', async (req, res, next) => {
     const { firebaseUid, email, displayName, firstName, lastName, phone, photoURL } = req.body;
     console.log('[API /register-profile] Received payload for UID:', firebaseUid, req.body);
@@ -56,7 +61,6 @@ router.post('/register-profile', async (req, res, next) => {
 });
 
 // ===== GET /api/user/:firebaseUid/profile =====
-// لا تغييرات هنا، يبقى كما هو.
 router.get('/:firebaseUid/profile', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
     console.log(`[API /profile] Request to fetch profile for UID: ${firebaseUid}`);
@@ -83,7 +87,6 @@ router.get('/:firebaseUid/profile', verifyFirebaseToken, async (req, res, next) 
 });
 
 // ===== PUT /api/user/:firebaseUid/profile =====
-// لا تغييرات هنا، يبقى كما هو.
 router.put('/:firebaseUid/profile', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
     const { firstName, lastName, displayName, phone, photoURL } = req.body;
@@ -130,9 +133,7 @@ router.put('/:firebaseUid/profile', verifyFirebaseToken, async (req, res, next) 
     }
 });
 
-// =================================================================================
-// === بداية التعديل: تعديل مسار منح الألعاب المجانية ===
-// =================================================================================
+// ===== POST /api/user/:firebaseUid/grant-free-games =====
 router.post('/:firebaseUid/grant-free-games', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
     const { promoCode, gamesToGrant, source } = req.body;
@@ -148,9 +149,8 @@ router.post('/:firebaseUid/grant-free-games', verifyFirebaseToken, async (req, r
 
     const client = await pool.connect();
     try {
-        await client.query('BEGIN'); // بدء المعاملة
+        await client.query('BEGIN');
 
-        // 1. تحقق من صحة الكود وأنه لا يزال فعالاً
         const promoResult = await client.query(
             "SELECT type, value FROM promo_codes WHERE code = $1 AND is_active = TRUE AND type = 'free_games'",
             [promoCode.toUpperCase()]
@@ -160,19 +160,7 @@ router.post('/:firebaseUid/grant-free-games', verifyFirebaseToken, async (req, r
             await client.query('ROLLBACK');
             return res.status(400).json({ message: "كود الألعاب المجانية المقدم غير صالح أو لا يتطابق مع العرض." });
         }
-        
-        // 2. تحقق مما إذا كان المستخدم قد استخدم هذا الكود من قبل
-        const usageCheckResult = await client.query(
-            "SELECT 1 FROM promo_code_usage WHERE promo_code_used = $1 AND user_firebase_uid = $2",
-            [promoCode.toUpperCase(), firebaseUid]
-        );
 
-        if (usageCheckResult.rows.length > 0) {
-            await client.query('ROLLBACK');
-            return res.status(409).json({ message: "لقد استخدمت هذا الكود بالفعل." });
-        }
-
-        // 3. قم بتحديث رصيد المستخدم
         const updateUserBalanceSql = `
             UPDATE users
             SET games_balance = games_balance + $1, updated_at = CURRENT_TIMESTAMP
@@ -187,15 +175,9 @@ router.post('/:firebaseUid/grant-free-games', verifyFirebaseToken, async (req, r
             return res.status(404).json({ message: "المستخدم غير موجود في قاعدة البيانات لتحديث الرصيد." });
         }
 
-        // 4. سجل استخدام الكود لمنع استخدامه مرة أخرى
-        await client.query(
-            "INSERT INTO promo_code_usage (promo_code_used, user_firebase_uid) VALUES ($1, $2)",
-            [promoCode.toUpperCase(), firebaseUid]
-        );
-        console.log(`[API /grant-free-games] Logged usage for code ${promoCode.toUpperCase()} by user ${firebaseUid}`);
+        // (مهم) يجب إضافة منطق لمنع استخدام نفس الكود المجاني عدة مرات هنا
 
-        await client.query('COMMIT'); // تأكيد جميع العمليات
-        
+        await client.query('COMMIT');
         console.log(`[API /grant-free-games] Granted ${gamesToGrant} games to UID: ${firebaseUid}. New balance: ${updatedUser.rows[0].games_balance}`);
         res.json({
             message: `تم إضافة ${gamesToGrant} ألعاب مجانية بنجاح!`,
@@ -204,26 +186,15 @@ router.post('/:firebaseUid/grant-free-games', verifyFirebaseToken, async (req, r
         });
 
     } catch (error) {
-        if (client) await client.query('ROLLBACK'); // تراجع عن العمليات في حالة حدوث أي خطأ
-        
-        // إذا كان الخطأ بسبب القيد الفريد (محاولة سريعة لاستخدام الكود مرتين)
-        if (error.code === '23505') { 
-            return res.status(409).json({ message: 'لقد استخدمت هذا الكود بالفعل.' });
-        }
-        
+        if (client) await client.query('ROLLBACK');
         console.error("[API /grant-free-games] Error for UID:", firebaseUid, error.stack);
         next(new Error("فشل في منح الألعاب المجانية. يرجى المحاولة مرة أخرى لاحقًا."));
     } finally {
         if (client) client.release();
     }
 });
-// =================================================================================
-// === نهاية التعديل ===
-// =================================================================================
-
 
 // ===== POST /api/user/:firebaseUid/deduct-game =====
-// لا تغييرات هنا، يبقى كما هو.
 router.post('/:firebaseUid/deduct-game', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
     console.log(`[API /deduct-game] Request to deduct game for UID: ${firebaseUid}`);
@@ -277,7 +248,6 @@ router.post('/:firebaseUid/deduct-game', verifyFirebaseToken, async (req, res, n
 });
 
 // ===== DELETE /api/user/:firebaseUid/delete-account =====
-// لا تغييرات هنا، يبقى كما هو.
 router.delete('/:firebaseUid/delete-account', verifyFirebaseToken, async (req, res, next) => {
     const { firebaseUid } = req.params;
     console.log(`[API /delete-account] Request to delete account for UID: ${firebaseUid}`);
@@ -287,6 +257,9 @@ router.delete('/:firebaseUid/delete-account', verifyFirebaseToken, async (req, r
     }
 
     try {
+        // في بيئة الإنتاج، قد ترغب في استخدام "soft delete" بدلاً من الحذف الفعلي،
+        // أو حذف البيانات المرتبطة في جداول أخرى ضمن معاملة.
+        // حاليًا، سيقوم ON DELETE CASCADE في جدول payment_logs بحذف السجلات المرتبطة.
         const result = await pool.query("DELETE FROM users WHERE firebase_uid = $1 RETURNING firebase_uid", [firebaseUid]);
         if (result.rowCount === 0) {
             console.warn(`[API /delete-account] User not found for deletion, UID: ${firebaseUid}, but proceeding as success from client's perspective.`);
