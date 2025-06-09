@@ -11,7 +11,7 @@ function parseBool(val) {
 // ===== GET /api/promos =====
 router.get('/', async (req, res, next) => {
     const sql = `
-        SELECT code, type, value, description, is_active, current_uses, created_at
+        SELECT code, type, value, description, is_active, created_at
         FROM promo_codes
         ORDER BY code
     `;
@@ -40,8 +40,8 @@ router.post('/', async (req, res, next) => {
     }
 
     const sql = `
-        INSERT INTO promo_codes (code, type, value, description, is_active, current_uses)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO promo_codes (code, type, value, description, is_active, created_at)
+        VALUES ($1, $2, $3, $4, $5, NOW())
         RETURNING *
     `;
     const params = [
@@ -49,8 +49,7 @@ router.post('/', async (req, res, next) => {
         type,
         valInt,
         description || null,
-        true,
-        0
+        true
     ];
 
     try {
@@ -109,7 +108,7 @@ router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
 
     try {
         const promoResult = await pool.query(
-            "SELECT code, type, value, is_active, current_uses, created_at FROM promo_codes WHERE code = $1 AND is_active = TRUE",
+            "SELECT code, type, value, is_active, created_at FROM promo_codes WHERE code = $1 AND is_active = TRUE",
             [promoCodeFromRequest]
         );
         if (promoResult.rows.length === 0) {
