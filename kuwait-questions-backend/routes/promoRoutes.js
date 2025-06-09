@@ -11,7 +11,7 @@ function parseBool(val) {
 // ===== GET /api/promos =====
 router.get('/', async (req, res, next) => {
     const sql = `
-        SELECT code, type, value, description, is_active, max_uses, current_uses, created_at
+        SELECT code, type, value, description, is_active, current_uses, created_at
         FROM promo_codes
         ORDER BY code
     `;
@@ -26,7 +26,7 @@ router.get('/', async (req, res, next) => {
 
 // ===== POST /api/promos =====
 router.post('/', async (req, res, next) => {
-    let { code, type, value, description, max_uses } = req.body;
+    let { code, type, value, description } = req.body;
 
     if (!code || !type || value == null) {
         return res.status(400).json({ message: 'Missing required fields: code, type, value.' });
@@ -34,15 +34,14 @@ router.post('/', async (req, res, next) => {
 
     const codeUpper = code.trim().toUpperCase();
     const valInt = parseInt(value, 10);
-    const maxUsesInt = parseInt(max_uses, 10) || 0;
 
     if (isNaN(valInt) || valInt <= 0) {
         return res.status(400).json({ message: 'Invalid value for discount.' });
     }
 
     const sql = `
-        INSERT INTO promo_codes (code, type, value, description, is_active, max_uses, current_uses)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO promo_codes (code, type, value, description, is_active, current_uses)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *
     `;
     const params = [
@@ -51,7 +50,6 @@ router.post('/', async (req, res, next) => {
         valInt,
         description || null,
         true,
-        maxUsesInt > 0 ? maxUsesInt : null,
         0
     ];
 
@@ -111,17 +109,13 @@ router.get('/validate/:code', verifyFirebaseToken, async (req, res, next) => {
 
     try {
         const promoResult = await pool.query(
-            "SELECT code, type, value, max_uses, current_uses, is_active, created_at FROM promo_codes WHERE code = $1 AND is_active = TRUE",
+            "SELECT code, type, value, is_active, current_uses, created_at FROM promo_codes WHERE code = $1 AND is_active = TRUE",
             [promoCodeFromRequest]
         );
         if (promoResult.rows.length === 0) {
             return res.status(404).json({ message: "كود الخصم غير صالح أو منتهي الصلاحية." });
         }
         const promo = promoResult.rows[0];
-
-        if (promo.max_uses > 0 && promo.current_uses >= promo.max_uses) {
-            return res.status(400).json({ message: "تم الوصول للحد الأقصى لاستخدام هذا الكود." });
-        }
 
         const usageCheckResult = await pool.query(
             "SELECT 1 FROM promo_code_usage WHERE promo_code_used = $1 AND user_firebase_uid = $2",
