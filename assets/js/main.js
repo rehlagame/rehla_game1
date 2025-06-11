@@ -86,9 +86,6 @@ const mainPlayButtonEl = document.querySelector('main.hero .btn-play');
 // --- Global State ---
 let isBackendProfileReady = false;
 
-// --- تم حذف دالة adjustMainContentPadding من هنا، script.js سيتعامل معها ---
-// --- وكذلك window.adjustMainContentPadding = adjustMainContentPadding; إذا كانت موجودة سابقاً ---
-
 
 // --- Helper Functions ---
 const showAuthError = (message, targetDiv = authErrorMessageDiv) => {
@@ -402,32 +399,26 @@ onAuthStateChanged(auth, async (user) => {
             window.location.href = 'auth.html';
         }
     }
-
-    // script.js سيتولى الآن مسؤولية استدعاء adjustMainContentPaddingLocal عند DOMContentLoaded و resize.
-    // لا حاجة لاستدعاء صريح هنا بعد الآن إذا كان script.js يُحمَّل بشكل صحيح.
 });
 
 // --- Profile Page (Logged.html) Logic ---
 async function setupProfilePage(user) {
-    const els = profilePageElements; // profilePageElements يجب أن يكون معرّفًا وفيها photoUploadInput محذوف
+    const els = profilePageElements;
 
-    if (!els.infoForm || !user) { // يمكنك إضافة els.userPhoto هنا إذا أردت التأكد من وجوده
+    if (!els.infoForm || !user) {
         console.warn("setupProfilePage: Missing elements or user object.");
         return;
     }
 
-    // 1. تعيين الصورة الرمزية الثابتة دائمًا
     if (els.userPhoto) {
-        els.userPhoto.src = 'assets/images/default-avatar.png'; // الصورة الرمزية الثابتة
+        els.userPhoto.src = 'assets/images/default-avatar.png';
     }
 
-    // 2. تعيين القيم الأولية من كائن Firebase Auth
     if (els.summaryName) els.summaryName.textContent = user.displayName || 'مستخدم رحلة';
     if (els.summaryEmail) els.summaryEmail.textContent = user.email;
-    if (els.emailInput) els.emailInput.value = user.email; // البريد الإلكتروني للقراءة فقط
+    if (els.emailInput) els.emailInput.value = user.email;
     if (els.displayNameInput) els.displayNameInput.value = user.displayName || '';
 
-    // 3. جلب تفاصيل إضافية من الخادم الخلفي إذا كان الملف الشخصي جاهزًا
     if (isBackendProfileReady) {
         try {
             const token = await getIdToken(user);
@@ -438,7 +429,6 @@ async function setupProfilePage(user) {
             if (!response.ok && response.status !== 404) {
                 const errorText = await response.text().catch(() => `فشل جلب تفاصيل الملف الشخصي (Code: SPP-BE-${response.status})`);
                 console.error(`Failed to fetch profile from backend (setupProfilePage): ${response.status} - ${errorText}`);
-                // استخدام بيانات Firebase كاحتياطي إذا فشل جلب البيانات من الخادم
                 const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
                 if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
                 if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
@@ -449,7 +439,7 @@ async function setupProfilePage(user) {
                 if (els.lastNameInput) els.lastNameInput.value = profileData.last_name || '';
                 if (profileData.phone) {
                     let fullPhone = profileData.phone;
-                    let countryCode = "+965"; // الافتراضي
+                    let countryCode = "+965";
                     let phoneNum = fullPhone;
                     const knownCodes = ["+965", "+966", "+971", "+973", "+974", "+968"];
                     for (const code of knownCodes) {
@@ -463,7 +453,6 @@ async function setupProfilePage(user) {
                     if (els.phoneInput) els.phoneInput.value = phoneNum;
                 }
                 if (els.displayNameInput && profileData.display_name) els.displayNameInput.value = profileData.display_name;
-                // لا يوجد تحديث لـ els.userPhoto.src من profileData.photo_url لأننا نريد صورة ثابتة
                 if (els.summaryName && profileData.display_name) els.summaryName.textContent = profileData.display_name;
             } else if (response.status === 404) {
                 console.warn(`[MainJS setupProfilePage] Profile for user ${user.uid} still not found in backend. Using Firebase data as fallback.`);
@@ -473,7 +462,6 @@ async function setupProfilePage(user) {
             }
         } catch (error) {
             console.error("Error in try-catch fetching/processing profile data (setupProfilePage):", error);
-            // استخدام بيانات Firebase كاحتياطي عند حدوث خطأ
             const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
             if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
             if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
@@ -484,10 +472,6 @@ async function setupProfilePage(user) {
         if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
         if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
     }
-
-    // 4. ربط مستمعي الأحداث (إذا لم يتم ربطهم من قبل)
-
-    // تم حذف الكود الخاص بـ els.photoUploadInput.addEventListener
 
     if (els.infoForm && !els.infoForm.dataset.listenerAttached) {
         els.infoForm.addEventListener('submit', async (e) => {
@@ -506,11 +490,8 @@ async function setupProfilePage(user) {
             }
 
             const updatedProfileDataForBackend = {
-                firstName: newFirstName,
-                lastName: newLastName,
-                displayName: newDisplayName,
+                firstName: newFirstName, lastName: newLastName, displayName: newDisplayName,
                 phone: newCountryCode && newPhone ? `${newCountryCode}${newPhone}` : null,
-                // لا نرسل photo_url لأننا لا نعدل الصورة
             };
 
             try {
@@ -549,14 +530,8 @@ async function setupProfilePage(user) {
             const newPassword = els.changePasswordForm['new-password'].value;
             const confirmNewPassword = els.changePasswordForm['confirm-new-password'].value;
 
-            if (newPassword !== confirmNewPassword) {
-                showAuthError("كلمتا المرور الجديدتان غير متطابقتين!", els.passwordChangeErrorDiv);
-                return;
-            }
-            if (newPassword.length < 6) {
-                showAuthError("كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل.", els.passwordChangeErrorDiv);
-                return;
-            }
+            if (newPassword !== confirmNewPassword) { showAuthError("كلمتا المرور الجديدتان غير متطابقتين!", els.passwordChangeErrorDiv); return; }
+            if (newPassword.length < 6) { showAuthError("كلمة المرور الجديدة يجب أن تكون 6 أحرف على الأقل.", els.passwordChangeErrorDiv); return; }
 
             try {
                 const credential = EmailAuthProvider.credential(auth.currentUser.email, currentPassword);
@@ -836,7 +811,6 @@ function setupPurchaseDropdown(userInstance) {
 // --- Header UI Update ---
 function updateHeaderUI(user) {
     if (!userActionsContainer) return;
-    // const headerElement = document.querySelector('header'); // لا حاجة لتعريفه هنا إذا لم نستخدمه مباشرة في هذه الدالة
 
     if (user) {
         const latestUser = auth.currentUser || user;
@@ -858,11 +832,6 @@ function updateHeaderUI(user) {
         userActionsContainer.innerHTML = `<a href="auth.html" class="btn btn-register">تسجيل / دخول</a>`;
         window.currentPurchaseDropdownSetup = null;
     }
-
-    // لم نعد بحاجة لاستدعاء adjustMainContentPadding صراحة من هنا،
-    // لأن script.js لديه مستمع لـ DOMContentLoaded و resize.
-    // إذا كان هناك تغيير في ارتفاع الهيدر بسبب تحديث محتواه هنا،
-    // فإن مستمع resize في script.js (الذي يراقب header) سيتولى الأمر.
 }
 
 
@@ -945,5 +914,3 @@ window.isUserBackendProfileReady = () => isBackendProfileReady;
 window.getUserGamesKey = getUserGamesKey;
 
 console.log("main.js loaded and updated. RENDER_API_BASE_URL is set to:", RENDER_API_BASE_URL);
-
-// --- تم حذف مستمع resize الخاص بـ adjustMainContentPadding من هنا، script.js سيتعامل معه ---
