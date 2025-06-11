@@ -52,7 +52,7 @@ router.post('/', async (req, res, next) => {
     const codeUpper     = code.trim().toUpperCase();
     const valInt        = parseInt(value, 10);
     // Convert boolean from request to boolean for DB (PostgreSQL BOOLEAN type)
-    const activeBool    = parseBool(is_active);
+    const activeBool    = (is_active === undefined) ? true : parseBool(is_active); // <-- هذا هو السطر المعدل
 
     if (isNaN(valInt) || valInt <= 0 || (type === 'percentage' && valInt > 100)) {
         return res.status(400).json({ message: 'Invalid value for discount.' });
