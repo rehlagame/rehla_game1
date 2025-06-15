@@ -371,4 +371,21 @@ main.auth-main-content {
     .social-login-divider::after { 
         width: 25%; /* تقليل العرض */
     }
+    /* --- START: أنماط جديدة في نهاية auth.css للتحكم بالزر المعطل --- */
+
+/* تعديل مظهر الزر الأساسي ليدعم التغييرات */
+.btn.btn-accent {
+    /* ... الأنماط الحالية للزر ... */
+    transition: background-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease; /* تأكد من وجود transition للشفافية */
+}
+
+/* هذا هو النمط المهم الذي سيتم تطبيقه عندما يكون الزر معطلاً */
+.btn.btn-accent:disabled {
+    background-color: var(--grey-color-light); /* لون رمادي فاتح */
+    color: var(--grey-color-dark); /* لون نص رمادي غامق */
+    cursor: not-allowed; /* تغيير شكل المؤشر للإشارة إلى عدم إمكانية النقر */
+    transform: none; /* إزالة أي تأثيرات تحريك */
+    opacity: 0.7; /* تقليل الشفافية لجعله يبدو باهتًا */
+}
+/* --- END: أنماط جديدة --- */
 }
