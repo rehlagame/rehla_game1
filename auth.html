@@ -1,5 +1,3 @@
---- START OF FILE auth.html ---
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -105,9 +103,9 @@
                             <input type="password" id="register-confirm-password" name="confirm_password" placeholder="أعد إدخال كلمة المرور" required>
                         </div>
 
-                        <!-- === START: الإضافة الجديدة === -->
-                        <div class="input-group terms-agreement" style="display: flex; align-items: center; gap: 8px; margin-top: 5px; margin-bottom: 20px;">
-                            <input type="checkbox" id="register-terms" name="terms" required style="width: auto; height: auto;">
+                        <!-- === START: تعديل قسم الشروط === -->
+                        <div class="input-group terms-agreement" style="display: flex; align-items: center; gap: 8px; margin-top: 5px; margin-bottom: 5px;">
+                            <input type="checkbox" id="register-terms" name="terms" style="width: auto; height: auto;">
                             <label for="register-terms" style="margin-bottom: 0; font-weight: normal; font-size: 0.8em;">
                                 أوافق على 
                                 <a href="terms.html" target="_blank" rel="noopener noreferrer" style="font-weight: bold; text-decoration: underline;">
@@ -115,7 +113,12 @@
                                 </a>
                             </label>
                         </div>
-                        <!-- === END: الإضافة الجديدة === -->
+                        
+                        <!-- هذا العنصر الجديد لعرض رسالة الخطأ الخاصة بالشروط -->
+                        <div id="terms-error" class="auth-error" style="display: none; font-size: 0.8em; margin-top: 0; margin-bottom: 15px;">
+                           يرجى الموافقة على الشروط والأحكام للمتابعة.
+                        </div>
+                        <!-- === END: تعديل قسم الشروط === -->
 
                         <button type="submit" class="btn btn-accent" id="register-submit-btn">إنشاء الحساب</button>
                     </form>
@@ -187,21 +190,34 @@
         const resetSuccessMessage = document.getElementById('reset-success-message');
         const errorMessageDiv = document.getElementById('auth-error-message');
         
-        // === START: الإضافة الجديدة للتحكم بزر التسجيل ===
+        // === START: تعديل منطق التحقق من الشروط ===
+        const registerEmailForm = document.getElementById('register-email-form');
         const termsCheckbox = document.getElementById('register-terms');
-        const registerSubmitBtn = document.getElementById('register-submit-btn');
+        const termsErrorDiv = document.getElementById('terms-error');
 
-        if (registerSubmitBtn && termsCheckbox) {
-            registerSubmitBtn.disabled = true; // تعطيل الزر افتراضياً
-            termsCheckbox.addEventListener('input', () => {
-                registerSubmitBtn.disabled = !termsCheckbox.checked;
+        // أزلنا الكود الذي يعطل الزر من هنا
+
+        if (registerEmailForm && termsCheckbox && termsErrorDiv) {
+            // أضفنا مستمع لحدث الإرسال الخاص بنموذج التسجيل
+            registerEmailForm.addEventListener('submit', (event) => {
+                // قم بإخفاء رسالة الخطأ الخاصة بالشروط في كل مرة يتم فيها محاولة الإرسال
+                termsErrorDiv.style.display = 'none';
+
+                // تحقق مما إذا كانت خانة الشروط غير محددة
+                if (!termsCheckbox.checked) {
+                    event.preventDefault(); // منع النموذج من الإرسال
+                    termsErrorDiv.style.display = 'block'; // إظهار رسالة الخطأ
+                }
             });
         }
-        // === END: الإضافة الجديدة ===
+        // === END: تعديل منطق التحقق من الشروط ===
+
 
         const hideMessages = () => {
             if (errorMessageDiv) errorMessageDiv.style.display = 'none';
             if (resetSuccessMessage) resetSuccessMessage.style.display = 'none';
+            // === إضافة: إخفاء رسالة خطأ الشروط عند تبديل النماذج ===
+            if (termsErrorDiv) termsErrorDiv.style.display = 'none';
         };
 
         if (showRegisterLink) {
