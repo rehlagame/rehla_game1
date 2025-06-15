@@ -1,3 +1,5 @@
+--- START OF FILE auth.html ---
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -102,7 +104,20 @@
                             <label for="register-confirm-password">تأكيد كلمة المرور</label>
                             <input type="password" id="register-confirm-password" name="confirm_password" placeholder="أعد إدخال كلمة المرور" required>
                         </div>
-                        <button type="submit" class="btn btn-accent">إنشاء الحساب</button>
+
+                        <!-- === START: الإضافة الجديدة === -->
+                        <div class="input-group terms-agreement" style="display: flex; align-items: center; gap: 8px; margin-top: 5px; margin-bottom: 20px;">
+                            <input type="checkbox" id="register-terms" name="terms" required style="width: auto; height: auto;">
+                            <label for="register-terms" style="margin-bottom: 0; font-weight: normal; font-size: 0.8em;">
+                                أوافق على 
+                                <a href="terms.html" target="_blank" rel="noopener noreferrer" style="font-weight: bold; text-decoration: underline;">
+                                    الشروط والأحكام وسياسة الخصوصية
+                                </a>
+                            </label>
+                        </div>
+                        <!-- === END: الإضافة الجديدة === -->
+
+                        <button type="submit" class="btn btn-accent" id="register-submit-btn">إنشاء الحساب</button>
                     </form>
                     <p class="switch-form">
                         لديك حساب بالفعل؟ <a href="#" class="show-login-trigger">تسجيل الدخول</a>
@@ -128,7 +143,7 @@
                     </p>
                 </div>
 
-               
+
             </div>
         </div>
     </div>
@@ -171,6 +186,18 @@
         const confirmPassword = document.getElementById('register-confirm-password');
         const resetSuccessMessage = document.getElementById('reset-success-message');
         const errorMessageDiv = document.getElementById('auth-error-message');
+        
+        // === START: الإضافة الجديدة للتحكم بزر التسجيل ===
+        const termsCheckbox = document.getElementById('register-terms');
+        const registerSubmitBtn = document.getElementById('register-submit-btn');
+
+        if (registerSubmitBtn && termsCheckbox) {
+            registerSubmitBtn.disabled = true; // تعطيل الزر افتراضياً
+            termsCheckbox.addEventListener('input', () => {
+                registerSubmitBtn.disabled = !termsCheckbox.checked;
+            });
+        }
+        // === END: الإضافة الجديدة ===
 
         const hideMessages = () => {
             if (errorMessageDiv) errorMessageDiv.style.display = 'none';
