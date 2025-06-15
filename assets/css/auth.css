@@ -99,8 +99,8 @@ main.auth-main-content {
     background-color: #fdfdff;
 }
 
-.input-group input::placeholder { 
-    color: #adb5bd; 
+.input-group input::placeholder {
+    color: #adb5bd;
 }
 
 .input-group input:focus,
@@ -205,46 +205,46 @@ main.auth-main-content {
     text-align: right;
 }
 
-.social-login-divider { 
-    text-align: center; 
+.social-login-divider {
+    text-align: center;
     margin: 20px 0; /* تقليل الهامش */
-    position: relative; 
-    color: var(--grey-color-dark); 
+    position: relative;
+    color: var(--grey-color-dark);
     font-size: 0.85em; /* تقليل حجم الخط */
 }
 
-.social-login-divider::before, 
-.social-login-divider::after { 
-    content: ''; 
-    position: absolute; 
-    top: 50%; 
-    width: 35%; 
-    height: 1px; 
-    background-color: var(--grey-color-light); 
+.social-login-divider::before,
+.social-login-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 35%;
+    height: 1px;
+    background-color: var(--grey-color-light);
 }
 
-.social-login-divider::before { 
-    right: 0; 
-    transform: translateY(-50%); 
+.social-login-divider::before {
+    right: 0;
+    transform: translateY(-50%);
 }
 
-.social-login-divider::after { 
-    left: 0; 
-    transform: translateY(-50%); 
+.social-login-divider::after {
+    left: 0;
+    transform: translateY(-50%);
 }
 
-.social-login-divider span { 
-    background-color: var(--white-color); 
-    padding: 0 10px; 
-    position: relative; 
-    z-index: 1; 
+.social-login-divider span {
+    background-color: var(--white-color);
+    padding: 0 10px;
+    position: relative;
+    z-index: 1;
 }
 
-.social-login-buttons { 
-    display: flex; 
-    justify-content: center; 
+.social-login-buttons {
+    display: flex;
+    justify-content: center;
     gap: 15px; /* تقليل المسافة */
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     margin-top: 10px; /* تقليل الهامش */
 }
 
@@ -264,25 +264,25 @@ main.auth-main-content {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.btn-social:hover { 
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15); 
+.btn-social:hover {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
 
-.social-icon { 
+.social-icon {
     width: 18px; /* تقليل الحجم */
-    height: 18px; 
+    height: 18px;
     margin-left: 6px; /* تقليل الهامش */
 }
 
-.btn-apple { 
-    background-color: var(--apple-btn-bg); 
-    color: var(--apple-btn-text); 
-    border-color: var(--apple-btn-bg); 
+.btn-apple {
+    background-color: var(--apple-btn-bg);
+    color: var(--apple-btn-text);
+    border-color: var(--apple-btn-bg);
 }
 
-.btn-apple:hover { 
-    background-color: #333333; 
-    border-color: #333333; 
+.btn-apple:hover {
+    background-color: #333333;
+    border-color: #333333;
 }
 
 .btn-social-img {
@@ -332,60 +332,43 @@ main.auth-main-content {
 }
 
 @media (max-width: 480px) {
-    main.auth-main-content { 
+    main.auth-main-content {
         padding: 20px 0 40px 0; /* تقليل الحشو أكثر */
         align-items: flex-start; /* محاذاة المحتوى للأعلى لتجنب التداخل مع الكيبورد */
     }
-    .auth-container { 
+    .auth-container {
         padding: 20px 15px; /* تقليل الحشو أكثر */
         max-width: 100%; /* جعل العرض يأخذ كامل المساحة المتاحة */
-        width: 95%; 
+        width: 95%;
         margin-top: 20px; /* إضافة هامش علوي لضمان الرؤية */
     }
-    .form-section h2 { 
+    .form-section h2 {
         font-size: 1.3em; /* تقليل حجم الخط */
         margin-bottom: 15px; /* تقليل الهامش */
     }
-    .btn.btn-accent { 
+    .btn.btn-accent {
         font-size: 0.95em; /* تقليل حجم الخط */
         padding: 9px 16px; /* تقليل الحشو */
     }
-    .btn-social { 
+    .btn-social {
         min-width: 100px; /* تقليل العرض الأدنى */
         font-size: 0.85em; /* تقليل حجم الخط */
         padding: 7px 10px; /* تقليل الحشو */
     }
-    .social-icon { 
+    .social-icon {
         width: 16px; /* تقليل الحجم */
-        height: 16px; 
+        height: 16px;
         margin-left: 5px; /* تقليل الهامش */
     }
-    .social-logo-img { 
+    .social-logo-img {
         height: 32px; /* تقليل الحجم */
         max-width: 110px; /* تقليل العرض */
     }
-    .social-login-buttons { 
+    .social-login-buttons {
         gap: 10px; /* تقليل المسافة */
     }
-    .social-login-divider::before, 
-    .social-login-divider::after { 
+    .social-login-divider::before,
+    .social-login-divider::after {
         width: 25%; /* تقليل العرض */
     }
-    /* --- START: أنماط جديدة في نهاية auth.css للتحكم بالزر المعطل --- */
-
-/* تعديل مظهر الزر الأساسي ليدعم التغييرات */
-.btn.btn-accent {
-    /* ... الأنماط الحالية للزر ... */
-    transition: background-color 0.3s ease, transform 0.2s ease, opacity 0.3s ease; /* تأكد من وجود transition للشفافية */
-}
-
-/* هذا هو النمط المهم الذي سيتم تطبيقه عندما يكون الزر معطلاً */
-.btn.btn-accent:disabled {
-    background-color: var(--grey-color-light); /* لون رمادي فاتح */
-    color: var(--grey-color-dark); /* لون نص رمادي غامق */
-    cursor: not-allowed; /* تغيير شكل المؤشر للإشارة إلى عدم إمكانية النقر */
-    transform: none; /* إزالة أي تأثيرات تحريك */
-    opacity: 0.7; /* تقليل الشفافية لجعله يبدو باهتًا */
-}
-/* --- END: أنماط جديدة --- */
 }
