@@ -10,9 +10,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <!-- لا حاجة لـ <style> لإخفاء الهيدر أو تعديل padding هنا بشكل خاص لهذه الصفحة -->
-    <!-- style.css و script.js سيتوليان ذلك بشكل عام -->
+    <style>
+        /* يمكن إضافة هذا النمط لضمان ظهور الرابط بشكل جيد */
+        .terms-agreement-link {
+            font-size: 0.9em;
+            color: var(--text-color-light, #555); /* استخدام متغير من style.css إذا كان متاحًا */
+            text-align: center;
+            margin-bottom: 15px; /* مسافة قبل زر إنشاء الحساب */
+            line-height: 1.5;
+        }
+        .terms-agreement-link a {
+            color: var(--primary-color, #2c3e50); /* استخدام متغير من style.css إذا كان متاحًا */
+            text-decoration: underline;
+        }
+        .terms-agreement-link a:hover {
+            color: var(--secondary-color, #3498db); /* استخدام متغير من style.css إذا كان متاحًا */
+        }
+    </style>
 </head>
 <body>
 
@@ -102,6 +116,15 @@
                             <label for="register-confirm-password">تأكيد كلمة المرور</label>
                             <input type="password" id="register-confirm-password" name="confirm_password" placeholder="أعد إدخال كلمة المرور" required>
                         </div>
+
+                        <!-- ===== بداية الإضافة المطلوبة ===== -->
+                        <p class="terms-agreement-link">
+                            بالتسجيل، أنت توافق على <a href="terms.html" target="_blank" rel="noopener noreferrer">الشروط والأحكام</a> و <a href="terms.html#privacy-policy" target="_blank" rel="noopener noreferrer">سياسة الخصوصية</a>.
+                            <br> <!-- سطر جديد إذا أردت فصل الجملتين -->
+                            <a href="terms.html" target="_blank" rel="noopener noreferrer">اضغط هنا للاطلاع على الشروط والأحكام كاملة.</a>
+                        </p>
+                        <!-- ===== نهاية الإضافة المطلوبة ===== -->
+
                         <button type="submit" class="btn btn-accent">إنشاء الحساب</button>
                     </form>
                     <p class="switch-form">
@@ -147,7 +170,7 @@
             </div>
         </div>
         <div class="footer-links-row">
-            <a href="terms.html" class="footer-text-link">Term and Conditions</a>
+            <a href="terms.html" class="footer-text-link">Term and Conditions & Privacy Policy</a> <!-- تم التعديل هنا ليكون الاسم كاملاً -->
              <span class="developer-credit-modern">
                 Created by <a href="https://olo-rehlas-projects.vercel.app/" target="_blank" rel="noopener noreferrer">OLO Tech Solutions</a>
             </span>
