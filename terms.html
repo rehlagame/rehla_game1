@@ -11,7 +11,104 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-        /* ... (نفس أنماط CSS السابقة) ... */
+        :root {
+            --primary-color: #2c3e50; /* لون أساسي - كحلي داكن */
+            --secondary-color: #3498db; /* لون ثانوي - أزرق فاتح */
+            --accent-color: #e67e22; /* لون مميز - برتقالي */
+            --white-color: #ffffff;
+            --black-color: #000000;
+            --text-color: #333333; /* لون النصوص الأساسي */
+            --text-color-light: #555555;
+            --bg-color: #f4f6f8; /* لون خلفية الصفحة */
+            --bg-color-alt: #ecf0f1; /* لون خلفية بديل */
+            --grey-color-light: #dddddd;
+            --grey-color-medium: #bbbbbb;
+            --danger-color: #e74c3c; /* لون للخطر أو التنبيهات الهامة */
+            --success-color: #2ecc71; /* لون للنجاح */
+        }
+        body {
+            font-family: 'Cairo', sans-serif;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        header {
+            background-color: var(--white-color);
+            padding: 15px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 a {
+            font-size: 2em;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 25px; /* RTL: margin-right */
+        }
+        [dir="rtl"] nav ul li {
+            margin-left: 0;
+            margin-right: 25px;
+        }
+
+
+        nav ul li a {
+            text-decoration: none;
+            color: var(--text-color-light);
+            font-weight: 400;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .user-actions .btn {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 700;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .user-actions .btn-register {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border: 1px solid var(--primary-color);
+        }
+        .user-actions .btn-register:hover {
+             background-color: var(--secondary-color);
+             border-color: var(--secondary-color);
+        }
+
         .terms-main-content {
             padding-bottom: 40px;
             background-color: var(--white-color);
@@ -31,6 +128,7 @@
             font-size: 2.5em;
             color: var(--primary-color);
             text-align: center;
+            margin-top: 40px;
             margin-bottom: 30px;
             border-bottom: 2px solid var(--accent-color);
             padding-bottom: 10px;
@@ -107,6 +205,85 @@
             margin-bottom: 20px;
             border-top: 1px dashed var(--grey-color-medium);
         }
+        footer {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            padding: 40px 0 20px 0;
+            text-align: center;
+        }
+
+        .footer-container-modern {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-icons-row {
+            display: flex;
+            justify-content: center; /* Center the two groups */
+            align-items: center;
+            width: 100%; /* Ensure it takes full width to center its content */
+            gap: 40px; /* Space between social media and app store icon groups */
+        }
+
+        .social-media-icons, .app-store-icons {
+            display: flex;
+            gap: 20px; /* Space between icons within a group */
+        }
+
+        .social-icon-link i, .app-icon-link i {
+            font-size: 1.8em; /* Larger icons */
+            color: var(--white-color);
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .social-icon-link:hover i, .app-icon-link:hover i {
+            color: var(--accent-color);
+            transform: translateY(-3px); /* Slight lift effect */
+        }
+
+        .footer-links-row {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+            justify-content: center;
+            align-items: center;
+            gap: 15px 30px; /* Vertical and horizontal gap */
+            margin-top: 10px;
+        }
+
+        .footer-text-link {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: color 0.3s ease;
+        }
+
+        .footer-text-link:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+
+        .developer-credit-modern {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .developer-credit-modern a {
+            color: var(--white-color); /* Make link stand out a bit */
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        .developer-credit-modern a:hover {
+            color: var(--accent-color);
+        }
+
+        .footer-copyright-row p {
+            font-size: 0.85em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 20px;
+            margin-bottom: 0;
+        }
 
 
         @media (max-width: 768px) {
@@ -115,6 +292,13 @@
             .terms-container h3 { font-size: 1.3em; }
             .terms-main-content { margin-top: 10px; padding-bottom: 20px; }
             .terms-container { padding: 0 15px; }
+
+            header .container { flex-direction: column; gap: 10px;}
+            nav ul { flex-direction: column; text-align: center; }
+            nav ul li { margin-right: 0; margin-bottom: 10px; }
+            .user-actions { margin-top: 10px; }
+
+            .footer-icons-row { flex-direction: column; gap: 20px; }
         }
     </style>
 </head>
@@ -141,7 +325,6 @@
 <main class="terms-main-content">
     <div class="terms-container">
         <h1>شروط وأحكام استخدام لعبة "رحلة"</h1>
-        <!-- ... (كامل قسم الشروط والأحكام باللغة العربية كما كان) ... -->
         <p>مرحباً بك في <strong>"رحلة" – لعبة الأسئلة العامة</strong> على الموقع الإلكتروني <a href="https://rehlagame.com" target="_blank" rel="noopener noreferrer">www.rehlagame.com</a>. قبل استخدامك لهذه اللعبة، يُرجى قراءة الشروط والأحكام التالية بعناية، حيث تُعد موافقتك على الدخول واستخدام اللعبة بمثابة قبول كامل لهذه الشروط:</p>
         <hr>
         <h2>1. وصف اللعبة والغرض منها</h2>
@@ -180,21 +363,58 @@
         <ul>
             <li>يمكن شراء محاولات اللعب أو الاشتراكات داخل اللعبة. يُحظر أي محاولة للتحايل على أنظمة الدفع أو استغلال الثغرات.</li>
             <li>في حالة وجود عروض ترويجية أو أكواد خصم، تخضع هذه لاشتراطات صلاحية محددة ولا تضمن صلاحيتها بعد انتهاء المدة.</li>
+            <li>عند تسجيل المستخدم لأول مرة، يحصل على لعبة مجانية واحدة كمحاولة تجريبية.</li>
         </ul>
         <hr>
-        <h2>7. حماية البيانات والخصوصية</h2>
+        <!-- ****** بداية إضافة الشروط الجديدة ****** -->
+        <h2>7. سياسات البيع، التوصيل، الاستبدال، والإلغاء والاسترداد</h2>
+        <p>تنطبق هذه السياسات على شراء محاولات اللعب الإضافية في منصة "رحلة".</p>
+        <h3>أ. سياسة البيع (Sales Policy)</h3>
+        <ul>
+            <li><strong>المنتج المُباع:</strong> يقر العميل بأنه يشتري "محاولات لعب" أو "رصيد ألعاب"، وهو منتج رقمي غير ملموس يُضاف إلى حسابه الشخصي داخل منصة "رحلة" ويُمكّنه من المشاركة في الألعاب المتاحة.</li>
+            <li><strong>الأسعار والباقات:</strong> جميع أسعار باقات محاولات اللعب (مثل: لعبة واحدة مقابل 1 دينار كويتي، 5 ألعاب مقابل 4 دنانير كويتية، إلخ) معلنة بوضوح على الموقع قبل إتمام عملية الشراء. تحتفظ "رحلة" بالحق في تعديل الأسعار والباقات في أي وقت، على أن تطبق الأسعار الجديدة على عمليات الشراء اللاحقة للتعديل.</li>
+            <li><strong>العملة المعتمدة:</strong> جميع المعاملات المالية وعرض الأسعار تتم حصراً بالدينار الكويتي (KWD).</li>
+        </ul>
+
+        <h3>ب. سياسة التوصيل (Delivery Policy)</h3>
+        <ul>
+            <li><strong>آلية التوصيل:</strong> يتم "توصيل" محاولات اللعب بإضافتها بشكل فوري وآلي إلى رصيد حساب المستخدم المسجل في منصة "رحلة" بمجرد تأكيد نجاح عملية الدفع الإلكتروني.</li>
+            <li><strong>في حال عدم الإضافة:</strong> في حال تم خصم المبلغ من حساب العميل ولم تتم إضافة محاولات اللعب إلى رصيده بسبب خلل تقني، يرجى التواصل الفوري مع فريق الدعم الفني عبر البريد الإلكتروني <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a>، مع تزويدنا برقم العملية وتفاصيل الحساب لمراجعة الحالة ومعالجتها في أقرب وقت ممكن.</li>
+        </ul>
+
+        <h3>ج. سياسة الاستبدال والإلغاء (Exchange & Cancellation Policy)</h3>
+        <ul>
+            <li><strong>طبيعة المنتج:</strong> محاولات اللعب هي منتج رقمي مخصص للاستخدام الفردي داخل اللعبة، ويعتبر مستهلكاً بمجرد استخدامه في بدء جولة لعب.</li>
+            <li><strong>عدم قابلية الاستبدال أو الإلغاء:</strong> بمجرد إتمام عملية شراء محاولات اللعب وإضافتها بنجاح إلى حساب المستخدم، لا يمكن استبدالها بأي منتج آخر أو إلغاء عملية الشراء أو استرجاع قيمتها، إلا وفقاً لما هو منصوص عليه في سياسة استرداد الأموال أدناه.</li>
+        </ul>
+
+        <h3>د. سياسة استرداد الأموال (Refund Policy)</h3>
+        <ul>
+            <li><strong>القاعدة العامة (عدم الاسترداد):</strong> نظراً لطبيعة المنتج الرقمي (محاولات اللعب) والذي يتم تسليمه فورياً وإضافته إلى حساب المستخدم، فإن جميع المبالغ المدفوعة تعتبر نهائية وغير قابلة للاسترداد.</li>
+            <li><strong>الاستثناءات (حالات الاسترداد المحدودة):</strong> يتم النظر في طلبات الاسترداد فقط في الحالات النادرة التالية، ووفقاً لتقدير إدارة "رحلة" وحدها:
+                <ul>
+                    <li><strong>خطأ تقني من جانب المنصة:</strong> إذا تم خصم المبلغ من العميل بسبب خلل تقني مثبت في نظام "رحلة"، ولم تتم إضافة محاولات اللعب، وتعذر على فريق الدعم حل المشكلة بإضافة المحاولات يدوياً خلال فترة زمنية معقولة (تحددها إدارة "رحلة").</li>
+                    <li><strong>عملية شراء مكررة عن طريق الخطأ:</strong> إذا قام النظام بمعالجة وخصم قيمة نفس باقة محاولات اللعب مرتين متتاليتين من حساب العميل عن طريق الخطأ الفني البحت من النظام لنفس الطلب.</li>
+                </ul>
+            </li>
+            <li><strong>آلية طلب الاسترداد (للحالات الاستثنائية):</strong> لتقديم طلب استرداد في إحدى الحالات الاستثنائية المذكورة أعلاه، يجب على العميل التواصل مع فريق الدعم عبر البريد الإلكتروني <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> خلال مدة أقصاها 24 ساعة من وقت حدوث العملية، مع تقديم كافة الإثباتات اللازمة (مثل رقم العملية، كشف حساب بنكي يوضح الخصم، وتفاصيل الحساب). سيتم مراجعة الطلب والرد عليه خلال مدة عمل معقولة.</li>
+        </ul>
+        <hr>
+        <!-- ****** نهاية إضافة الشروط الجديدة ****** -->
+
+        <h2>8. حماية البيانات والخصوصية</h2> <!-- تم تغيير الرقم من 7 إلى 8 -->
         <p>نحن نأخذ خصوصيتك على محمل الجد. لمزيد من التفاصيل حول كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك، يرجى الرجوع إلى <a href="#privacy-policy">سياسة الخصوصية</a> الخاصة بنا أدناه.</p>
         <hr>
-        <h2>8. حدود المسؤولية</h2>
+        <h2>9. حدود المسؤولية</h2> <!-- تم تغيير الرقم من 8 إلى 9 -->
         <ul>
             <li>لا تضمن اللعبة توافر الخدمة بشكل دائم، وقد تكون هناك أوقات توقف مؤقت للصيانة أو التحديث.</li>
             <li>لا تتحمل اللعبة أو مطورها أي خسائر مالية أو معنوية قد تنشأ نتيجة توقف الخدمة أو أخطاء فنية أو محتوى غير دقيق.</li>
         </ul>
         <hr>
-        <h2>9. القانون الواجب التطبيق</h2>
+        <h2>10. القانون الواجب التطبيق</h2> <!-- تم تغيير الرقم من 9 إلى 10 -->
         <p>تخضع هذه الشروط وتُفسر وفقاً لقوانين <strong>دولة الكويت</strong>، وفي حالة وجود أي نزاع، تكون <strong>الجهات القضائية الكويتية</strong> هي المختصة حصرياً.</p>
         <hr>
-        <h2>10. قبول الشروط</h2>
+        <h2>11. قبول الشروط</h2> <!-- تم تغيير الرقم من 10 إلى 11 -->
         <p>باستخدامك للعبة "رحلة"، فإنك تقر أنك قرأت وفهمت هذه الشروط وتوافق عليها بالكامل. إذا لم توافق على أي جزء من هذه الشروط، يرجى التوقف فوراً عن استخدام اللعبة.</p>
 
         <hr style="margin-top: 50px; margin-bottom: 50px; border-style: dashed;">
@@ -213,7 +433,7 @@
                 <li><strong>لتوفير وتشغيل اللعبة:</strong> لإنشاء وإدارة حسابك، تمكينك من اللعب، وتتبع تقدمك ونقاطك.</li>
                 <li><strong>لتخصيص تجربتك:</strong> قد نستخدم المعلومات لفهم تفضيلاتك وتقديم محتوى أو عروض قد تهمك (بموافقتك حيثما يقتضي القانون).</li>
                 <li><strong>للتواصل معك:</strong> لإرسال إشعارات مهمة حول حسابك، تحديثات اللعبة، أو تغييرات في الشروط والسياسات. قد نرسل أيضًا مواد تسويقية إذا وافقت على ذلك.</li>
-                <li><strong>لتقديم الدعم الفني:</strong> لمساعدتك في حل المشكلات التي قد تواجهها.</li>
+                <li><strong>لتقديم الدعم الفني:</strong> لمساعدتك في حل المشكلات التي قد تواجهها عبر <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a>.</li>
                 <li><strong>لتحسين خدماتنا:</strong> لتحليل كيفية استخدام اللعبة، تحديد الاتجاهات، وإجراء تحسينات على الميزات والأداء.</li>
             </ul>
             <h3>3. مشاركة المعلومات</h3>
@@ -238,7 +458,7 @@
                 <li>طلب حذف معلوماتك الشخصية (مع مراعاة بعض الاستثناءات القانونية أو التشغيلية).</li>
                 <li>الاعتراض على أو تقييد معالجة معينة لمعلوماتك.</li>
             </ul>
-            لممارسة هذه الحقوق، يرجى التواصل معنا عبر معلومات الاتصال المتوفرة في صفحة "تواصل معنا".
+            لممارسة هذه الحقوق، يرجى التواصل معنا عبر البريد الإلكتروني <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> أو معلومات الاتصال المتوفرة في صفحة "تواصل معنا".
             </p>
             <h3>9. معلومات إضافية</h3>
             <ul>
@@ -251,10 +471,110 @@
             <h3>11. قبول سياسة الخصوصية</h3>
             <p>باستخدامك للعبة "رحلة"، فإنك توافق على جمع واستخدام المعلومات وفقًا لهذه السياسة. إذا كنت لا توافق على أي جزء من هذه السياسة، يُرجى عدم استخدام اللعبة.</p>
             <h3>12. معلومات الاتصال</h3>
-            <p>إذا كان لديك أي أسئلة حول سياسة الخصوصية هذه، يرجى التواصل معنا عبر صفحة <a href="contact.html">"تواصل معنا"</a>.</p>
+            <p>إذا كان لديك أي أسئلة حول سياسة الخصوصية هذه، يرجى التواصل معنا عبر البريد الإلكتروني <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> أو صفحة <a href="contact.html">"تواصل معنا"</a>.</p>
+        </section> <!-- نهاية قسم سياسة الخصوصية العربية -->
 
-            <!-- English Version -->
-            <div class="language-separator"></div>
+        <!-- English Version -->
+        <div class="language-separator"></div>
+
+        <!-- بداية قسم الشروط والأحكام باللغة الإنجليزية -->
+        <h1 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px; font-size: 2.5em; color: var(--primary-color); text-align: left; margin-bottom: 30px; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px;">
+            Terms and Conditions of Use for "Rehla" Game
+        </h1>
+        <p class="english-text">Welcome to <strong>"Rehla" – The General Knowledge Game</strong> on the website <a href="https://rehlagame.com" target="_blank" rel="noopener noreferrer">www.rehlagame.com</a>. Before using this game, please read the following terms and conditions carefully, as your access and use of the game constitute full acceptance of these terms:</p>
+        <hr>
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">1. Game Description and Purpose</h2>
+        <p class="english-text">"Rehla" is a general knowledge quiz game aimed at providing an entertaining and educational experience for users by posing diverse questions about Kuwait and other general information.</p>
+        <div class="disclaimer" style="border-right:none; border-left: 5px solid var(--danger-color); direction:ltr;">
+            <p class="english-text"><strong>Important Disclaimer:</strong> A significant portion of this game's content, including but not limited to questions, answers, and information provided, has been developed with the assistance of artificial intelligence tools. Although we strive to ensure the accuracy and reliability of the information, we acknowledge that the game may contain unintentional errors, inaccurate information, or outdated data. We make no express or implied warranties regarding the completeness, accuracy, reliability, suitability, or availability of the information and content in the game for any purpose.</p>
+        </div>
+        <hr>
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">2. Intellectual Property and Copyright</h2>
+        <ul class="english-list">
+            <li>All rights are reserved to the site owner and the original developer of the game.</li>
+            <li>Copying, redistributing, or modifying any part of the game's content, including questions, design, and programming, without prior written permission is prohibited.</li>
+            <li>The game's logo, interface design, databases, and gameplay mechanics are protected under local and international intellectual property laws.</li>
+        </ul>
+        <hr>
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">3. Account and Registration</h2>
+        <ul class="english-list">
+            <li>To use some game features, users may be required to create an account using an email address or third-party login methods (such as Google or Apple).</li>
+            <li>Users commit to providing accurate and complete information upon registration and maintaining the confidentiality of their login credentials.</li>
+            <li>Any activity conducted through an account will be the sole responsibility of the account holder, and the game administration reserves the right to suspend or delete offending accounts without prior notice.</li>
+        </ul>
+        <hr>
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">4. Permitted Use</h2>
+        <ul class="english-list">
+            <li>The game is permitted for personal and entertainment purposes only.</li>
+            <li>Using the game or any part of it for commercial purposes, formal educational purposes, or on other platforms without official permission from the game owner is prohibited.</li>
+        </ul>
+        <hr>
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">5. Modifications and Updates</h2>
+        <ul class="english-list">
+            <li>The game developer reserves the right to modify or update content, questions, or gameplay without prior notice.</li>
+            <li>Prices, subscription features, or payment methods may change at any time according to the administration's vision.</li>
+        </ul>
+        <hr>
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">6. Fair Use and Payment Policy</h2>
+        <ul class="english-list">
+            <li>Play attempts or subscriptions can be purchased within the game. Any attempt to circumvent payment systems or exploit vulnerabilities is prohibited.</li>
+            <li>In the case of promotional offers or discount codes, these are subject to specific validity conditions and their validity is not guaranteed after the period ends.</li>
+            <li>Upon first registration, the user receives one free game as a trial attempt.</li>
+        </ul>
+        <hr>
+        <!-- ****** Start of new English policies ****** -->
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">7. Sales, Delivery, Exchange, Cancellation, and Refund Policies</h2>
+        <p class="english-text">These policies apply to the purchase of additional play attempts on the "Rehla" platform.</p>
+        <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">A. Sales Policy</h3>
+        <ul class="english-list">
+            <li><strong>Product Sold:</strong> The customer acknowledges purchasing "play attempts" or "game credits," which are non-tangible digital products added to their personal account within the "Rehla" platform, enabling participation in available games.</li>
+            <li><strong>Prices and Packages:</strong> All prices for play attempt packages (e.g., one game for 1 KWD, 5 games for 4 KWD, etc.) are clearly stated on the website before completing the purchase. "Rehla" reserves the right to modify prices and packages at any time, with new prices applying to purchases made after the modification.</li>
+            <li><strong>Currency:</strong> All financial transactions and price displays are exclusively in Kuwaiti Dinar (KWD).</li>
+        </ul>
+
+        <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">B. Delivery Policy</h3>
+        <ul class="english-list">
+            <li><strong>Delivery Mechanism:</strong> Play attempts are "delivered" by being immediately and automatically added to the registered user's account balance on the "Rehla" platform upon confirmation of a successful electronic payment.</li>
+            <li><strong>In Case of Non-Addition:</strong> If the amount is debited from the customer's account and play attempts are not added to their balance due to a technical glitch, please contact technical support immediately via email at <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a>, providing the transaction number and account details to review and resolve the issue as soon as possible.</li>
+        </ul>
+
+        <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">C. Exchange & Cancellation Policy</h3>
+        <ul class="english-list">
+            <li><strong>Nature of Product:</strong> Play attempts are digital products intended for single use within the game and are considered consumed once used to start a game round.</li>
+            <li><strong>Non-Exchangeable/Non-Cancellable:</strong> Once play attempts are purchased and successfully added to the user's account, they cannot be exchanged for any other product, nor can the purchase be canceled or its value refunded, except as stipulated in the Refund Policy below.</li>
+        </ul>
+
+        <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">D. Refund Policy</h3>
+        <ul class="english-list">
+            <li><strong>General Rule (No Refunds):</strong> Due to the digital nature of play attempts, which are delivered instantly and added to the user's account, all payments made are considered final and non-refundable.</li>
+            <li><strong>Exceptions (Limited Refund Cases):</strong> Refund requests will only be considered in the following rare cases, at the sole discretion of "Rehla" management:
+                <ul class="english-list" style="padding-left: 20px;"> <!-- Nested list -->
+                    <li><strong>Technical Error by the Platform:</strong> If the amount was debited from the customer due to a proven technical fault in the "Rehla" system, play attempts were not added, and support was unable to resolve the issue by manually adding the attempts within a reasonable timeframe (determined by "Rehla" management).</li>
+                    <li><strong>Duplicate Purchase Error:</strong> If the system mistakenly processed and debited the value of the same play attempt package twice consecutively from the customer's account for the same order due to a purely technical system error.</li>
+                </ul>
+            </li>
+            <li><strong>Refund Request Mechanism (for exceptional cases):</strong> To request a refund in one of the exceptional cases mentioned above, the customer must contact support via email at <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> within a maximum of 24 hours from the time of the transaction, providing all necessary proof (such as transaction number, bank statement showing the debit, and account details). The request will be reviewed and responded to within a reasonable working period.</li>
+        </ul>
+        <hr>
+        <!-- ****** End of new English policies ****** -->
+
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">8. Data Protection and Privacy</h2> <!-- Renumbered -->
+        <p class="english-text">We take your privacy seriously. For more details on how we collect, use, and protect your information, please refer to our <a href="#privacy-policy-en">Privacy Policy</a> below.</p>
+        <hr>
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">9. Limitation of Liability</h2> <!-- Renumbered -->
+        <ul class="english-list">
+            <li>The game does not guarantee continuous service availability, and there may be temporary downtimes for maintenance or updates.</li>
+            <li>Neither the game nor its developer shall be liable for any financial or moral losses that may arise from service interruption, technical errors, or inaccurate content.</li>
+        </ul>
+        <hr>
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">10. Governing Law</h2> <!-- Renumbered -->
+        <p class="english-text">These terms shall be governed and construed in accordance with the laws of the <strong>State of Kuwait</strong>. In the event of any dispute, the <strong>Kuwaiti judicial authorities</strong> shall have exclusive jurisdiction.</p>
+        <hr>
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">11. Acceptance of Terms</h2> <!-- Renumbered -->
+        <p class="english-text">By using the "Rehla" game, you acknowledge that you have read, understood, and agree to these terms in their entirety. If you do not agree with any part of these terms, please cease using the game immediately.</p>
+        <!-- نهاية قسم الشروط والأحكام باللغة الإنجليزية -->
+
+        <section id="privacy-policy-en" style="margin-top: 50px;"> <!-- Added -en to id for uniqueness -->
             <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">Privacy Policy</h2>
             <p class="english-text">At "Rehla", we highly value your privacy. This policy explains how we collect, use, and protect your information when you use our game and services.</p>
 
@@ -270,7 +590,7 @@
                 <li><strong>To Provide and Operate the Game:</strong> To create and manage your account, enable you to play, and track your progress and scores.</li>
                 <li><strong>To Personalize Your Experience:</strong> We may use information to understand your preferences and offer content or promotions that may interest you (with your consent where required by law).</li>
                 <li><strong>To Communicate With You:</strong> To send important notifications about your account, game updates, or changes to terms and policies. We may also send marketing materials if you consent.</li>
-                <li><strong>To Provide Technical Support:</strong> To help you resolve issues you may encounter.</li>
+                <li><strong>To Provide Technical Support:</strong> To help you resolve issues you may encounter via <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a>.</li>
                 <li><strong>To Improve Our Services:</strong> To analyze how the game is used, identify trends, and make improvements to features and performance.</li>
             </ul>
 
@@ -301,7 +621,7 @@
                 <li>Request deletion of your personal information (subject to certain legal or operational exceptions).</li>
                 <li>Object to or restrict certain processing of your information.</li>
             </ul>
-            To exercise these rights, please contact us via the contact information provided on our "Contact Us" page.
+            To exercise these rights, please contact us via email at <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> or the contact information provided on our "Contact Us" page.
             </p>
 
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">9. Additional Information</h3>
@@ -318,7 +638,7 @@
             <p class="english-text">By using the "Rehla" game, you consent to the collection and use of information in accordance with this policy. If you do not agree to any part of this policy, please do not use the game.</p>
 
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">12. Contact Information</h3>
-            <p class="english-text">If you have any questions about this Privacy Policy, please contact us via our <a href="contact.html">"Contact Us"</a> page.</p>
+            <p class="english-text">If you have any questions about this Privacy Policy, please contact us via email at <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> or our <a href="contact.html">"Contact Us"</a> page.</p>
         </section>
 
     </div>
@@ -337,7 +657,7 @@
             </div>
         </div>
         <div class="footer-links-row">
-            <a href="terms.html" class="footer-text-link">Term and Conditions & Privacy Policy</a> <!-- تم تعديل الرابط هنا -->
+            <a href="terms.html" class="footer-text-link">Term and Conditions & Privacy Policy</a>
              <span class="developer-credit-modern">
                 Created by <a href="https://olo-rehlas-projects.vercel.app/" target="_blank" rel="noopener noreferrer">OLO Tech Solutions</a>
             </span>
