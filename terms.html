@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>شروط وأحكام وسياسة خصوصية لعبة رحلة</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css"> <!-- الاعتماد على هذا الملف للهيدر والفوتر -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
+        /* :root وال body يمكن أن تبقى هنا إذا كانت هناك تخصيصات طفيفة للصفحة،
+           أو يمكن نقلها بالكامل إلى style.css إذا كانت عامة تمامًا.
+           للحفاظ على أنماط محتوى الصفحة الفريدة، سنبقيها هنا مؤقتاً. */
         :root {
             --primary-color: #2c3e50; /* لون أساسي - كحلي داكن */
             --secondary-color: #3498db; /* لون ثانوي - أزرق فاتح */
@@ -29,90 +32,16 @@
         body {
             font-family: 'Cairo', sans-serif;
             margin: 0;
-            background-color: var(--bg-color);
+            background-color: var(--bg-color); /* قد يأتي هذا من style.css أيضاً */
             color: var(--text-color);
             line-height: 1.6;
         }
 
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-
-        header {
-            background-color: var(--white-color);
-            padding: 15px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        header .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo h1 a {
-            font-size: 2em;
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-        nav ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-        }
-
-        nav ul li {
-            margin-left: 25px; /* RTL: margin-right */
-        }
-        [dir="rtl"] nav ul li {
-            margin-left: 0;
-            margin-right: 25px;
-        }
-
-
-        nav ul li a {
-            text-decoration: none;
-            color: var(--text-color-light);
-            font-weight: 400;
-            transition: color 0.3s ease;
-        }
-
-        nav ul li a:hover, nav ul li a.active {
-            color: var(--primary-color);
-            font-weight: 700;
-        }
-
-        .user-actions .btn {
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: 700;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .user-actions .btn-register {
-            background-color: var(--primary-color);
-            color: var(--white-color);
-            border: 1px solid var(--primary-color);
-        }
-        .user-actions .btn-register:hover {
-             background-color: var(--secondary-color);
-             border-color: var(--secondary-color);
-        }
-
+        /* أنماط خاصة بمحتوى صفحة الشروط والأحكام فقط */
         .terms-main-content {
             padding-bottom: 40px;
             background-color: var(--white-color);
-            margin-top: 20px;
+            margin-top: 20px; /* يمكن تعديله أو أخذه من style.css إذا كان هناك main padding عام */
             margin-bottom: 40px;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
@@ -121,14 +50,24 @@
         .terms-container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 0 25px;
+            padding: 0 25px; /* الهوامش الداخلية للمحتوى */
         }
+
+        /* هذا الـ container قد يكون معرفاً بشكل عام في style.css */
+        /* إذا كان كذلك، يمكن إزالة التعريف التالي إذا سبب تضارب */
+        .container { /* تعريف عام للحاوية، قد يكون موجودًا في style.css */
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px; /* هذا قد يؤثر على الهيدر إذا لم يكن padding الهيدر مضبوطاً بشكل جيد في style.css */
+        }
+
 
         .terms-container h1 {
             font-size: 2.5em;
             color: var(--primary-color);
             text-align: center;
-            margin-top: 40px;
+            margin-top: 40px; /* مسافة من الهيدر أو بداية المحتوى */
             margin-bottom: 30px;
             border-bottom: 2px solid var(--accent-color);
             padding-bottom: 10px;
@@ -163,17 +102,16 @@
             padding-right: 25px;
             margin-bottom: 20px;
         }
-        .terms-container ul.english-list { /* تنسيق خاص للقائمة الإنجليزية */
-            padding-right: 0; /* إزالة الحشوة اليمنى */
-            padding-left: 25px; /* إضافة حشوة يسرى */
-            direction: ltr; /* ضبط اتجاه النص لليسار */
-            text-align: left; /* ضبط محاذاة النص لليسار */
+        .terms-container ul.english-list {
+            padding-right: 0;
+            padding-left: 25px;
+            direction: ltr;
+            text-align: left;
         }
          .terms-container p.english-text, .terms-container ul.english-list li {
             direction: ltr;
             text-align: left;
         }
-
 
         .terms-container hr {
             border: 0;
@@ -200,111 +138,30 @@
         .disclaimer strong {
             color: var(--danger-color);
         }
-        .language-separator { /* فاصل بين اللغتين */
+        .language-separator {
             margin-top: 40px;
             margin-bottom: 20px;
             border-top: 1px dashed var(--grey-color-medium);
         }
-        footer {
-            background-color: var(--primary-color);
-            color: var(--white-color);
-            padding: 40px 0 20px 0;
-            text-align: center;
-        }
 
-        .footer-container-modern {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .footer-icons-row {
-            display: flex;
-            justify-content: center; /* Center the two groups */
-            align-items: center;
-            width: 100%; /* Ensure it takes full width to center its content */
-            gap: 40px; /* Space between social media and app store icon groups */
-        }
-
-        .social-media-icons, .app-store-icons {
-            display: flex;
-            gap: 20px; /* Space between icons within a group */
-        }
-
-        .social-icon-link i, .app-icon-link i {
-            font-size: 1.8em; /* Larger icons */
-            color: var(--white-color);
-            transition: color 0.3s ease, transform 0.3s ease;
-        }
-
-        .social-icon-link:hover i, .app-icon-link:hover i {
-            color: var(--accent-color);
-            transform: translateY(-3px); /* Slight lift effect */
-        }
-
-        .footer-links-row {
-            display: flex;
-            flex-wrap: wrap; /* Allow wrapping on smaller screens */
-            justify-content: center;
-            align-items: center;
-            gap: 15px 30px; /* Vertical and horizontal gap */
-            margin-top: 10px;
-        }
-
-        .footer-text-link {
-            color: var(--white-color);
-            text-decoration: none;
-            font-size: 0.95em;
-            transition: color 0.3s ease;
-        }
-
-        .footer-text-link:hover {
-            color: var(--accent-color);
-            text-decoration: underline;
-        }
-
-        .developer-credit-modern {
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        .developer-credit-modern a {
-            color: var(--white-color); /* Make link stand out a bit */
-            text-decoration: underline;
-            font-weight: bold;
-        }
-        .developer-credit-modern a:hover {
-            color: var(--accent-color);
-        }
-
-        .footer-copyright-row p {
-            font-size: 0.85em;
-            color: rgba(255, 255, 255, 0.7);
-            margin-top: 20px;
-            margin-bottom: 0;
-        }
-
+        /* --- الأنماط المتعلقة بالهيدر والفوتر تم حذفها من هنا --- */
+        /* --- ستعتمد الصفحة الآن على assets/css/style.css لهذه العناصر --- */
 
         @media (max-width: 768px) {
+            /* أنماط خاصة بمحتوى الشروط عند تصغير الشاشة */
             .terms-container h1 { font-size: 2em; }
             .terms-container h2 { font-size: 1.6em; }
             .terms-container h3 { font-size: 1.3em; }
             .terms-main-content { margin-top: 10px; padding-bottom: 20px; }
             .terms-container { padding: 0 15px; }
 
-            header .container { flex-direction: column; gap: 10px;}
-            nav ul { flex-direction: column; text-align: center; }
-            nav ul li { margin-right: 0; margin-bottom: 10px; }
-            .user-actions { margin-top: 10px; }
-
-            .footer-icons-row { flex-direction: column; gap: 20px; }
+            /* أنماط الهيدر والفوتر المتجاوبة يجب أن تكون في style.css */
         }
     </style>
 </head>
 <body>
 
-<header>
+<header> <!-- سيعتمد على الأنماط من style.css -->
     <div class="container">
         <div class="logo">
             <h1><a href="index.html">رحلة</a></h1>
@@ -324,6 +181,7 @@
 
 <main class="terms-main-content">
     <div class="terms-container">
+        <!-- ... محتوى الشروط والأحكام والخصوصية باللغتين كما كان ... -->
         <h1>شروط وأحكام استخدام لعبة "رحلة"</h1>
         <p>مرحباً بك في <strong>"رحلة" – لعبة الأسئلة العامة</strong> على الموقع الإلكتروني <a href="https://rehlagame.com" target="_blank" rel="noopener noreferrer">www.rehlagame.com</a>. قبل استخدامك لهذه اللعبة، يُرجى قراءة الشروط والأحكام التالية بعناية، حيث تُعد موافقتك على الدخول واستخدام اللعبة بمثابة قبول كامل لهذه الشروط:</p>
         <hr>
@@ -366,7 +224,6 @@
             <li>عند تسجيل المستخدم لأول مرة، يحصل على لعبة مجانية واحدة كمحاولة تجريبية.</li>
         </ul>
         <hr>
-        <!-- ****** بداية إضافة الشروط الجديدة ****** -->
         <h2>7. سياسات البيع، التوصيل، الاستبدال، والإلغاء والاسترداد</h2>
         <p>تنطبق هذه السياسات على شراء محاولات اللعب الإضافية في منصة "رحلة".</p>
         <h3>أ. سياسة البيع (Sales Policy)</h3>
@@ -400,27 +257,26 @@
             <li><strong>آلية طلب الاسترداد (للحالات الاستثنائية):</strong> لتقديم طلب استرداد في إحدى الحالات الاستثنائية المذكورة أعلاه، يجب على العميل التواصل مع فريق الدعم عبر البريد الإلكتروني <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> خلال مدة أقصاها 24 ساعة من وقت حدوث العملية، مع تقديم كافة الإثباتات اللازمة (مثل رقم العملية، كشف حساب بنكي يوضح الخصم، وتفاصيل الحساب). سيتم مراجعة الطلب والرد عليه خلال مدة عمل معقولة.</li>
         </ul>
         <hr>
-        <!-- ****** نهاية إضافة الشروط الجديدة ****** -->
-
-        <h2>8. حماية البيانات والخصوصية</h2> <!-- تم تغيير الرقم من 7 إلى 8 -->
+        <h2>8. حماية البيانات والخصوصية</h2>
         <p>نحن نأخذ خصوصيتك على محمل الجد. لمزيد من التفاصيل حول كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك، يرجى الرجوع إلى <a href="#privacy-policy">سياسة الخصوصية</a> الخاصة بنا أدناه.</p>
         <hr>
-        <h2>9. حدود المسؤولية</h2> <!-- تم تغيير الرقم من 8 إلى 9 -->
+        <h2>9. حدود المسؤولية</h2>
         <ul>
             <li>لا تضمن اللعبة توافر الخدمة بشكل دائم، وقد تكون هناك أوقات توقف مؤقت للصيانة أو التحديث.</li>
             <li>لا تتحمل اللعبة أو مطورها أي خسائر مالية أو معنوية قد تنشأ نتيجة توقف الخدمة أو أخطاء فنية أو محتوى غير دقيق.</li>
         </ul>
         <hr>
-        <h2>10. القانون الواجب التطبيق</h2> <!-- تم تغيير الرقم من 9 إلى 10 -->
+        <h2>10. القانون الواجب التطبيق</h2>
         <p>تخضع هذه الشروط وتُفسر وفقاً لقوانين <strong>دولة الكويت</strong>، وفي حالة وجود أي نزاع، تكون <strong>الجهات القضائية الكويتية</strong> هي المختصة حصرياً.</p>
         <hr>
-        <h2>11. قبول الشروط</h2> <!-- تم تغيير الرقم من 10 إلى 11 -->
+        <h2>11. قبول الشروط</h2>
         <p>باستخدامك للعبة "رحلة"، فإنك تقر أنك قرأت وفهمت هذه الشروط وتوافق عليها بالكامل. إذا لم توافق على أي جزء من هذه الشروط، يرجى التوقف فوراً عن استخدام اللعبة.</p>
 
         <hr style="margin-top: 50px; margin-bottom: 50px; border-style: dashed;">
 
         <section id="privacy-policy">
             <h2>سياسة الخصوصية</h2>
+            <!-- ... محتوى سياسة الخصوصية العربية كما كان ... -->
             <p>نحن في "رحلة" نولي أهمية كبيرة لخصوصيتك. توضح هذه السياسة كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك الشخصية عند استخدامك للعبتنا وخدماتنا.</p>
             <h3>1. المعلومات التي نجمعها</h3>
             <ul>
@@ -472,15 +328,14 @@
             <p>باستخدامك للعبة "رحلة"، فإنك توافق على جمع واستخدام المعلومات وفقًا لهذه السياسة. إذا كنت لا توافق على أي جزء من هذه السياسة، يُرجى عدم استخدام اللعبة.</p>
             <h3>12. معلومات الاتصال</h3>
             <p>إذا كان لديك أي أسئلة حول سياسة الخصوصية هذه، يرجى التواصل معنا عبر البريد الإلكتروني <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> أو صفحة <a href="contact.html">"تواصل معنا"</a>.</p>
-        </section> <!-- نهاية قسم سياسة الخصوصية العربية -->
+        </section>
 
-        <!-- English Version -->
         <div class="language-separator"></div>
 
-        <!-- بداية قسم الشروط والأحكام باللغة الإنجليزية -->
         <h1 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px; font-size: 2.5em; color: var(--primary-color); text-align: left; margin-bottom: 30px; border-bottom: 2px solid var(--accent-color); padding-bottom: 10px;">
             Terms and Conditions of Use for "Rehla" Game
         </h1>
+        <!-- ... محتوى الشروط والأحكام الإنجليزية كما كان ... -->
         <p class="english-text">Welcome to <strong>"Rehla" – The General Knowledge Game</strong> on the website <a href="https://rehlagame.com" target="_blank" rel="noopener noreferrer">www.rehlagame.com</a>. Before using this game, please read the following terms and conditions carefully, as your access and use of the game constitute full acceptance of these terms:</p>
         <hr>
         <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">1. Game Description and Purpose</h2>
@@ -522,7 +377,6 @@
             <li>Upon first registration, the user receives one free game as a trial attempt.</li>
         </ul>
         <hr>
-        <!-- ****** Start of new English policies ****** -->
         <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">7. Sales, Delivery, Exchange, Cancellation, and Refund Policies</h2>
         <p class="english-text">These policies apply to the purchase of additional play attempts on the "Rehla" platform.</p>
         <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">A. Sales Policy</h3>
@@ -548,7 +402,7 @@
         <ul class="english-list">
             <li><strong>General Rule (No Refunds):</strong> Due to the digital nature of play attempts, which are delivered instantly and added to the user's account, all payments made are considered final and non-refundable.</li>
             <li><strong>Exceptions (Limited Refund Cases):</strong> Refund requests will only be considered in the following rare cases, at the sole discretion of "Rehla" management:
-                <ul class="english-list" style="padding-left: 20px;"> <!-- Nested list -->
+                <ul class="english-list" style="padding-left: 20px;">
                     <li><strong>Technical Error by the Platform:</strong> If the amount was debited from the customer due to a proven technical fault in the "Rehla" system, play attempts were not added, and support was unable to resolve the issue by manually adding the attempts within a reasonable timeframe (determined by "Rehla" management).</li>
                     <li><strong>Duplicate Purchase Error:</strong> If the system mistakenly processed and debited the value of the same play attempt package twice consecutively from the customer's account for the same order due to a purely technical system error.</li>
                 </ul>
@@ -556,35 +410,31 @@
             <li><strong>Refund Request Mechanism (for exceptional cases):</strong> To request a refund in one of the exceptional cases mentioned above, the customer must contact support via email at <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> within a maximum of 24 hours from the time of the transaction, providing all necessary proof (such as transaction number, bank statement showing the debit, and account details). The request will be reviewed and responded to within a reasonable working period.</li>
         </ul>
         <hr>
-        <!-- ****** End of new English policies ****** -->
-
-        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">8. Data Protection and Privacy</h2> <!-- Renumbered -->
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">8. Data Protection and Privacy</h2>
         <p class="english-text">We take your privacy seriously. For more details on how we collect, use, and protect your information, please refer to our <a href="#privacy-policy-en">Privacy Policy</a> below.</p>
         <hr>
-        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">9. Limitation of Liability</h2> <!-- Renumbered -->
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">9. Limitation of Liability</h2>
         <ul class="english-list">
             <li>The game does not guarantee continuous service availability, and there may be temporary downtimes for maintenance or updates.</li>
             <li>Neither the game nor its developer shall be liable for any financial or moral losses that may arise from service interruption, technical errors, or inaccurate content.</li>
         </ul>
         <hr>
-        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">10. Governing Law</h2> <!-- Renumbered -->
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">10. Governing Law</h2>
         <p class="english-text">These terms shall be governed and construed in accordance with the laws of the <strong>State of Kuwait</strong>. In the event of any dispute, the <strong>Kuwaiti judicial authorities</strong> shall have exclusive jurisdiction.</p>
         <hr>
-        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">11. Acceptance of Terms</h2> <!-- Renumbered -->
+        <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">11. Acceptance of Terms</h2>
         <p class="english-text">By using the "Rehla" game, you acknowledge that you have read, understood, and agree to these terms in their entirety. If you do not agree with any part of these terms, please cease using the game immediately.</p>
-        <!-- نهاية قسم الشروط والأحكام باللغة الإنجليزية -->
 
-        <section id="privacy-policy-en" style="margin-top: 50px;"> <!-- Added -en to id for uniqueness -->
+        <section id="privacy-policy-en" style="margin-top: 50px;">
             <h2 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">Privacy Policy</h2>
+            <!-- ... محتوى سياسة الخصوصية الإنجليزية كما كان ... -->
             <p class="english-text">At "Rehla", we highly value your privacy. This policy explains how we collect, use, and protect your information when you use our game and services.</p>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">1. Information We Collect</h3>
             <ul class="english-list">
                 <li><strong>Registration Information:</strong> When you create an account, we may collect information such as your name (if provided), email address, and password (hashed). If you register via a third-party service (like Google or Apple), we may receive basic profile information you've agreed to share with that service.</li>
                 <li><strong>Usage Information:</strong> We may collect non-personal information about how you interact with the game, such as pages visited, features used, game duration, and errors that may occur. This is done to improve the game experience.</li>
                 <li><strong>Device Information:</strong> We may collect basic information about your device, operating system, and browser for compatibility and technical support purposes.</li>
             </ul>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">2. How We Use Information</h3>
             <ul class="english-list">
                 <li><strong>To Provide and Operate the Game:</strong> To create and manage your account, enable you to play, and track your progress and scores.</li>
@@ -593,26 +443,20 @@
                 <li><strong>To Provide Technical Support:</strong> To help you resolve issues you may encounter via <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a>.</li>
                 <li><strong>To Improve Our Services:</strong> To analyze how the game is used, identify trends, and make improvements to features and performance.</li>
             </ul>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">3. Information Sharing</h3>
             <ul class="english-list">
                 <li><strong>No Sale or Sharing for Commercial Purposes:</strong> We do not sell or share your personal information with third parties for their direct marketing purposes without your explicit consent.</li>
                 <li><strong>Service Providers:</strong> We may share your information with third-party service providers who help us operate the game (e.g., hosting services, data analytics, payment processing). These are contractually obligated to protect your information and use it only for the services they provide to us.</li>
                 <li><strong>Legal Requirements:</strong> We may disclose your information if required by law, court order, or in response to a legitimate government request.</li>
             </ul>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">4. Usage Analytics</h3>
             <p class="english-text">We may use internal or third-party analytics tools (like Google Analytics) to collect information about how players use the game. This data is collected anonymously or in an aggregated form, is not directly linked to your personal identity, and is used for improving the game and understanding user behavior.</p>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">5. Information Security</h3>
             <p class="english-text">We take reasonable technical, organizational, and administrative security measures to protect your personal information from unauthorized access, use, modification, disclosure, or destruction. However, no method of transmission over the Internet or electronic storage is 100% secure, so we cannot guarantee absolute security.</p>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">6. Cookies and Similar Technologies</h3>
             <p class="english-text">We may use cookies and similar tracking technologies to enhance user experience, remember your preferences, analyze site usage, and for security purposes. You can control cookies through your browser settings.</p>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">7. Third-Party Links</h3>
             <p class="english-text">The game or our website may contain links to other sites or services that we do not operate. If you click on a third-party link, you will be directed to that third party's site. We strongly advise you to review the privacy policy of every site you visit. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.</p>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">8. User Rights</h3>
             <p class="english-text">You have the right to:
             <ul class="english-list">
@@ -623,20 +467,16 @@
             </ul>
             To exercise these rights, please contact us via email at <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> or the contact information provided on our "Contact Us" page.
             </p>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">9. Additional Information</h3>
             <ul class="english-list">
                 <li>The game may contain in-app purchases to buy additional play attempts or other features. These payments are processed through secure payment gateways.</li>
                 <li>The application does not currently contain third-party advertisements.</li>
                 <li>The application does not use advanced tracking methods for the purpose of targeting you with personalized ads outside of our direct services.</li>
             </ul>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">10. Changes to This Privacy Policy</h3>
             <p class="english-text">We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new policy on this page and/or through other communication channels. We encourage you to review this policy periodically for any updates.</p>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">11. Acceptance of This Policy</h3>
             <p class="english-text">By using the "Rehla" game, you consent to the collection and use of information in accordance with this policy. If you do not agree to any part of this policy, please do not use the game.</p>
-
             <h3 dir="ltr" style="text-align:left; border-right: none; border-left: 4px solid var(--primary-color); padding-left: 10px;">12. Contact Information</h3>
             <p class="english-text">If you have any questions about this Privacy Policy, please contact us via email at <a href="mailto:rehlagame@gmail.com">rehlagame@gmail.com</a> or our <a href="contact.html">"Contact Us"</a> page.</p>
         </section>
@@ -644,7 +484,7 @@
     </div>
 </main>
 
-<footer>
+<footer> <!-- سيعتمد على الأنماط من style.css -->
     <div class="container footer-container-modern">
         <div class="footer-icons-row">
             <div class="social-media-icons">
