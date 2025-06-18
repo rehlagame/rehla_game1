@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>نجاح عملية الدفع - لعبة رحلة</title>
+    <link rel="stylesheet" href="assets/css/style.css"> <!-- ملف الأنماط العام -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--bg-color-light, #f8f9fa);
+        }
+        .payment-status-main {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .status-container {
+            background-color: var(--white-color, #fff);
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            max-width: 550px;
+            width: 100%;
+            animation: fadeInScaleUp 0.5s ease-out forwards;
+        }
+        @keyframes fadeInScaleUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .status-icon {
+            font-size: 5em; /* حجم كبير للأيقونة */
+            color: var(--success-color, #28a745);
+            margin-bottom: 25px;
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .status-container h1 {
+            font-size: 2.2em;
+            color: var(--text-color, #343a40);
+            margin-bottom: 15px;
+        }
+        .status-container p {
+            font-size: 1.1em;
+            color: var(--grey-color-dark, #6c757d);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        .status-container .reference-info {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .status-actions .btn {
+            margin: 10px 5px;
+            padding: 12px 30px;
+            font-size: 1.05em;
+            border-radius: 25px;
+        }
+        .btn-primary-action {
+            background-color: var(--primary-color, #17a2b8);
+            color: var(--white-color, #fff);
+        }
+        .btn-primary-action:hover {
+            background-color: var(--secondary-color, #138496);
+        }
+        .btn-secondary-action {
+            background-color: transparent;
+            color: var(--primary-color, #17a2b8);
+            border: 2px solid var(--primary-color, #17a2b8);
+        }
+        .btn-secondary-action:hover {
+            background-color: var(--primary-color, #17a2b8);
+            color: var(--white-color, #fff);
+        }
+
+        /* التجاوبية */
+        @media (max-width: 600px) {
+            .status-container { padding: 30px 20px; }
+            .status-icon { font-size: 4em; margin-bottom: 20px;}
+            .status-container h1 { font-size: 1.8em; }
+            .status-container p { font-size: 1em; }
+            .status-actions .btn { width: 100%; margin: 8px 0; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="logo"><h1><a href="index.html">رحلة</a></h1></div>
+        <nav>
+            <ul>
+                <li><a href="game.html">العب</a></li>
+                <li><a href="how-to-play.html">طريقة اللعب</a></li>
+                <li><a href="contact.html">تواصل معنا</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <!-- سيتم ملؤه بواسطة main.js -->
+            <a href="auth.html" class="btn btn-register">تسجيل / دخول</a>
+        </div>
+    </div>
+</header>
+
+<main class="payment-status-main">
+    <div class="status-container">
+        <div class="status-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1>تمت عملية الدفع بنجاح!</h1>
+        <p id="payment-result-message">
+            شكرًا لك! تم إضافة رصيد الألعاب إلى حسابك. استعد لرحلة ممتعة مليئة بالتحديات والمعرفة.
+        </p>
+        <p class="reference-info" id="payment-ref" style="display: none;">رقم المرجع: </p>
+        <div class="status-actions">
+            <a href="game.html" class="btn btn-primary-action">ابدأ اللعب الآن</a>
+            <a href="index.html" class="btn btn-secondary-action">العودة للرئيسية</a>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container footer-container-modern">
+        <div class="footer-icons-row">
+            <div class="social-media-icons">
+                <a href="https://www.instagram.com/rehlagame?igsh=MW1haWtleXRqcWo0MA%3D%3D&utm_source=qr" class="social-icon-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@rehlagame" class="social-icon-link" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <div class="app-store-icons">
+                <a href="#" class="app-icon-link" aria-label="Get it on Google Play"><i class="fab fa-android"></i></a>
+                <a href="#" class="app-icon-link" aria-label="Download on the App Store"><i class="fab fa-apple"></i></a>
+            </div>
+        </div>
+        <div class="footer-links-row">
+            <a href="terms.html" class="footer-text-link">Term and Conditions & Privacy Policy</a>
+            <span class="developer-credit-modern">
+                Created by <a href="https://olo-rehlas-projects.vercel.app/" target="_blank" rel="noopener noreferrer">OLO Tech Solutions</a>
+            </span>
+        </div>
+        <div class="footer-copyright-row">
+            <p>Copyright Rehla - All Rights Reserved 2025 <sup>®</sup></p>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/main.js" type="module"></script>
+<script src="assets/js/script.js" defer></script>
+</body>
+</html>
