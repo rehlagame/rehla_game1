@@ -8,10 +8,10 @@ const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 
 // --- إعدادات Tap Payments (يتم تحميلها من ملف .env) ---
-// استخدام أسماء المتغيرات كما هي في ملف .env المحدث
-const TAP_SECRET_KEY = process.env.TAP_SECRET_KEY;
+const TAP_SECRET_KEY = process.env.TAP_SECRET_KEY; // يستخدم هذا الآن لتوقيع الـ hashstring
 const TAP_API_BASE_URL = process.env.TAP_API_BASE_URL || 'https://api.tap.company/v2';
-const TAP_WEBHOOK_SIGNATURE_KEY = process.env.TAP_WEBHOOK_SIGNATURE_KEY; // !! يجب أن يكون هذا مفتاح توقيع الـ Webhook الاختباري الفعلي !!
+// لم نعد بحاجة إلى TAP_WEBHOOK_SIGNATURE_KEY بشكل منفصل إذا كان هو نفسه الـ SECRET_KEY
+// وإذا كان Tap يستخدم الـ SECRET_KEY للتحقق من الـ hashstring
 
 const APP_FRONTEND_URL = process.env.APP_FRONTEND_URL || 'https://rehlagame.com';
 const BACKEND_URL_FOR_WEBHOOKS = process.env.BACKEND_URL;
@@ -20,15 +20,24 @@ const BACKEND_URL_FOR_WEBHOOKS = process.env.BACKEND_URL;
 if (!TAP_SECRET_KEY || TAP_SECRET_KEY.includes('DUMMYKEY')) {
     console.error("خطأ فادح: TAP_SECRET_KEY (الاختباري) غير مهيأ بشكل صحيح في متغيرات البيئة!");
 }
-if (!TAP_WEBHOOK_SIGNATURE_KEY || TAP_WEBHOOK_SIGNATURE_KEY.includes('DUMMYSECRETKEY')) {
-    console.warn("تحذير: TAP_WEBHOOK_SIGNATURE_KEY (الاختباري) غير مهيأ بشكل صحيح. التحقق من الـ Webhook سيفشل أو سيكون غير آمن. الرجاء إضافته من لوحة تحكم Tap.");
-}
 if (!BACKEND_URL_FOR_WEBHOOKS) {
     console.warn("تحذير: BACKEND_URL غير مهيأ. عنوان URL للـ Webhook قد يكون غير صحيح.");
 }
 
+// --- Helper function to format amount based on currency (as per Tap docs example) ---
+// This is a simplified version. For production, use a proper library for currency formatting.
+function formatAmountForHashing(amount, currency) {
+    const currencyDecimals = {
+        KWD: 3, BHD: 3, OMR: 3, // 3 decimal places
+        SAR: 2, AED: 2, QAR: 2, USD: 2, EUR: 2, GBP: 2, EGP: 2 // 2 decimal places
+    };
+    const decimals = currencyDecimals[currency.toUpperCase()] !== undefined ? currencyDecimals[currency.toUpperCase()] : 2;
+    return parseFloat(amount).toFixed(decimals);
+}
+
 
 // ===== POST /api/payment/initiate-tap-payment =====
+// ... (لا تغييرات هنا، الكود الحالي صحيح)
 router.post('/initiate-tap-payment', verifyFirebaseToken, async (req, res, next) => {
     const { amount, currency, packageName, gamesInPackage, customerName, customerEmail, appliedPromoCode } = req.body;
     const firebaseUid = req.user.uid;
@@ -42,7 +51,6 @@ router.post('/initiate-tap-payment', verifyFirebaseToken, async (req, res, next)
     if (!packageName || typeof gamesInPackage !== 'number' || gamesInPackage <= 0) {
         return res.status(400).json({ message: 'تفاصيل الباقة غير صالحة.' });
     }
-    // التحقق من TAP_SECRET_KEY الصحيح
     if (!TAP_SECRET_KEY || TAP_SECRET_KEY.includes('DUMMYKEY')) {
         console.error("[API /initiate-tap-payment] مفتاح Tap السري الاختباري غير مهيأ بشكل صحيح. لا يمكن المتابعة.");
         return res.status(500).json({ message: "خطأ في تهيئة بوابة الدفع." });
@@ -143,8 +151,8 @@ router.post('/initiate-tap-payment', verifyFirebaseToken, async (req, res, next)
     }
 });
 
-
 // ===== GET /api/payment/payment-callback =====
+// ... (لا تغييرات هنا، الكود الحالي صحيح)
 router.get('/payment-callback', async (req, res) => {
     const { tap_id, localInvoiceId, dbLogId } = req.query;
     const gatewayChargeIdFromCallback = tap_id;
@@ -242,43 +250,75 @@ router.get('/payment-callback', async (req, res) => {
 
 // ===== POST /api/payment/webhook/tap =====
 router.post('/webhook/tap', async (req, res, next) => {
-    const rawBody = req.rawBody;
-    const webhookData = req.body;
-    const tapSignature = req.headers['x-tap-signature'];
+    console.log('[API Tap Webhook] ALL INCOMING HEADERS:', JSON.stringify(req.headers, null, 2));
 
-    console.log(`[API Tap Webhook] Received. Signature: ${tapSignature}, Parsed Body:`, JSON.stringify(webhookData, null, 2));
+    const webhookData = req.body; // الجسم الخام لم يعد ضروريًا بهذه الطريقة
+    const receivedHashstring = req.headers['hashstring']; // Header الصحيح من Tap
 
-    if (!TAP_WEBHOOK_SIGNATURE_KEY || TAP_WEBHOOK_SIGNATURE_KEY.includes('DUMMYSECRETKEY')) {
-        console.error("[API Tap Webhook] TAP_WEBHOOK_SIGNATURE_KEY is not properly configured. Cannot verify webhook. REJECTING.");
-        return res.status(500).send('Webhook configuration error (missing or dummy signature key).');
+    console.log(`[API Tap Webhook] Received. Hashstring from header: ${receivedHashstring}, Parsed Body:`, JSON.stringify(webhookData, null, 2));
+
+    if (!TAP_SECRET_KEY || TAP_SECRET_KEY.includes('DUMMYKEY')) {
+        console.error("[API Tap Webhook] TAP_SECRET_KEY is not properly configured. Cannot verify webhook. REJECTING.");
+        return res.status(500).send('Webhook configuration error (missing secret key).');
     }
-    if (!tapSignature) {
-        console.warn('[API Tap Webhook] X-TAP-SIGNATURE header missing.');
-        return res.status(400).send('Missing signature header.');
+
+    if (!receivedHashstring) {
+        console.warn('[API Tap Webhook] "hashstring" header missing. Cannot verify.');
+        return res.status(400).send('Missing hashstring header.');
     }
-    if (!rawBody) {
-        console.error('[API Tap Webhook] Raw request body (req.rawBody) unavailable. Cannot verify signature. Ensure express.json() is configured correctly in server.js.');
-        return res.status(500).send('Server configuration error (rawBody unavailable).');
+
+    // استخراج الحقول اللازمة للـ hash من جسم الـ webhookData
+    // يجب أن تتطابق هذه الحقول وترتيبها مع ما هو موثق من Tap لنوع الحدث (Charge)
+    let id, amount, currency, gateway_reference, payment_reference, status, created_timestamp;
+
+    if (webhookData.object === 'charge') {
+        id = webhookData.id;
+        amount = webhookData.amount; // Tap يتوقع هذا الرقم بالفعل بالتنسيق الصحيح
+        currency = webhookData.currency;
+        gateway_reference = webhookData.reference?.gateway;
+        payment_reference = webhookData.reference?.payment;
+        status = webhookData.status;
+        created_timestamp = webhookData.transaction?.created; // يجب أن يكون هذا timestamp
+    } else {
+        console.warn(`[API Tap Webhook] Received webhook for unhandled object type: ${webhookData.object}`);
+        return res.status(400).send(`Unhandled webhook object type: ${webhookData.object}`);
     }
+    
+    // التحقق من وجود جميع الحقول الضرورية قبل بناء السلسلة
+    if ([id, amount, currency, status, created_timestamp].some(val => val === undefined || val === null) || 
+        (webhookData.object === 'charge' && (gateway_reference === undefined || payment_reference === undefined))) {
+        console.error('[API Tap Webhook] Missing one or more required fields for hashstring calculation from webhook body:', {id, amount, currency, gateway_reference, payment_reference, status, created_timestamp});
+        return res.status(400).send('Webhook body missing required fields for hashstring.');
+    }
+
+    // بناء السلسلة النصية للـ hash كما هو موضح في وثائق Tap لـ Charge
+    // x_id{charge.id}x_amount{charge.amount}x_currency{charge.currency}x_gateway_reference{charge.reference.gateway}x_payment_reference{charge.reference.payment}x_status{charge.status}x_created{charge.transaction.created}
+    const formattedAmount = formatAmountForHashing(amount, currency); // استخدام الدالة المساعدة
+    const toBeHashedString = `x_id${id}x_amount${formattedAmount}x_currency${currency}x_gateway_reference${gateway_reference}x_payment_reference${payment_reference}x_status${status}x_created${created_timestamp}`;
+    
+    console.log(`[API Tap Webhook] String to be hashed: "${toBeHashedString}"`);
 
     try {
-        const expectedSignature = crypto
-            .createHmac('sha256', TAP_WEBHOOK_SIGNATURE_KEY)
-            .update(rawBody.toString('utf8'))
+        const calculatedHashstring = crypto
+            .createHmac('sha256', TAP_SECRET_KEY) // استخدام TAP_SECRET_KEY
+            .update(toBeHashedString)
             .digest('hex');
 
-        if (!crypto.timingSafeEqual(Buffer.from(tapSignature), Buffer.from(expectedSignature))) {
-            console.warn('[API Tap Webhook] Invalid signature. Received:', tapSignature, 'Expected (calculated):', expectedSignature);
-            return res.status(403).send('Invalid signature.');
+        console.log(`[API Tap Webhook] Calculated hashstring: ${calculatedHashstring}`);
+
+        if (calculatedHashstring !== receivedHashstring) {
+            console.warn('[API Tap Webhook] Invalid hashstring. Received:', receivedHashstring, 'Calculated:', calculatedHashstring);
+            return res.status(403).send('Invalid hashstring.');
         }
-        console.log('[API Tap Webhook] Signature verified successfully.');
+        console.log('[API Tap Webhook] Hashstring verified successfully.');
     } catch (sigError) {
-        console.error('[API Tap Webhook] Error during signature verification process:', sigError);
-        return res.status(500).send('Error during signature verification process.');
+        console.error('[API Tap Webhook] Error during hashstring verification process:', sigError);
+        return res.status(500).send('Error during hashstring verification process.');
     }
 
-    const gatewayChargeId = webhookData.id;
-    const gatewayChargeStatus = webhookData.status;
+    // --- بقية منطق معالجة الـ Webhook (كما كان، مع بعض التعديلات الطفيفة للتأكد من الحصول على البيانات) ---
+    const gatewayChargeId = webhookData.id; // هذا هو id من webhookData
+    const gatewayChargeStatus = webhookData.status; // status من webhookData
     const metadata = webhookData.metadata || {};
     const dbLogIdFromMeta = metadata.db_log_id;
     const firebaseUidFromMeta = metadata.firebase_uid;
@@ -290,8 +330,9 @@ router.post('/webhook/tap', async (req, res, next) => {
 
     const client = await pool.connect();
     try {
+        // ... (المنطق المتبقي كما هو، تأكد فقط أنك تستخدم المتغيرات الصحيحة من webhookData)
         if (!effectiveDbLogId || !effectiveFirebaseUid || typeof effectiveGamesToGrant !== 'number') {
-            console.log(`[API Tap Webhook] Metadata incomplete. Attempting lookup for charge ID: ${gatewayChargeId}`);
+            console.log(`[API Tap Webhook] Metadata incomplete from webhook. Attempting lookup for charge ID: ${gatewayChargeId}`);
             const logRes = await client.query(
                 'SELECT id, user_firebase_uid, games_in_package FROM payment_logs WHERE gateway_invoice_id = $1 ORDER BY created_at DESC LIMIT 1',
                 [gatewayChargeId]
@@ -302,17 +343,19 @@ router.post('/webhook/tap', async (req, res, next) => {
                 effectiveGamesToGrant = parseInt(logRes.rows[0].games_in_package, 10);
                 console.log(`[API Tap Webhook] Found log from DB: dbLogId=${effectiveDbLogId}, uid=${effectiveFirebaseUid}, games=${effectiveGamesToGrant}`);
             } else {
-                console.warn(`[API Tap Webhook] No payment_log found for gateway_invoice_id: ${gatewayChargeId} (after signature verification).`);
-                return res.status(200).send('Webhook processed: Log entry not found for this charge ID.');
+                console.warn(`[API Tap Webhook] No payment_log found for gateway_invoice_id: ${gatewayChargeId}. Cannot process webhook further.`);
+                return res.status(200).send('Webhook processed: Log entry not found for this charge ID, cannot fulfill.');
             }
         }
 
         if (!effectiveDbLogId || !effectiveFirebaseUid || typeof effectiveGamesToGrant !== 'number' || effectiveGamesToGrant <= 0) {
-            console.error(`[API Tap Webhook] Invalid log data. dbLogId: ${effectiveDbLogId}, uid: ${effectiveFirebaseUid}, games: ${effectiveGamesToGrant}`);
-            await client.query(
-                "UPDATE payment_logs SET status = 'ERROR_INVALID_LOG_DATA_WEBHOOK', gateway_response_webhook = $1, error_message = $2, updated_at = NOW() WHERE gateway_invoice_id = $3 OR id = $4",
-                [webhookData, `Invalid log data. DBLogID: ${effectiveDbLogId}, UID: ${effectiveFirebaseUid}, Games: ${effectiveGamesToGrant}`, gatewayChargeId, effectiveDbLogId || null]
-            );
+            console.error(`[API Tap Webhook] Invalid or incomplete log data after lookup. dbLogId: ${effectiveDbLogId}, uid: ${effectiveFirebaseUid}, games: ${effectiveGamesToGrant}`);
+            if(effectiveDbLogId) {
+                await client.query(
+                    "UPDATE payment_logs SET status = 'ERROR_INVALID_LOG_DATA_WEBHOOK', gateway_response_webhook = $1, error_message = $2, updated_at = NOW() WHERE id = $3",
+                    [webhookData, `Invalid log data. DBLogID: ${effectiveDbLogId}, UID: ${effectiveFirebaseUid}, Games: ${effectiveGamesToGrant}`, effectiveDbLogId]
+                ).catch(e => console.error("Error updating log for invalid data:", e));
+            }
             return res.status(200).send('Webhook processed: Invalid log data associated with this charge.');
         }
 
@@ -349,7 +392,7 @@ router.post('/webhook/tap', async (req, res, next) => {
                     "UPDATE payment_logs SET status = 'ERROR_USER_NOT_FOUND_COMPLETION', gateway_response_webhook = $1, error_message = $2, updated_at = NOW() WHERE id = $3",
                     [webhookData, `User ${effectiveFirebaseUid} not found for balance update.`, effectiveDbLogId]
                 );
-                await client.query('COMMIT');
+                await client.query('COMMIT'); 
                 return res.status(200).send('Webhook processed: User not found for balance update.');
             }
             const newBalance = balanceUpdateResult.rows[0].games_balance;
@@ -374,7 +417,7 @@ router.post('/webhook/tap', async (req, res, next) => {
     } catch (error) {
         if (client) await client.query('ROLLBACK');
         console.error(`[API Tap Webhook] Critical error processing webhook for Charge ID ${gatewayChargeId} (Log ID: ${effectiveDbLogId}):`, error.stack);
-        res.status(500).send('Internal server error processing webhook.');
+        res.status(200).send('Webhook received but internal server error occurred during processing.');
     } finally {
         if (client) client.release();
     }
