@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>فشل عملية الدفع - لعبة رحلة</title>
+    <link rel="stylesheet" href="assets/css/style.css"> <!-- ملف الأنماط العام -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: var(--bg-color-light, #f8f9fa);
+        }
+        .payment-status-main {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .status-container {
+            background-color: var(--white-color, #fff);
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            max-width: 550px;
+            width: 100%;
+            animation: fadeInScaleUp 0.5s ease-out forwards;
+        }
+        /* Keyframes موجودة في صفحة النجاح، لا حاجة لتكرارها إذا كان CSS في نفس الملف */
+        .status-icon {
+            font-size: 5em;
+            color: var(--danger-color, #dc3545); /* لون الخطأ */
+            margin-bottom: 25px;
+            animation: shakeOnError 0.7s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shakeOnError {
+          10%, 90% { transform: translate3d(-1px, 0, 0) scale(1); }
+          20%, 80% { transform: translate3d(2px, 0, 0) scale(1); }
+          30%, 50%, 70% { transform: translate3d(-3px, 0, 0) scale(1); }
+          40%, 60% { transform: translate3d(3px, 0, 0) scale(1); }
+          100% { opacity: 1; }
+        }
+
+        .status-container h1 {
+            font-size: 2.2em;
+            color: var(--text-color, #343a40);
+            margin-bottom: 15px;
+        }
+        .status-container p {
+            font-size: 1.1em;
+            color: var(--grey-color-dark, #6c757d);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        .status-container .reference-info {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .status-actions .btn {
+            margin: 10px 5px;
+            padding: 12px 30px;
+            font-size: 1.05em;
+            border-radius: 25px;
+        }
+        .btn-primary-action {
+            background-color: var(--primary-color, #17a2b8);
+            color: var(--white-color, #fff);
+        }
+        .btn-primary-action:hover {
+            background-color: var(--secondary-color, #138496);
+        }
+        .btn-secondary-action {
+            background-color: transparent;
+            color: var(--primary-color, #17a2b8);
+            border: 2px solid var(--primary-color, #17a2b8);
+        }
+        .btn-secondary-action:hover {
+            background-color: var(--primary-color, #17a2b8);
+            color: var(--white-color, #fff);
+        }
+
+        /* التجاوبية */
+        @media (max-width: 600px) {
+            .status-container { padding: 30px 20px; }
+            .status-icon { font-size: 4em; margin-bottom: 20px;}
+            .status-container h1 { font-size: 1.8em; }
+            .status-container p { font-size: 1em; }
+            .status-actions .btn { width: 100%; margin: 8px 0; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <div class="logo"><h1><a href="index.html">رحلة</a></h1></div>
+        <nav>
+            <ul>
+                <li><a href="game.html">العب</a></li>
+                <li><a href="how-to-play.html">طريقة اللعب</a></li>
+                <li><a href="contact.html">تواصل معنا</a></li>
+            </ul>
+        </nav>
+        <div class="user-actions">
+            <!-- سيتم ملؤه بواسطة main.js -->
+            <a href="auth.html" class="btn btn-register">تسجيل / دخول</a>
+        </div>
+    </div>
+</header>
+
+<main class="payment-status-main">
+    <div class="status-container">
+        <div class="status-icon">
+            <i class="fas fa-times-circle"></i> <!-- أيقونة الخطأ -->
+        </div>
+        <h1>فشلت عملية الدفع</h1>
+        <p id="payment-result-message">
+            نأسف، يبدو أنه حدث خطأ ما أثناء معالجة دفعتك ولم تكتمل. لم يتم خصم أي مبلغ.
+            <br>يمكنك المحاولة مرة أخرى أو التواصل مع الدعم إذا استمرت المشكلة.
+        </p>
+        <p class="reference-info" id="payment-ref" style="display: none;">رقم المرجع: </p> <!-- لإظهار رقم المرجع إذا لزم الأمر -->
+        <div class="status-actions">
+            <a href="index.html#purchase-section" onclick="openPurchaseDropdownFromFailure(event)" class="btn btn-primary-action">المحاولة مرة أخرى</a> <!--  سنحتاج لدالة JS بسيطة لفتح القائمة المنسدلة -->
+            <a href="contact.html" class="btn btn-secondary-action">تواصل مع الدعم</a>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="container footer-container-modern">
+        <div class="footer-icons-row">
+            <div class="social-media-icons">
+                <a href="https://www.instagram.com/rehlagame?igsh=MW1haWtleXRqcWo0MA%3D%3D&utm_source=qr" class="social-icon-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@rehlagame" class="social-icon-link" aria-label="TikTok" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok"></i></a>
+            </div>
+            <div class="app-store-icons">
+                <a href="#" class="app-icon-link" aria-label="Get it on Google Play"><i class="fab fa-android"></i></a>
+                <a href="#" class="app-icon-link" aria-label="Download on the App Store"><i class="fab fa-apple"></i></a>
+            </div>
+        </div>
+        <div class="footer-links-row">
+            <a href="terms.html" class="footer-text-link">Term and Conditions & Privacy Policy</a>
+             <span class="developer-credit-modern">
+                Created by <a href="https://olo-rehlas-projects.vercel.app/" target="_blank" rel="noopener noreferrer">OLO Tech Solutions</a>
+            </span>
+        </div>
+        <div class="footer-copyright-row">
+            <p>Copyright Rehla - All Rights Reserved 2025 <sup>®</sup></p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // دالة بسيطة لفتح القائمة المنسدلة للشراء عند النقر على "المحاولة مرة أخرى"
+    function openPurchaseDropdownFromFailure(event) {
+        event.preventDefault(); // منع الانتقال الفوري للرابط
+        // الانتقال إلى الصفحة الرئيسية أولاً
+        window.location.href = 'index.html';
+        // بعد تحميل الصفحة الرئيسية، سيقوم onAuthStateChanged بتحديث الهيدر،
+        // ثم سنحاول فتح القائمة. قد نحتاج إلى تأخير بسيط.
+        // يمكن تحسين هذا بجعل main.js يستمع لحدث مخصص أو بارامتر في الـ URL.
+        // للتبسيط الآن، سنوجه المستخدم للصفحة الرئيسية، ويمكنه فتح القائمة يدويًا.
+        // إذا كان المستخدم مسجلاً دخوله، فإن القائمة ستكون متاحة.
+    }
+
+    // لعرض رقم المرجع إذا تم تمريره في الـ URL (يتم التعامل معه أيضًا في main.js)
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentRef = urlParams.get('ref');
+        const chargeId = urlParams.get('charge_id');
+        const reason = urlParams.get('reason');
+        const paymentRefElement = document.getElementById('payment-ref');
+        const messageContainer = document.getElementById('payment-result-message');
+
+        if (paymentRefElement && paymentRef) {
+            paymentRefElement.textContent = `رقم المرجع: ${paymentRef} (معرف الشحنة: ${chargeId || 'N/A'})`;
+            paymentRefElement.style.display = 'block';
+        }
+        if (messageContainer && reason) {
+            // يمكن تخصيص الرسالة أكثر بناءً على 'reason'
+            // messageContainer.textContent += ` (السبب: ${decodeURIComponent(reason)})`;
+        }
+    });
+</script>
+<script src="assets/js/main.js" type="module"></script>
+<script src="assets/js/script.js" defer></script>
+</body>
+</html>
