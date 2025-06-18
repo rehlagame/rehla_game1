@@ -44,9 +44,12 @@ const storage = getStorage(app);
 
 // --- Constants ---
 const USER_GAMES_KEY_PREFIX = 'rehlaUserGames_';
-const PROD_RENDER_API_BASE_URL = 'https://rehla-game-backend.onrender.com';
-const RENDER_API_BASE_URL = PROD_RENDER_API_BASE_URL; // Change this for local dev if needed
+// تحديد RENDER_API_BASE_URL بناءً على بيئة التشغيل (محلي أو إنتاج)
+const RENDER_API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:'
+    ? 'http://localhost:3001' // للخادم الخلفي المحلي
+    : 'https://rehla-game-backend.onrender.com'; // عنوان URL للإنتاج على Render
 const PROMO_API_URL = `${RENDER_API_BASE_URL}/api/promos`;
+
 
 // --- Global Variable for Pending Registration Data ---
 let _pendingRegistrationData = null;
@@ -85,10 +88,6 @@ const mainPlayButtonEl = document.querySelector('main.hero .btn-play');
 
 // --- Global State ---
 let isBackendProfileReady = false;
-
-// --- تم حذف دالة adjustMainContentPadding من هنا، script.js سيتعامل معها ---
-// --- وكذلك window.adjustMainContentPadding = adjustMainContentPadding; إذا كانت موجودة سابقاً ---
-
 
 // --- Helper Functions ---
 const showAuthError = (message, targetDiv = authErrorMessageDiv) => {
@@ -402,32 +401,26 @@ onAuthStateChanged(auth, async (user) => {
             window.location.href = 'auth.html';
         }
     }
-
-    // script.js سيتولى الآن مسؤولية استدعاء adjustMainContentPaddingLocal عند DOMContentLoaded و resize.
-    // لا حاجة لاستدعاء صريح هنا بعد الآن إذا كان script.js يُحمَّل بشكل صحيح.
 });
 
 // --- Profile Page (Logged.html) Logic ---
 async function setupProfilePage(user) {
-    const els = profilePageElements; // profilePageElements يجب أن يكون معرّفًا وفيها photoUploadInput محذوف
+    const els = profilePageElements;
 
-    if (!els.infoForm || !user) { // يمكنك إضافة els.userPhoto هنا إذا أردت التأكد من وجوده
+    if (!els.infoForm || !user) {
         console.warn("setupProfilePage: Missing elements or user object.");
         return;
     }
 
-    // 1. تعيين الصورة الرمزية الثابتة دائمًا
     if (els.userPhoto) {
-        els.userPhoto.src = 'assets/images/default-avatar.png'; // الصورة الرمزية الثابتة
+        els.userPhoto.src = 'assets/images/default-avatar.png';
     }
 
-    // 2. تعيين القيم الأولية من كائن Firebase Auth
     if (els.summaryName) els.summaryName.textContent = user.displayName || 'مستخدم رحلة';
     if (els.summaryEmail) els.summaryEmail.textContent = user.email;
-    if (els.emailInput) els.emailInput.value = user.email; // البريد الإلكتروني للقراءة فقط
+    if (els.emailInput) els.emailInput.value = user.email;
     if (els.displayNameInput) els.displayNameInput.value = user.displayName || '';
 
-    // 3. جلب تفاصيل إضافية من الخادم الخلفي إذا كان الملف الشخصي جاهزًا
     if (isBackendProfileReady) {
         try {
             const token = await getIdToken(user);
@@ -438,7 +431,6 @@ async function setupProfilePage(user) {
             if (!response.ok && response.status !== 404) {
                 const errorText = await response.text().catch(() => `فشل جلب تفاصيل الملف الشخصي (Code: SPP-BE-${response.status})`);
                 console.error(`Failed to fetch profile from backend (setupProfilePage): ${response.status} - ${errorText}`);
-                // استخدام بيانات Firebase كاحتياطي إذا فشل جلب البيانات من الخادم
                 const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
                 if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
                 if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
@@ -449,7 +441,7 @@ async function setupProfilePage(user) {
                 if (els.lastNameInput) els.lastNameInput.value = profileData.last_name || '';
                 if (profileData.phone) {
                     let fullPhone = profileData.phone;
-                    let countryCode = "+965"; // الافتراضي
+                    let countryCode = "+965";
                     let phoneNum = fullPhone;
                     const knownCodes = ["+965", "+966", "+971", "+973", "+974", "+968"];
                     for (const code of knownCodes) {
@@ -463,7 +455,6 @@ async function setupProfilePage(user) {
                     if (els.phoneInput) els.phoneInput.value = phoneNum;
                 }
                 if (els.displayNameInput && profileData.display_name) els.displayNameInput.value = profileData.display_name;
-                // لا يوجد تحديث لـ els.userPhoto.src من profileData.photo_url لأننا نريد صورة ثابتة
                 if (els.summaryName && profileData.display_name) els.summaryName.textContent = profileData.display_name;
             } else if (response.status === 404) {
                 console.warn(`[MainJS setupProfilePage] Profile for user ${user.uid} still not found in backend. Using Firebase data as fallback.`);
@@ -473,7 +464,6 @@ async function setupProfilePage(user) {
             }
         } catch (error) {
             console.error("Error in try-catch fetching/processing profile data (setupProfilePage):", error);
-            // استخدام بيانات Firebase كاحتياطي عند حدوث خطأ
             const nameParts = user.displayName ? user.displayName.split(' ') : ['', ''];
             if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
             if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
@@ -484,10 +474,6 @@ async function setupProfilePage(user) {
         if (els.firstNameInput && !els.firstNameInput.value) els.firstNameInput.value = nameParts[0] || '';
         if (els.lastNameInput && !els.lastNameInput.value) els.lastNameInput.value = nameParts.slice(1).join(' ') || '';
     }
-
-    // 4. ربط مستمعي الأحداث (إذا لم يتم ربطهم من قبل)
-
-    // تم حذف الكود الخاص بـ els.photoUploadInput.addEventListener
 
     if (els.infoForm && !els.infoForm.dataset.listenerAttached) {
         els.infoForm.addEventListener('submit', async (e) => {
@@ -510,7 +496,6 @@ async function setupProfilePage(user) {
                 lastName: newLastName,
                 displayName: newDisplayName,
                 phone: newCountryCode && newPhone ? `${newCountryCode}${newPhone}` : null,
-                // لا نرسل photo_url لأننا لا نعدل الصورة
             };
 
             try {
@@ -631,7 +616,6 @@ async function setupProfilePage(user) {
     }
 }
 
-
 // --- Purchase Dropdown Logic ---
 function setupPurchaseDropdown(userInstance) {
     const purchaseDropdown = document.getElementById('purchase-dropdown');
@@ -698,13 +682,14 @@ function setupPurchaseDropdown(userInstance) {
                 discountMultiplier = currentPromo.value / 100;
             }
             finalPrice = selectedPrice * (1 - discountMultiplier);
+            finalPrice = parseFloat(finalPrice.toFixed(2)); // Ensure two decimal places for calculations
             payNowBtn.disabled = false;
             payNowBtn.textContent = 'ادفع الآن';
         } else {
             finalPrice = 0;
             payNowBtn.textContent = 'اختر باقة أولاً';
         }
-        totalPriceDisplay.textContent = `${finalPrice.toFixed(2)} KWD`;
+        totalPriceDisplay.textContent = `${finalPrice.toFixed(3)} KWD`; // KWD uses 3 decimal places for display
     }
 
     purchaseOptions.forEach(option => {
@@ -754,7 +739,7 @@ function setupPurchaseDropdown(userInstance) {
                 console.error("Promo validation error:", error);
                 showPromoStatus(error.message || "خطأ في تطبيق كود الخصم.", "error");
                 currentPromo = null; gamesToGrantFromPromo = 0;
-                resetPromoState(false);
+                resetPromoState(false); // Don't clear input on error, let user retry
             } finally {
                 if(applyPromoBtn) { applyPromoBtn.disabled = (currentPromo && currentPromo.type === 'free_games'); applyPromoBtn.textContent = 'تطبيق';}
                 updateFinalPrice();
@@ -793,7 +778,7 @@ function setupPurchaseDropdown(userInstance) {
                         alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ${gamesToGrantFromPromo === 1 ? 'لعبة' : (gamesToGrantFromPromo === 2 ? 'لعبتين' : `${gamesToGrantFromPromo} ألعاب`)} مجانية. رصيدك الآن ${responseData.newBalance}.`);
                     } else {
                         console.warn("Grant free games response did not contain newBalance, syncing from profile. UID:", userId);
-                        await ensureAndSyncBackendProfile(currentUserForPayment, null);
+                        await ensureAndSyncBackendProfile(currentUserForPayment, null); // Attempt to sync
                         alert(`تهانينا! لقد حصلت على ${gamesToGrantFromPromo} ألعاب مجانية. يتم تحديث رصيدك.`);
                     }
                     if(currentPurchaseDropdownElement) currentPurchaseDropdownElement.classList.remove('show');
@@ -806,18 +791,39 @@ function setupPurchaseDropdown(userInstance) {
                 } finally {
                     if(payNowBtn) {payNowBtn.disabled = false; updateFinalPrice();}
                 }
-            } else if (selectedGames > 0 && finalPrice >= 0) {
-                console.log("[MainJS PayNowBtn] Initiating MyFatoorah payment. UID:", userId, "Amount:", finalPrice, "Package:", selectedPackageName);
+            } else if (selectedGames > 0 && finalPrice >= 0) { // Allow 0 price for 100% discount
+                console.log("[MainJS PayNowBtn] Initiating Tap Payment. UID:", userId, "Amount:", finalPrice, "Package:", selectedPackageName);
                 try {
-                    const paymentPayload = { amount: finalPrice, currency: "KWD", packageName: selectedPackageName, gamesInPackage: selectedGames, customerName: currentUserForPayment.displayName || currentUserForPayment.email, customerEmail: currentUserForPayment.email, appliedPromoCode: (currentPromo && currentPromo.type === 'percentage') ? currentPromo.code : null };
-                    const paymentResponse = await fetch(`${RENDER_API_BASE_URL}/api/payment/initiate-myfatoorah`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify(paymentPayload) });
-                    if (!paymentResponse.ok) { const errorData = await paymentResponse.json().catch(() => ({ message: "فشل في بدء عملية الدفع." })); throw new Error(errorData.message); }
+                    const paymentPayload = {
+                        amount: finalPrice, // finalPrice is already calculated with discount
+                        currency: "KWD",
+                        packageName: selectedPackageName,
+                        gamesInPackage: selectedGames,
+                        customerName: currentUserForPayment.displayName || currentUserForPayment.email.split('@')[0],
+                        customerEmail: currentUserForPayment.email,
+                        appliedPromoCode: (currentPromo && currentPromo.type === 'percentage') ? currentPromo.code : null
+                    };
+                    // !!! --- CHANGED ENDPOINT FOR TAP PAYMENTS --- !!!
+                    const paymentResponse = await fetch(`${RENDER_API_BASE_URL}/api/payment/initiate-tap-payment`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                        body: JSON.stringify(paymentPayload)
+                    });
+
+                    if (!paymentResponse.ok) {
+                        const errorData = await paymentResponse.json().catch(() => ({ message: "فشل في بدء عملية الدفع مع Tap." }));
+                        throw new Error(errorData.message);
+                    }
                     const paymentData = await paymentResponse.json();
-                    if (paymentData.paymentURL) { window.location.href = paymentData.paymentURL; }
-                    else { throw new Error("لم يتم استلام رابط الدفع من الخادم."); }
+                    if (paymentData.paymentURL) {
+                        console.log("[MainJS PayNowBtn] Received paymentURL from backend for Tap:", paymentData.paymentURL);
+                        window.location.href = paymentData.paymentURL; // Redirect user to Tap payment page
+                    } else {
+                        throw new Error("لم يتم استلام رابط الدفع من الخادم (Tap).");
+                    }
                 } catch (error) {
-                    console.error("Payment initiation error. UID:", userId, "Error:", error);
-                    alert(`خطأ في بدء عملية الدفع: ${error.message}`);
+                    console.error("Tap Payment initiation error. UID:", userId, "Error:", error);
+                    alert(`خطأ في بدء عملية الدفع مع Tap: ${error.message}`);
                     if(payNowBtn) {payNowBtn.disabled = false; payNowBtn.textContent = 'ادفع الآن';}
                 }
             } else {
@@ -829,22 +835,52 @@ function setupPurchaseDropdown(userInstance) {
     }
 
     if (userInstance) updateRemainingGamesDisplay(userInstance.uid);
-    updateFinalPrice();
+    updateFinalPrice(); // Ensure price is updated when dropdown is setup
     return { resetDropdownStateForNewOpen };
 }
 
 // --- Header UI Update ---
 function updateHeaderUI(user) {
     if (!userActionsContainer) return;
-    // const headerElement = document.querySelector('header'); // لا حاجة لتعريفه هنا إذا لم نستخدمه مباشرة في هذه الدالة
 
     if (user) {
         const latestUser = auth.currentUser || user;
         const displayName = latestUser?.displayName || (latestUser?.email ? latestUser.email.split('@')[0] : 'مستخدم رحلة');
-        userActionsContainer.innerHTML = ` <span class="user-greeting">مرحباً، ${displayName}</span> <div class="games-counter-container"> <button id="games-trigger" class="btn games-trigger-btn"> <span>عدد الألعاب: <span id="remaining-games-count">0</span></span> <span class="plus-icon">+</span> </button> <div id="purchase-dropdown" class="purchase-dropdown-menu"> <h4 class="dropdown-title">شراء ألعاب إضافية</h4> <ul class="purchase-options-list"> <li class="purchase-option" data-games="1" data-price="1.00"><span>لعبة واحدة</span> <span class="price">1.00 KWD</span></li> <li class="purchase-option" data-games="2" data-price="2.00"><span>لعبتين</span> <span class="price">2.00 KWD</span></li> <li class="purchase-option" data-games="5" data-price="4.00"><span>5 ألعاب</span> <span class="price">4.00 KWD</span></li> <li class="purchase-option" data-games="10" data-price="8.00"><span>10 ألعاب</span> <span class="price">8.00 KWD</span></li> </ul> <div class="promo-section"> <input type="text" id="promo-code-input" placeholder="أدخل كود الخصم" style="text-transform: uppercase;"> <button id="apply-promo-btn" class="btn btn-secondary btn-sm">تطبيق</button> </div> <div class="promo-status-feedback" style="font-size: 0.85em; margin-top: -10px; margin-bottom: 15px; text-align: center; min-height: 1.2em; font-weight: bold; color: var(--primary-color);"></div> <div class="total-section"> <span>المجموع:</span> <strong id="total-price-display">0.00 KWD</strong> </div> <button id="pay-now-btn" class="btn btn-primary btn-block" disabled>اختر باقة أولاً</button> </div> </div> <a href="Logged.html" class="btn btn-logout" style="color: white;">حسابي</a> <button class="btn btn-logout" id="logout-btn-header">تسجيل الخروج</button> `;
+        userActionsContainer.innerHTML = `
+            <span class="user-greeting">مرحباً، ${displayName}</span>
+            <div class="games-counter-container">
+                <button id="games-trigger" class="btn games-trigger-btn">
+                    <span>عدد الألعاب: <span id="remaining-games-count">0</span></span>
+                    <span class="plus-icon">+</span>
+                </button>
+                <div id="purchase-dropdown" class="purchase-dropdown-menu">
+                    <h4 class="dropdown-title">شراء ألعاب إضافية</h4>
+                    <ul class="purchase-options-list">
+                        <li class="purchase-option" data-games="1" data-price="1.00"><span>لعبة واحدة</span> <span class="price">1.00 KWD</span></li>
+                        <li class="purchase-option" data-games="2" data-price="2.00"><span>لعبتين</span> <span class="price">2.00 KWD</span></li>
+                        <li class="purchase-option" data-games="5" data-price="4.00"><span>5 ألعاب</span> <span class="price">4.00 KWD</span></li>
+                        <li class="purchase-option" data-games="10" data-price="8.00"><span>10 ألعاب</span> <span class="price">8.00 KWD</span></li>
+                    </ul>
+                    <div class="promo-section">
+                        <input type="text" id="promo-code-input" placeholder="أدخل كود الخصم" style="text-transform: uppercase;">
+                        <button id="apply-promo-btn" class="btn btn-secondary btn-sm">تطبيق</button>
+                    </div>
+                    <div class="promo-status-feedback" style="font-size: 0.85em; margin-top: -10px; margin-bottom: 15px; text-align: center; min-height: 1.2em; font-weight: bold; color: var(--primary-color);"></div>
+                    <div class="total-section">
+                        <span>المجموع:</span>
+                        <strong id="total-price-display">0.000 KWD</strong>
+                    </div>
+                    <button id="pay-now-btn" class="btn btn-primary btn-block" disabled>اختر باقة أولاً</button>
+                </div>
+            </div>
+            <a href="Logged.html" class="btn btn-logout" style="color: white;">حسابي</a>
+            <button class="btn btn-logout" id="logout-btn-header">تسجيل الخروج</button>
+        `;
         const logoutButtonHeader = document.getElementById('logout-btn-header');
         if (logoutButtonHeader && !logoutButtonHeader.dataset.listenerAttachedLogout) {
-            logoutButtonHeader.addEventListener('click', () => { signOut(auth).catch((error) => console.error("Sign Out Error:", error)); });
+            logoutButtonHeader.addEventListener('click', () => {
+                signOut(auth).catch((error) => console.error("Sign Out Error:", error));
+            });
             logoutButtonHeader.dataset.listenerAttachedLogout = 'true';
         }
         if (latestUser) {
@@ -858,11 +894,6 @@ function updateHeaderUI(user) {
         userActionsContainer.innerHTML = `<a href="auth.html" class="btn btn-register">تسجيل / دخول</a>`;
         window.currentPurchaseDropdownSetup = null;
     }
-
-    // لم نعد بحاجة لاستدعاء adjustMainContentPadding صراحة من هنا،
-    // لأن script.js لديه مستمع لـ DOMContentLoaded و resize.
-    // إذا كان هناك تغيير في ارتفاع الهيدر بسبب تحديث محتواه هنا،
-    // فإن مستمع resize في script.js (الذي يراقب header) سيتولى الأمر.
 }
 
 
@@ -903,7 +934,7 @@ function handlePlayAttemptCheckBalanceOnly() {
         window.location.href = 'auth.html';
         return false;
     }
-    if (!isBackendProfileReady) { // Check if backend profile is ready
+    if (!isBackendProfileReady) {
         alert("جاري مزامنة بيانات حسابك، يرجى الانتظار لحظات ثم حاول مرة أخرى.");
         return false;
     }
@@ -917,7 +948,7 @@ function handlePlayAttemptCheckBalanceOnly() {
         const purchaseDropdown = document.getElementById('purchase-dropdown');
         if (gamesTrigger && purchaseDropdown && !purchaseDropdown.classList.contains('show')) {
             setTimeout(() => {
-                if(document.getElementById('games-trigger')) { // Re-check element existence
+                if(document.getElementById('games-trigger')) {
                     document.getElementById('games-trigger').click();
                 }
             }, 100);
@@ -944,6 +975,48 @@ window.RENDER_API_BASE_URL = RENDER_API_BASE_URL;
 window.isUserBackendProfileReady = () => isBackendProfileReady;
 window.getUserGamesKey = getUserGamesKey;
 
-console.log("main.js loaded and updated. RENDER_API_BASE_URL is set to:", RENDER_API_BASE_URL);
+console.log("main.js loaded. RENDER_API_BASE_URL is set to:", RENDER_API_BASE_URL);
 
-// --- تم حذف مستمع resize الخاص بـ adjustMainContentPadding من هنا، script.js سيتعامل معه ---
+// --- معالجة بارامترات الـ Callback من بوابة الدفع ---
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('status');
+    const paymentRef = urlParams.get('ref');
+    const chargeId = urlParams.get('charge_id');
+
+    if (paymentStatus && paymentRef) {
+        const currentPagePath = window.location.pathname.toLowerCase();
+        // التأكد من أننا في صفحة نجاح أو فشل الدفع قبل محاولة تعديل DOM
+        if (currentPagePath.includes('payment-success.html') || currentPagePath.includes('payment-failure.html')) {
+            const messageContainer = document.getElementById('payment-result-message'); // افترض وجود هذا العنصر
+            const refElement = document.getElementById('payment-ref'); // افترض وجود هذا العنصر
+
+            if (currentPagePath.includes('payment-success.html')) {
+                if (messageContainer) messageContainer.textContent = `تمت عملية الدفع بنجاح!`;
+                if (refElement) refElement.textContent = `رقم المرجع: ${paymentRef} (معرف الشحنة: ${chargeId || 'N/A'})`;
+                console.log(`Payment successful for ref: ${paymentRef}, charge: ${chargeId}`);
+            } else if (currentPagePath.includes('payment-failure.html')) {
+                const reason = urlParams.get('reason') || 'سبب غير معروف';
+                if (messageContainer) messageContainer.textContent = `فشلت عملية الدفع. (السبب: ${reason})`;
+                if (refElement) refElement.textContent = `رقم المرجع: ${paymentRef} (معرف الشحنة: ${chargeId || 'N/A'})`;
+                console.error(`Payment failed for ref: ${paymentRef}, charge: ${chargeId}. Reason: ${reason}`);
+            }
+
+            // تحديث رصيد الألعاب للمستخدم بغض النظر عن حالة الدفع، لأن الخادم هو مصدر الحقيقة
+            if (auth.currentUser) {
+                ensureAndSyncBackendProfile(auth.currentUser)
+                    .then(() => {
+                        console.log("User balance synced after payment callback page load.");
+                    })
+                    .catch(err => {
+                        console.error("Error syncing balance on payment callback page:", err);
+                    });
+            }
+        }
+        // إزالة البارامترات من الـ URL
+        if (window.history.replaceState) {
+            const cleanURL = window.location.pathname;
+            window.history.replaceState({ path: cleanURL }, document.title, cleanURL);
+        }
+    }
+});
