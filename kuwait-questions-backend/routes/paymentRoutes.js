@@ -7,6 +7,15 @@ const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 
+// --- تهيئة SendGrid ---
+const sgMail = require('@sendgrid/mail');
+if (process.env.SENDGRID_API_KEY && !process.env.SENDGRID_API_KEY.includes('DUMMY')) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    console.log('[SendGrid] SDK initialized with API key from environment.');
+} else {
+    console.warn("[SendGrid] SENDGRID_API_KEY is not set or is a dummy value. Email sending will be disabled.");
+}
+
 // --- إعدادات Tap Payments (يتم تحميلها من ملف .env) ---
 const TAP_SECRET_KEY = process.env.TAP_SECRET_KEY;
 const TAP_API_BASE_URL = process.env.TAP_API_BASE_URL || 'https://api.tap.company/v2';
@@ -27,6 +36,35 @@ function formatAmountForHashing(amount, currency) {
     const decimals = currencyDecimals[currency.toUpperCase()] !== undefined ? currencyDecimals[currency.toUpperCase()] : 2;
     return parseFloat(amount).toFixed(decimals);
 }
+
+// --- دالة إرسال الإيميل عبر SendGrid ---
+async function sendPurchaseEmail(to, subject, htmlContent) {
+    if (!process.env.SENDGRID_API_KEY || process.env.SENDGRID_API_KEY.includes('DUMMY') || !process.env.SENDER_EMAIL) {
+        console.log(`[Email Sending SKIPPED] SENDGRID_API_KEY or SENDER_EMAIL not configured. To: ${to}, Subject: ${subject}`);
+        return; // لا تحاول الإرسال إذا لم يتم تكوين المفتاح أو بريد المرسل
+    }
+    const msg = {
+        to: to,
+        from: {
+            email: process.env.SENDER_EMAIL,
+            name: 'لعبة رحلة' // اسم المرسل الذي سيظهر
+        },
+        subject: subject,
+        html: htmlContent,
+    };
+    try {
+        await sgMail.send(msg);
+        console.log(`[Payment Email] Email sent successfully to ${to} with subject: "${subject}"`);
+    } catch (error) {
+        console.error(`[Payment Email] Error sending email to ${to} with subject "${subject}":`, error.toString());
+        if (error.response && error.response.body && error.response.body.errors) {
+            console.error("[SendGrid Error Details]:", JSON.stringify(error.response.body.errors, null, 2));
+        } else if (error.response) {
+            console.error("[SendGrid Error Response]:", error.response.body);
+        }
+    }
+}
+
 
 // ===== POST /api/payment/initiate-tap-payment =====
 router.post('/initiate-tap-payment', verifyFirebaseToken, async (req, res, next) => {
@@ -122,7 +160,7 @@ router.post('/initiate-tap-payment', verifyFirebaseToken, async (req, res, next)
         if (client) { try { await client.query('ROLLBACK'); } catch (rbError) { console.error('[API /initiate-tap-payment] Rollback error:', rbError); } }
         const errorMsg = error.response?.data?.errors?.[0]?.description || error.response?.data?.response?.message || error.message || "خطأ غير معروف في الخادم.";
         console.error('[API /initiate-tap-payment] Critical error:', errorMsg, error.stack);
-        next(error); // تمرير الخطأ لمعالج الأخطاء العام
+        next(error);
     } finally {
         if (client) client.release();
     }
@@ -364,7 +402,7 @@ router.post('/webhook/tap', async (req, res, next) => {
 
         if (currentLogStatus === 'COMPLETED') {
             console.log(`[API Tap Webhook] INFO: Order ${effectiveDbLogId} (Charge: ${gatewayChargeId}) is already COMPLETED. Ignoring webhook. ROLLING BACK (no changes needed).`);
-            await client.query('ROLLBACK'); // No changes needed, so rollback is fine.
+            await client.query('ROLLBACK');
             console.log('[API Tap Webhook] Transaction ROLLED BACK.');
             return res.status(200).send('Webhook processed: Order already completed.');
         }
@@ -373,8 +411,8 @@ router.post('/webhook/tap', async (req, res, next) => {
             console.log(`[API Tap Webhook] Charge status is ${gatewayChargeStatus}. Attempting to update user balance for UID: ${effectiveFirebaseUid}, Games: ${effectiveGamesToGrant}`);
             const updateUserBalanceSql = `
                 UPDATE users SET games_balance = games_balance + $1, updated_at = NOW()
-                WHERE firebase_uid = $2 RETURNING games_balance;
-            `;
+                WHERE firebase_uid = $2 RETURNING games_balance, email, display_name;
+            `; // جلب الإيميل والاسم أيضًا
             const balanceUpdateResult = await client.query(updateUserBalanceSql, [effectiveGamesToGrant, effectiveFirebaseUid]);
             console.log(`[API Tap Webhook] DB Query for user balance update (UID ${effectiveFirebaseUid}) result rowCount: ${balanceUpdateResult.rowCount}`);
 
@@ -390,6 +428,9 @@ router.post('/webhook/tap', async (req, res, next) => {
                 return res.status(200).send('Webhook processed: User not found for balance update.');
             }
             const newBalance = balanceUpdateResult.rows[0].games_balance;
+            const userEmailForReceipt = balanceUpdateResult.rows[0].email;
+            const userDisplayNameForReceipt = balanceUpdateResult.rows[0].display_name || 'عميلنا العزيز';
+
             console.log(`[API Tap Webhook] SUCCESS: User balance updated. New balance for ${effectiveFirebaseUid}: ${newBalance}`);
 
             console.log(`[API Tap Webhook] Attempting to update payment_logs to COMPLETED for dbLogId: ${effectiveDbLogId}`);
@@ -398,11 +439,64 @@ router.post('/webhook/tap', async (req, res, next) => {
                 [gatewayChargeId, webhookData, effectiveDbLogId]
             );
             console.log('[API Tap Webhook] SUCCESS: payment_logs updated to COMPLETED.');
-
-            console.log('[API Tap Webhook] Attempting to COMMIT transaction...');
-            await client.query('COMMIT');
+            await client.query('COMMIT'); // COMMIT التغييرات في قاعدة البيانات هنا
             console.log('[API Tap Webhook] SUCCESS: Transaction COMMITTED for COMPLETED payment.');
-            console.log(`[API Tap Webhook] <<<<< WEBHOOK PROCESSING ENDED SUCCESSFULLY (GAMES GRANTED) for dbLogId: ${effectiveDbLogId} >>>>>`);
+
+            // --- إرسال الإيميلات بعد تأكيد حفظ التغييرات في قاعدة البيانات ---
+            const customerEmail = webhookData.customer?.email || userEmailForReceipt;
+            const customerName = webhookData.customer?.first_name || userDisplayNameForReceipt;
+            const packageName = webhookData.metadata?.package || 'باقة ألعاب رحلة';
+            const gamesGranted = effectiveGamesToGrant;
+            const amountPaid = webhookData.amount;
+            const currencyPaid = webhookData.currency;
+            const paymentReference = webhookData.id; // هو نفسه gatewayChargeId
+            const transactionDate = new Date(webhookData.transaction.created * 1000).toLocaleString('ar-KW-u-nu-latn', { dateStyle: 'full', timeStyle: 'short' });
+
+            if (customerEmail) {
+                const customerSubject = `✅ تأكيد شراء باقة ألعاب رحلة - طلب رقم ${paymentReference}`;
+                const customerHtml = `
+                    <div dir="rtl" style="font-family: Arial, sans-serif; text-align: right; padding: 20px; border: 1px solid #eee; border-radius: 5px; max-width: 600px; margin: auto;">
+                        <h2 style="color: #17a2b8;">أهلاً ${customerName}،</h2>
+                        <p>شكراً لشرائك من لعبة رحلة! تم بنجاح إضافة الألعاب إلى حسابك.</p>
+                        <h3 style="color: #138496;">تفاصيل الطلب:</h3>
+                        <ul style="list-style-type: none; padding-right: 0;">
+                            <li><strong>رقم المرجع:</strong> ${paymentReference}</li>
+                            <li><strong>الباقة:</strong> ${packageName}</li>
+                            <li><strong>عدد الألعاب المضافة:</strong> ${gamesGranted}</li>
+                            <li><strong>المبلغ المدفوع:</strong> ${formatAmountForHashing(amountPaid, currencyPaid)} ${currencyPaid.toUpperCase()}</li>
+                            <li><strong>تاريخ العملية:</strong> ${transactionDate}</li>
+                        </ul>
+                        <p>رصيدك الحالي من الألعاب هو: <strong>${newBalance}</strong> ${newBalance === 1 ? 'لعبة' : (newBalance === 2 ? 'لعبتين' : `${newBalance} ألعاب`)}.</p>
+                        <p style="margin-top: 20px;">يمكنك الآن الاستمتاع باللعب! <a href="${APP_FRONTEND_URL}/game.html" style="color: #ffc107; text-decoration: none; font-weight: bold;">ابدأ اللعب الآن</a>.</p>
+                        <p style="margin-top: 30px; font-size: 0.9em; color: #777;">مع تحيات،<br>فريق لعبة رحلة</p>
+                    </div>`;
+                await sendPurchaseEmail(customerEmail, customerSubject, customerHtml);
+            } else {
+                console.warn(`[API Tap Webhook] Customer email not found for charge ${gatewayChargeId}, cannot send receipt to customer.`);
+            }
+
+            if (process.env.ADMIN_EMAIL_RECIPIENT) {
+                const adminSubject = `تنبيه: عملية شراء جديدة #${paymentReference} في لعبة رحلة`;
+                const adminHtml = `
+                    <div dir="rtl" style="font-family: Arial, sans-serif; text-align: right;">
+                        <h2>عملية شراء جديدة في لعبة رحلة:</h2>
+                        <ul style="list-style-type: none; padding-right: 0;">
+                            <li><strong>العميل:</strong> ${customerName} (${customerEmail || 'لا يوجد بريد للعميل'})</li>
+                            <li><strong>معرف المستخدم (Firebase):</strong> ${effectiveFirebaseUid}</li>
+                            <li><strong>رقم مرجع Tap:</strong> ${paymentReference}</li>
+                            <li><strong>الباقة:</strong> ${packageName}</li>
+                            <li><strong>عدد الألعاب:</strong> ${gamesGranted}</li>
+                            <li><strong>المبلغ:</strong> ${formatAmountForHashing(amountPaid, currencyPaid)} ${currencyPaid.toUpperCase()}</li>
+                            <li><strong>تاريخ العملية:</strong> ${transactionDate}</li>
+                            <li><strong>رصيد المستخدم الجديد:</strong> ${newBalance}</li>
+                            <li><strong>DB Log ID:</strong> ${effectiveDbLogId}</li>
+                        </ul>
+                    </div>`;
+                await sendPurchaseEmail(process.env.ADMIN_EMAIL_RECIPIENT, adminSubject, adminHtml);
+            }
+            // --- نهاية إرسال الإيميلات ---
+
+            console.log(`[API Tap Webhook] <<<<< WEBHOOK PROCESSING ENDED SUCCESSFULLY (GAMES GRANTED & EMAILS SCHEDULED) for dbLogId: ${effectiveDbLogId} >>>>>`);
             res.status(200).send('Webhook processed successfully and games granted.');
 
         } else {
@@ -419,7 +513,7 @@ router.post('/webhook/tap', async (req, res, next) => {
             res.status(200).send('Webhook processed: Payment not successful or in other state.');
         }
     } catch (error) {
-        console.error(`[API Tap Webhook] CRITICAL ERROR during DB operations for Charge ID ${gatewayChargeId} (Log ID: ${effectiveDbLogId}):`, error.message, error.stack);
+        console.error(`[API Tap Webhook] CRITICAL ERROR during DB operations for Charge ID ${gatewayChargeId} (Log ID: ${effectiveDbLogId || 'N/A'}):`, error.message, error.stack);
         if (client) {
             console.log('[API Tap Webhook] Attempting to ROLLBACK transaction due to caught error...');
             try {
