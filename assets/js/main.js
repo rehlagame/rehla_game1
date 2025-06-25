@@ -282,7 +282,7 @@ if (registerEmailFormEl) {
 
         try {
             const displayName = `${firstName} ${lastName}`.trim() || email.split('@')[0];
-            _pendingRegistrationData = { firstName, lastName, countryCode, phone, displayName };
+            _pendingRegistrationData = { firstName, lastName, displayName };
             console.log("[MainJS RegisterForm] Stored _pendingRegistrationData:", _pendingRegistrationData);
 
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
