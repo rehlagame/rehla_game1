@@ -275,8 +275,7 @@ if (registerEmailFormEl) {
         const confirmPassword = registerEmailFormEl['register-confirm-password'].value;
         const firstName = registerEmailFormEl['register-first-name'].value;
         const lastName = registerEmailFormEl['register-last-name'].value;
-        const countryCode = registerEmailFormEl['register-country-code'].value;
-        const phone = registerEmailFormEl['register-phone'].value;
+     
 
         if (password !== confirmPassword) { showAuthError("كلمتا المرور غير متطابقتين!"); return; }
         if (password.length < 6) { showAuthError("كلمة المرور يجب أن تكون 6 أحرف على الأقل."); return; }
