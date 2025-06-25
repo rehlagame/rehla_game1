@@ -494,7 +494,7 @@ async function setupProfilePage(user) {
                 firstName: newFirstName,
                 lastName: newLastName,
                 displayName: newDisplayName,
-                phone: newCountryCode && newPhone ? `${newCountryCode}${newPhone}` : null,
+               
             };
 
             try {
