@@ -15,13 +15,6 @@
         header {
             display: none !important; /* لإخفاء الهيدر الأصلي تمامًا في هذه الصفحة */
         }
-        /* يمكنك إضافة مسافة بسيطة في الأعلى إذا أردت بعد إخفاء الهيدر */
-        /*
-        main.game-content {
-             padding-top: 20px;
-        }
-        */
-
         /* --- أنماط أيقونة العودة للصفحة الرئيسية (العامة وفي قسم الإعداد) --- */
         .back-to-home-icon-setup {
             position: fixed;    /* تثبيت الأيقونة بالنسبة للشاشة */
@@ -45,39 +38,98 @@
             background-color: var(--secondary-color); /* لون أغمق عند المرور */
             transform: scale(1.1);
         }
-
-        /* تعديل div معلومات الدور ليحتوي على الأيقونة */
         #current-turn-info {
-            position: relative; /* للسماح بتموضع الأيقونة بداخله */
-            padding-left: 55px; /* مساحة للأيقونة على اليسار (بسبب RTL، الأيقونة ستكون يسارًا) */
-            /* إذا كان اتجاه الصفحة LTR، ستكون padding-right */
+            position: relative;
+            padding-left: 55px;
         }
-
-        /* أيقونة العودة داخل معلومات الدور */
         .back-to-home-icon-ingame {
             position: absolute;
             top: 50%;
-            /* بما أن الصفحة RTL، "left" تعني الطرف الأيسر من الحاوية */
             left: 15px;
             transform: translateY(-50%);
-            color: var(--secondary-color); /* لون مختلف قليلاً للتمييز */
-            font-size: 1.6em; /* حجم أكبر قليلاً للأيقونة */
+            color: var(--secondary-color);
+            font-size: 1.6em;
             text-decoration: none;
             transition: color 0.3s ease, transform 0.2s ease;
-            padding: 5px; /* لجعل منطقة النقر أكبر قليلاً */
+            padding: 5px;
         }
         .back-to-home-icon-ingame:hover {
             color: var(--primary-color);
-            transform: translateY(-50%) scale(1.15); /* تكبير أكثر قليلاً عند المرور */
+            transform: translateY(-50%) scale(1.15);
         }
-
-        /* يتم التحكم في الإخفاء والإظهار بشكل رئيسي عبر JavaScript في game.js */
-        /* ولكن يمكن ترك هذه كقواعد افتراضية إذا فشل JS لسبب ما (نادر) */
         #game-setup-section.hidden + #game-play-area .back-to-home-icon-setup,
-        #game-play-area.hidden ~ .back-to-home-icon-ingame { /* استهداف أيقونة اللعب عندما تكون منطقة اللعب مخفية */
+        #game-play-area.hidden ~ .back-to-home-icon-ingame {
             /* display: none; */ /* سيتم التحكم بها من game.js */
         }
 
+        /* --- أنماط تنبيه تدوير الشاشة --- */
+        .rotate-prompt-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex; /* سيتحكم به JavaScript */
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 9999;
+            padding: 20px;
+            box-sizing: border-box;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+        .rotate-prompt-overlay.visible { /* JS سيضيف هذه الكلاس */
+            opacity: 1;
+            visibility: visible;
+        }
+        .rotate-prompt-content {
+            background-color: var(--primary-color, #17a2b8);
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.35);
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .rotate-prompt-overlay.visible .rotate-prompt-content {
+            transform: scale(1);
+        }
+        .rotate-prompt-content .rotate-icon-animation {
+            font-size: 4em;
+            margin-bottom: 20px;
+            display: block;
+            animation: subtle-rotate-pulse 3s infinite ease-in-out;
+        }
+        @keyframes subtle-rotate-pulse {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            20% { transform: rotate(15deg) scale(1.05); }
+            40% { transform: rotate(-10deg) scale(1.02); }
+            60% { transform: rotate(5deg) scale(1.01); }
+            80% { transform: rotate(-5deg) scale(1); }
+        }
+        .rotate-prompt-content p {
+            font-size: 1.25em;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+        .btn-close-prompt {
+            background-color: var(--accent-color, #ffc107);
+            color: var(--text-color, #343a40);
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .btn-close-prompt:hover {
+            background-color: #e0a800;
+            transform: scale(1.05);
+        }
+        .rotate-prompt-overlay.hidden { /* لإخفاء العنصر عند عدم الحاجة إليه */
+            display: none !important;
+        }
     </style>
 </head>
 <body class="game-active-page">
@@ -326,9 +378,102 @@
     </div>
 </main>
 
+<!-- ===== بداية إضافة HTML لتنبيه تدوير الشاشة ===== -->
+<div id="rotate-device-prompt" class="rotate-prompt-overlay hidden">
+    <div class="rotate-prompt-content">
+        <i class="fas fa-mobile-screen-button rotate-icon-animation"></i>
+        <p>للاستمتاع باللعبة بأفضل شكل، يرجى تدوير شاشة هاتفك.</p>
+        <button id="close-rotate-prompt" class="btn-close-prompt">فهمت!</button>
+    </div>
+</div>
+<!-- ===== نهاية إضافة HTML لتنبيه تدوير الشاشة ===== -->
+
 <script src="assets/js/game.js" type="module"></script>
 <script src="assets/js/main.js" type="module"></script>
-<!-- لا حاجة لـ script.js هنا إذا كانت وظيفته الرئيسية هي الهيدر المخفي/الظاهر، والهيدر الآن مخفي تمامًا في هذه الصفحة -->
-<!-- <script src="assets/js/script.js" defer></script> -->
+
+<!-- ===== بداية إضافة JavaScript لتنبيه تدوير الشاشة ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    if (!document.body.classList.contains('game-active-page')) {
+        return;
+    }
+
+    const rotatePromptOverlay = document.getElementById('rotate-device-prompt');
+    const closeRotatePromptBtn = document.getElementById('close-rotate-prompt');
+
+    const PHONE_MAX_WIDTH = 767;
+    const PHONE_MAX_HEIGHT_WHEN_LANDSCAPE = 480;
+
+    let promptWasShownThisSession = sessionStorage.getItem('rotatePromptShownThisSession') === 'true';
+    let isPortraitPreviousState = window.innerHeight > window.innerWidth;
+
+    function isLikelyPhone() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const isPortrait = height > width;
+
+        if (isPortrait) {
+            return width <= PHONE_MAX_WIDTH;
+        } else {
+            return height <= PHONE_MAX_HEIGHT_WHEN_LANDSCAPE && width <= 926; // مثال: iPhone 12 Pro Max landscape is 926x428
+        }
+    }
+
+    function handleRotationPrompt() {
+        if (!rotatePromptOverlay) return;
+
+        const isPhoneDevice = isLikelyPhone();
+        const isPortrait = window.innerHeight > window.innerWidth;
+        const dismissedManuallyThisSession = sessionStorage.getItem('rotatePromptDismissedManually') === 'true';
+
+        const shouldShow = isPhoneDevice && isPortrait && !dismissedManuallyThisSession;
+
+        if (shouldShow) {
+            if (!promptWasShownThisSession || (promptWasShownThisSession && !isPortraitPreviousState)) {
+                rotatePromptOverlay.classList.remove('hidden');
+                setTimeout(() => rotatePromptOverlay.classList.add('visible'), 10);
+                sessionStorage.setItem('rotatePromptShownThisSession', 'true');
+                promptWasShownThisSession = true;
+            }
+        } else {
+            rotatePromptOverlay.classList.remove('visible');
+            // لضمان إخفاء الـ div تمامًا بعد انتهاء الأنيميشن إذا كان قد ظهر
+             if (!rotatePromptOverlay.classList.contains('hidden')) {
+                setTimeout(() => {
+                    if (!rotatePromptOverlay.classList.contains('visible')) { // تحقق مرة أخرى قبل الإخفاء
+                       rotatePromptOverlay.classList.add('hidden');
+                    }
+                }, 400); // يجب أن يتوافق مع مدة الـ transition في CSS
+            }
+        }
+        isPortraitPreviousState = isPortrait;
+    }
+
+    function debounce(func, delay) {
+        let timeout;
+        return function(...args) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    if (rotatePromptOverlay) {
+        handleRotationPrompt();
+
+        window.addEventListener('orientationchange', handleRotationPrompt);
+        window.addEventListener('resize', debounce(handleRotationPrompt, 250));
+
+        if (closeRotatePromptBtn) {
+            closeRotatePromptBtn.addEventListener('click', () => {
+                rotatePromptOverlay.classList.remove('visible');
+                 setTimeout(() => rotatePromptOverlay.classList.add('hidden'), 400); // إخفاء بعد الأنيميشن
+                sessionStorage.setItem('rotatePromptDismissedManually', 'true');
+            });
+        }
+    }
+});
+</script>
+<!-- ===== نهاية إضافة JavaScript لتنبيه تدوير الشاشة ===== -->
+
 </body>
 </html>
