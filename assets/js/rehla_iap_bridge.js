@@ -197,23 +197,19 @@
 
     // تحويل معرف المنتج من Tap إلى IAP (قابل للتخصيص)
     mapTapProductToIAP: function(tapProductId) {
-      const mapping = {
-        // معرفات Tap -> معرفات Apple IAP
-        'tap_100_coins': 'com.rehlagame.coins_100',
-        'tap_500_coins': 'com.rehlagame.coins_500',
-        'tap_1000_coins': 'com.rehlagame.coins_1000',
-        'tap_premium': 'com.rehlagame.premium_pass',
-        'tap_vip': 'com.rehlagame.vip_membership',
-        
-        // يمكن إضافة معرفات إضافية هنا
-        '1_game': 'com.rehlagame.game_single',
-        '2_games': 'com.rehlagame.games_double',
-        '5_games': 'com.rehlagame.games_pack5',
-        '10_games': 'com.rehlagame.games_pack10'
-      };
-      
-      return mapping[tapProductId] || tapProductId;
-    },
+  const mapping = {
+    // معرفات الموقع -> معرفات Apple IAP
+    '1_game': 'com.rehlagame.game_single',    // باقة لعبة واحدة
+    '2_games': 'com.rehlagame.games_double',   // باقة لعبتين
+    '5_games': 'com.rehlagame.games_pack5',    // باقة 5 ألعاب
+    '10_games': 'com.rehlagame.games_pack10'  // باقة 10 ألعاب
+
+    // ملاحظة: تم إزالة باقات العملات والعضويات لتركيزها على الألعاب فقط
+    // يمكنك إضافتها مرة أخرى إذا احتجت إليها
+  };
+
+  return mapping[tapProductId] || null; // يرجع null إذا لم يتم العثور على المنتج
+},
 
     // دالة مساعدة لإظهار واجهة IAP
     showIAPInterface: function(options = {}) {
