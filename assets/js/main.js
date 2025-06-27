@@ -845,6 +845,7 @@ function updateHeaderUI(user) {
     if (user) {
         const latestUser = auth.currentUser || user;
         const displayName = latestUser?.displayName || (latestUser?.email ? latestUser.email.split('@')[0] : 'مستخدم رحلة');
+        // ===== بداية التعديل المهم هنا =====
         userActionsContainer.innerHTML = `
             <span class="user-greeting">مرحباً، ${displayName}</span>
             <div class="games-counter-container">
@@ -855,10 +856,10 @@ function updateHeaderUI(user) {
                 <div id="purchase-dropdown" class="purchase-dropdown-menu">
                     <h4 class="dropdown-title">شراء ألعاب إضافية</h4>
                     <ul class="purchase-options-list">
-                        <li class="purchase-option" data-games="1" data-price="1.00"><span>لعبة واحدة</span> <span class="price">1.00 KWD</span></li>
-                        <li class="purchase-option" data-games="2" data-price="2.00"><span>لعبتين</span> <span class="price">2.00 KWD</span></li>
-                        <li class="purchase-option" data-games="5" data-price="4.00"><span>5 ألعاب</span> <span class="price">4.00 KWD</span></li>
-                        <li class="purchase-option" data-games="10" data-price="8.00"><span>10 ألعاب</span> <span class="price">8.00 KWD</span></li>
+                        <li class="purchase-option" data-product-id="1_game" data-games="1" data-price="1.00"><span>لعبة واحدة</span> <span class="price">1.00 KWD</span></li>
+                        <li class="purchase-option" data-product-id="2_games" data-games="2" data-price="2.00"><span>لعبتين</span> <span class="price">2.00 KWD</span></li>
+                        <li class="purchase-option" data-product-id="5_games" data-games="5" data-price="4.00"><span>5 ألعاب</span> <span class="price">4.00 KWD</span></li>
+                        <li class="purchase-option" data-product-id="10_games" data-games="10" data-price="8.00"><span>10 ألعاب</span> <span class="price">8.00 KWD</span></li>
                     </ul>
                     <div class="promo-section">
                         <input type="text" id="promo-code-input" placeholder="أدخل كود الخصم" style="text-transform: uppercase;">
@@ -875,6 +876,8 @@ function updateHeaderUI(user) {
             <a href="Logged.html" class="btn btn-logout" style="color: white;">حسابي</a>
             <button class="btn btn-logout" id="logout-btn-header">تسجيل الخروج</button>
         `;
+        // ===== نهاية التعديل المهم هنا =====
+
         const logoutButtonHeader = document.getElementById('logout-btn-header');
         if (logoutButtonHeader && !logoutButtonHeader.dataset.listenerAttachedLogout) {
             logoutButtonHeader.addEventListener('click', () => {
@@ -894,8 +897,6 @@ function updateHeaderUI(user) {
         window.currentPurchaseDropdownSetup = null;
     }
 }
-
-
 // --- Event Delegation for Purchase Dropdown ---
 if (userActionsContainer && !userActionsContainer.dataset.delegatedListenerAttached) {
     userActionsContainer.addEventListener('click', function(event) {
