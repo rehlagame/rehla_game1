@@ -13,7 +13,7 @@
     INTERCEPT_ENABLED: true, // التحكم في اعتراض الدفعات
     SUPPORTED_PLATFORMS: ['ios'], // المنصات المدعومة
     TAP_DOMAINS: ['tap.company', 'api.tap.company', 'checkout.tap.company'],
-    PAYMENT_ENDPOINTS: ['/payment', '/charge', '/checkout'],
+    PAYMENT_ENDPOINTS: ['/payment', '/charge', '/checkout', '/api/payment/initiate-tap-payment'],
     USER_AGENT_CHECK: /iPhone|iPad|iPod/i,
     WEBKIT_CHECK: true // التحقق من WebKit
   };
@@ -195,21 +195,30 @@
       }
     },
 
-    // تحويل معرف المنتج من Tap إلى IAP (قابل للتخصيص)
+    // تحويل معرف المنتج من Tap إلى IAP - محدث للمنتجات الجديدة
     mapTapProductToIAP: function(tapProductId) {
-  const mapping = {
-    // معرفات الموقع -> معرفات Apple IAP
-    '1_game': 'com.rehlagame.game_single',    // باقة لعبة واحدة
-    '2_games': 'com.rehlagame.games_double',   // باقة لعبتين
-    '5_games': 'com.rehlagame.games_pack5',    // باقة 5 ألعاب
-    '10_games': 'com.rehlagame.games_pack10'  // باقة 10 ألعاب
-
-    // ملاحظة: تم إزالة باقات العملات والعضويات لتركيزها على الألعاب فقط
-    // يمكنك إضافتها مرة أخرى إذا احتجت إليها
-  };
-
-  return mapping[tapProductId] || null; // يرجع null إذا لم يتم العثور على المنتج
-},
+      const mapping = {
+        // معرفات ألعاب من الموقع -> معرفات IAP في التطبيق
+        '1': 'com.rehlagame.game_1',      // لعبة واحدة - 1 KWD
+        '2': 'com.rehlagame.game_2',      // لعبتين - 2 KWD  
+        '5': 'com.rehlagame.game_5',      // 5 ألعاب - 4 KWD
+        '10': 'com.rehlagame.game_10',    // 10 ألعاب - 8 KWD
+        
+        // معرفات بديلة محتملة
+        'game_1': 'com.rehlagame.game_1',
+        'game_2': 'com.rehlagame.game_2',
+        'game_5': 'com.rehlagame.game_5',
+        'game_10': 'com.rehlagame.game_10',
+        
+        // معرفات من النظام القديم (للتوافق)
+        '1_game': 'com.rehlagame.game_1',
+        '2_games': 'com.rehlagame.game_2',
+        '5_games': 'com.rehlagame.game_5',
+        '10_games': 'com.rehlagame.game_10'
+      };
+      
+      return mapping[tapProductId] || tapProductId;
+    },
 
     // دالة مساعدة لإظهار واجهة IAP
     showIAPInterface: function(options = {}) {
@@ -289,11 +298,18 @@
                       bodyData.product_id || 
                       bodyData.item_id || 
                       bodyData.sku || 
-                      bodyData.package_id,
+                      bodyData.package_id ||
+                      bodyData.gamesInPackage, // من الموقع
             amount: bodyData.amount || bodyData.price,
             currency: bodyData.currency || 'KWD',
+            gamesCount: bodyData.gamesInPackage || bodyData.games_count,
             metadata: bodyData.metadata || {}
           };
+          
+          // إذا كان gamesInPackage موجود، استخدمه كمعرف
+          if (bodyData.gamesInPackage && !productInfo.productId) {
+            productInfo.productId = bodyData.gamesInPackage.toString();
+          }
           
         } catch (e) {
           console.error('Error parsing payment data:', e);
@@ -315,6 +331,7 @@
                   originalProductId: productInfo.productId,
                   amount: productInfo.amount,
                   currency: productInfo.currency,
+                  gamesCount: productInfo.gamesCount,
                   source: 'IAP'
                 }
               }));
@@ -413,6 +430,7 @@
       
       // التحقق من أزرار الدفع المختلفة
       const isPaymentButton = 
+        button.id === 'pay-now-btn' || // زر الدفع في الموقع
         button.classList.contains('tap-pay-button') ||
         button.classList.contains('payment-button') ||
         button.classList.contains('pay-btn') ||
@@ -427,21 +445,32 @@
         ));
       
       if (isPaymentButton) {
-        // البحث عن معلومات المنتج
-        const productElement = button.closest('[data-product-id], [data-product], [data-item]');
-        const productData = productElement ? {
-          id: productElement.dataset.productId || 
-              productElement.dataset.product || 
-              productElement.dataset.item,
-          price: productElement.dataset.price,
-          name: productElement.dataset.productName || productElement.dataset.name
-        } : null;
+        event.preventDefault();
+        event.stopPropagation();
         
-        if (productData && productData.id) {
-          event.preventDefault();
-          event.stopPropagation();
-          
-          const iapProductId = window.RehlaPayment.mapTapProductToIAP(productData.id);
+        // البحث عن معلومات المنتج من العناصر المحددة في الموقع
+        let productId = null;
+        let gamesCount = null;
+        
+        // البحث عن الخيار المحدد في قائمة الشراء
+        const selectedOption = document.querySelector('.purchase-option.selected');
+        if (selectedOption) {
+          gamesCount = selectedOption.dataset.games;
+          productId = gamesCount; // استخدم عدد الألعاب كمعرف
+        }
+        
+        // إذا لم نجد خيار محدد، ابحث في العناصر الأخرى
+        if (!productId) {
+          const productElement = button.closest('[data-product-id], [data-product], [data-item]');
+          if (productElement) {
+            productId = productElement.dataset.productId || 
+                       productElement.dataset.product || 
+                       productElement.dataset.item;
+          }
+        }
+        
+        if (productId) {
+          const iapProductId = window.RehlaPayment.mapTapProductToIAP(productId);
           
           // إضافة تأثير بصري للزر
           button.disabled = true;
@@ -453,16 +482,18 @@
             button.textContent = originalText;
             
             if (result.success) {
-              // إظهار رسالة نجاح أو تحديث الصفحة
-              if (window.location.reload) {
-                setTimeout(() => window.location.reload(), 1000);
-              }
+              // إظهار رسالة نجاح
+              alert(`تمت عملية الشراء بنجاح! تم إضافة ${gamesCount || ''} ${gamesCount == 1 ? 'لعبة' : 'ألعاب'} إلى رصيدك.`);
+              
+              // تحديث الصفحة بعد ثانية
+              setTimeout(() => window.location.reload(), 1000);
             } else {
               alert('فشلت عملية الشراء: ' + (result.error || 'خطأ غير معروف'));
             }
           });
-        } else if (CONFIG.DEBUG_MODE) {
-          console.log('Payment button clicked but no product data found');
+        } else {
+          // إذا لم نجد معلومات المنتج، اعرض قائمة المنتجات
+          window.RehlaPayment.showIAPInterface();
         }
       }
     }, true); // استخدام capture phase
@@ -500,12 +531,12 @@
     
     // إضافة زر أو رسالة للمشتريات داخل التطبيق
     const paymentContainers = document.querySelectorAll(
-      '.payment-container, .payment-options, .checkout-section'
+      '.payment-container, .payment-options, .checkout-section, .purchase-dropdown-menu'
     );
     
     paymentContainers.forEach(container => {
       // التحقق من عدم إضافة الزر مسبقاً
-      if (!container.querySelector('.iap-button')) {
+      if (!container.querySelector('.iap-button') && !container.classList.contains('purchase-dropdown-menu')) {
         const iapNotice = document.createElement('div');
         iapNotice.className = 'iap-notice';
         iapNotice.innerHTML = `
