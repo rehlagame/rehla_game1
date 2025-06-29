@@ -142,10 +142,49 @@
         return;
       }
 
+      // === التحسين 3: إضافة مؤشر التحميل ===
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.id = 'iap-loading-overlay';
+      loadingOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        font-family: 'Cairo', sans-serif;
+      `;
+      loadingOverlay.innerHTML = `
+        <div style="
+          width: 60px;
+          height: 60px;
+          border: 5px solid #f3f3f3;
+          border-top: 5px solid #17a2b8;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        "></div>
+        <p style="color: white; margin-top: 20px; font-size: 18px;">جاري معالجة الشراء...</p>
+        <style>
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        </style>
+      `;
+      document.body.appendChild(loadingOverlay);
+
       // التحقق من عدم وجود عملية شراء جارية
       if (transactionLog.has(productId)) {
         const lastTransaction = transactionLog.get(productId);
         if (Date.now() - lastTransaction < 5000) { // 5 ثواني
+          // إزالة مؤشر التحميل في حالة الخطأ
+          const overlay = document.getElementById('iap-loading-overlay');
+          if (overlay) overlay.remove();
           callback({ success: false, error: 'Purchase already in progress' });
           return;
         }
@@ -156,6 +195,11 @@
       
       window.handleIAPPurchase = function(result) {
         transactionLog.delete(productId);
+        
+        // إزالة مؤشر التحميل
+        const overlay = document.getElementById('iap-loading-overlay');
+        if (overlay) overlay.remove();
+        
         callbackManager.execute(callbackId, result);
       };
 
@@ -164,6 +208,11 @@
       } catch (error) {
         console.error('Error calling requestPurchase:', error);
         transactionLog.delete(productId);
+        
+        // إزالة مؤشر التحميل في حالة الخطأ
+        const overlay = document.getElementById('iap-loading-overlay');
+        if (overlay) overlay.remove();
+        
         callbackManager.execute(callbackId, { 
           success: false, 
           error: 'Failed to initiate purchase' 
@@ -303,6 +352,7 @@
             amount: bodyData.amount || bodyData.price,
             currency: bodyData.currency || 'KWD',
             gamesCount: bodyData.gamesInPackage || bodyData.games_count,
+            packageName: bodyData.packageName || '',
             metadata: bodyData.metadata || {}
           };
           
@@ -335,6 +385,21 @@
                   source: 'IAP'
                 }
               }));
+              
+              // === التحسين 1: تسجيل Analytics ===
+              if (window.gtag) {
+                window.gtag('event', 'purchase', {
+                  'transaction_id': result.transactionId,
+                  'value': productInfo.amount,
+                  'currency': productInfo.currency || 'KWD',
+                  'items': [{
+                    'item_id': iapProductId,
+                    'item_name': productInfo.packageName || `${productInfo.gamesCount} ${productInfo.gamesCount === 1 ? 'لعبة' : 'ألعاب'}`,
+                    'quantity': 1,
+                    'price': productInfo.amount
+                  }]
+                });
+              }
               
               // محاكاة استجابة ناجحة من Tap
               resolve(new Response(JSON.stringify({
@@ -639,5 +704,33 @@
       subtree: true
     });
   }
+
+  // === التحسين 2: التحقق من تحميل Bridge بنجاح ===
+  setTimeout(() => {
+    if (environment.isIOSWebView() && !window.RehlaPayment) {
+      console.error('IAP Bridge failed to initialize properly');
+      
+      // إنشاء رسالة تحذيرية
+      const warningDiv = document.createElement('div');
+      warningDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #f44336;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        z-index: 9999;
+        font-family: 'Cairo', sans-serif;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      `;
+      warningDiv.textContent = 'خطأ في تحميل نظام الدفع. يرجى إعادة تحميل الصفحة.';
+      document.body.appendChild(warningDiv);
+      
+      // إخفاء الرسالة بعد 5 ثواني
+      setTimeout(() => warningDiv.remove(), 5000);
+    }
+  }, 2000); // التحقق بعد ثانيتين من التحميل
 
 })();
